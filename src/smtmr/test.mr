@@ -1,0 +1,75 @@
+; 种子公式和其可满足性
+(seeds (<s_1> <status_1>) (<s2> <status_2>) ... (<s_n> <status_n>) )
+; 生成公式和其可满足性
+(mutant <m> <status>)
+; 变量替换声明
+; :vars 属性的值是种子公式原有变量和新变量、常数
+;       变量名后跟公式标识符为原有变量
+;       变量名后带属性，:var 表示新变量、:cons 表示新常数
+; :funs 属性的值是不同类型的替换公式序列，其中每个元素：
+;       第一个参数 <sort> 为变量类型
+;       后续参数为各变量替换公式和新变量生成的公式
+(replace-var
+:vars ( (<v_1> <s_i>) (<v_2> <s_j>) ... (<v_p> <s_k>) (<v_n1> :<attri>) (<v_n2> :<attri>) ... (<v_nm> :<attri>) )
+:funs ( （<sort> (<f_1>) (<f_2>) ... (<f_m>)） ... (<sort> (<f_1>) (<f_2>) ... (<f_n>)) )
+)
+; 謂词替换声明
+; :vars 属性的值是种子公式原有变量和新的常数
+;       变量名后带属性，:var 表示原有变量、:cons 表示新的常数
+; :preds 属性的值是不同类型的謂词替换序列，其中每个元素：
+;       第一个参数 <sort> 为变量类型
+;       后续参数为被替换的謂词和用于替换的謂词对
+(replace-pred
+:vars ( (<v_1> <s_i>) (<v_2> <s_j>) ... (<v_p> <s_k>) (<v_n1> :<attri>) (<v_n2> :<attri>) ... (<v_nm> :<attri>) )
+:preds ( (<sort> (<p_11> <p_12>) (<p_21> <p_22>) ... (<p_m1> <p_m2>)) ... (<sort> (<p_11> <p_12>) (<p_21> <p_22>) ... (<p_n1> <p_n2>)) )
+)
+; 声明自定义算法方法名和返回的公式，根据属性 <:attri>：
+;       :new 新生成的公式片段
+;       :seed 对经过替换后的种子公式继续进行处理得到的公式
+(algorithm ("<a_1>" <c_1> <:attri>) ... ("<a_n>" <c_n> <:attri>))
+; 经过处理后的种子公式、新生成的公式（变量）、自定义算法返回的公式与生成公式之间的关系
+(assert <term>)
+
+
+; example1
+; sat example of semantic fusion
+(seeds (s1 sat) (s2 sat))
+(mutant m sat)
+
+(replace-var
+:vars ( (x s1) (y s2) (z :var) (c :cons))
+:funs ( (Int (= x (div z y)) (= y (div z x)) (= z (* x y))) 
+        (Int (= x (- z y)) (= y (- z x)) (= z (+ x y)))
+        (Real (= x (- (- z c) y)) (= y (- (- z c) x)) (= z (+ x c) y)) )
+)
+
+(assert (= m (and s1 s2)))
+
+
+; example2
+; unsat example of semantic fusion
+(seeds (s1 unsat) (s2 unsat))
+(mutant m unsat)
+
+(replace-var 
+:vars ( (x s1) (y s2) (z :var) (c :cons) )
+:funs ( ((_ BitVec 8) (= x (bvxor z y)) (= y (bvxor z x)) (= z (bvxor x y)) 
+        (String (= x (str.substr z 0 (str.len x))) (= y (str.replace (str.replace z x "") c "")) (= z (str.++ x c y))) )
+)
+
+(assert (= m (and (or s1 s2) z)))
+
+;example3
+; over-approximation example of SAE
+(seeds (s sat))
+(mutant (m sat))
+
+(replace-pred
+:vars ( (x :var) (y :var) (a :cons) )
+:preds ( ((Int, Real) ((< x y) (<= x y)) ((< x y) (distinct x y)) ((<= x y) (< (x (+ y a)))))
+         (String ((str.< x y) (str.<= x y)) ((str.<= x y) (str.<= x (str.++ y a)))) )
+)
+
+(algorithm ("LPI" c :seed))
+
+(assert (= m c))
