@@ -907,9 +907,9 @@ class SMTLIBv2Parser ( Parser ):
 
 
 
-    def (self):
+    def start(self):
 
-        localctx = SMTLIBv2Parser.Context(self, self._ctx, self.state)
+        localctx = SMTLIBv2Parser.StartContext(self, self._ctx, self.state)
         self.enterRule(localctx, 0, self.RULE_start)
         try:
             self.state = 202
