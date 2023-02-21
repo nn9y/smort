@@ -53,15 +53,6 @@ class SMTMRListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SMTMRParser#status.
-    def enterStatus(self, ctx:SMTMRParser.StatusContext):
-        pass
-
-    # Exit a parse tree produced by SMTMRParser#status.
-    def exitStatus(self, ctx:SMTMRParser.StatusContext):
-        pass
-
-
     # Enter a parse tree produced by SMTMRParser#symbol.
     def enterSymbol(self, ctx:SMTMRParser.SymbolContext):
         pass
@@ -251,6 +242,33 @@ class SMTMRListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SMTMRParser#var_dec.
+    def enterVar_dec(self, ctx:SMTMRParser.Var_decContext):
+        pass
+
+    # Exit a parse tree produced by SMTMRParser#var_dec.
+    def exitVar_dec(self, ctx:SMTMRParser.Var_decContext):
+        pass
+
+
+    # Enter a parse tree produced by SMTMRParser#term_dec.
+    def enterTerm_dec(self, ctx:SMTMRParser.Term_decContext):
+        pass
+
+    # Exit a parse tree produced by SMTMRParser#term_dec.
+    def exitTerm_dec(self, ctx:SMTMRParser.Term_decContext):
+        pass
+
+
+    # Enter a parse tree produced by SMTMRParser#sort_term_dec.
+    def enterSort_term_dec(self, ctx:SMTMRParser.Sort_term_decContext):
+        pass
+
+    # Exit a parse tree produced by SMTMRParser#sort_term_dec.
+    def exitSort_term_dec(self, ctx:SMTMRParser.Sort_term_decContext):
+        pass
+
+
     # Enter a parse tree produced by SMTMRParser#vars_dec.
     def enterVars_dec(self, ctx:SMTMRParser.Vars_decContext):
         pass
@@ -260,12 +278,12 @@ class SMTMRListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SMTMRParser#funs_dec.
-    def enterFuns_dec(self, ctx:SMTMRParser.Funs_decContext):
+    # Enter a parse tree produced by SMTMRParser#terms_dec.
+    def enterTerms_dec(self, ctx:SMTMRParser.Terms_decContext):
         pass
 
-    # Exit a parse tree produced by SMTMRParser#funs_dec.
-    def exitFuns_dec(self, ctx:SMTMRParser.Funs_decContext):
+    # Exit a parse tree produced by SMTMRParser#terms_dec.
+    def exitTerms_dec(self, ctx:SMTMRParser.Terms_decContext):
         pass
 
 
@@ -302,6 +320,15 @@ class SMTMRListener(ParseTreeListener):
 
     # Exit a parse tree produced by SMTMRParser#assert_dec.
     def exitAssert_dec(self, ctx:SMTMRParser.Assert_decContext):
+        pass
+
+
+    # Enter a parse tree produced by SMTMRParser#algorithem_dec.
+    def enterAlgorithem_dec(self, ctx:SMTMRParser.Algorithem_decContext):
+        pass
+
+    # Exit a parse tree produced by SMTMRParser#algorithem_dec.
+    def exitAlgorithem_dec(self, ctx:SMTMRParser.Algorithem_decContext):
         pass
 
 

@@ -132,7 +132,7 @@ GRW_Mutant
 GRW_Replace
     : 'replace'
     ;
-GRW_Algorithm
+GRW_Algorithms
     : 'algorithms'
     ;
 GRW_Assert
@@ -141,8 +141,8 @@ GRW_Assert
 GRW_Vars
     : 'vars'
     ;
-GRW_Funs
-    : 'funs'
+GRW_Terms
+    : 'terms'
     ;
 
 
@@ -267,7 +267,7 @@ UndefinedSymbol:
 // Starting rule(s)
 
 start
-    : seeds_dec mutant_dec replace_dec* algorithms_dec? assert_dec ;
+    : seeds_dec mutant_dec replace_dec* algorithms_dec? assert_dec EOF;
 
 simpleSymbol
     : predefSymbol
@@ -303,12 +303,6 @@ predefKeyword
     | PK_Snippet
     | PK_Seed
     ;
-
-status
-    : PS_Sat
-    | PS_Unsat
-    | PS_Unknown
-    ; 
 
 symbol
     : simpleSymbol
@@ -430,15 +424,27 @@ term
 
 
 formula_dec
-    : symbol status
+    : symbol symbol 
+    ;
+
+var_dec
+    : symbol ( symbol | attribute )
+    ;
+
+term_dec
+    : term term
+    ;
+
+sort_term_dec
+    : sort ( ParOpen term_dec ParClose )+
     ;
 
 vars_dec
-    : GRW_Vars ( ParOpen symbol ( symbol | attribute ) ParClose )+
+    : GRW_Vars ( ParOpen var_dec ParClose )+
     ;
 
-funs_dec
-    : GRW_Funs ( term term )+
+terms_dec
+    : GRW_Terms ( ParOpen sort_term_dec ParClose)+
     ;
 
 
@@ -451,7 +457,7 @@ mutant_dec
     ;
 
 replace_dec
-    : ParOpen GRW_Replace ParOpen vars_dec ParClose ParOpen funs_dec ParClose ParClose
+    : ParOpen GRW_Replace ParOpen vars_dec ParClose ParOpen terms_dec ParClose ParClose
     ;
 
 assert_dec
@@ -460,8 +466,12 @@ assert_dec
 
 // Extended Algorithm Declarations
 
+algorithem_dec
+    : string symbol attribute
+    ;
+
 algorithms_dec
-    : ParOpen GRW_Algorithm ( ParOpen string symbol attribute ParClose )+ ParClose
+    : ParOpen GRW_Algorithms ( ParOpen algorithem_dec ParClose )+ ParClose
     ;
 
 // Parser Rules End
