@@ -12,11 +12,11 @@ class TestPrinter(SMTMRListener):
         print(')')
         return 0
     
-    def enterSeeds_dec(self, ctx: SMTMRParser.Seeds_decContext):
-        print('( seeds ', end='')
+    def enterSeed_dec(self, ctx: SMTMRParser.Seed_decContext):
+        print('( seed ', end='')
         return 0
     
-    def exitSeeds_dec(self, ctx: SMTMRParser.Seeds_decContext):
+    def exitSeed_dec(self, ctx: SMTMRParser.Seed_decContext):
         print(')', end='')
         return 0
         
@@ -28,24 +28,24 @@ class TestPrinter(SMTMRListener):
         print(')', end='')
         return 0
 
-    def enterReplace_dec(self, ctx: SMTMRParser.Replace_decContext):
-        print('( replace ', end='')
+    def enterNotation_dec(self, ctx: SMTMRParser.Notation_decContext):
+        print('( notation_dec ', end='')
         return 0
     
-    def exitReplace_dec(self, ctx: SMTMRParser.Replace_decContext):
+    def exitNotation_dec(self, ctx: SMTMRParser.Notation_decContext):
         print(')', end='')
         return 0
-
-    def enterAlgorithms_dec(self, ctx: SMTMRParser.Algorithms_decContext):
-        print('( algorithm ', end='')
-        return 0
     
-    def exitAlgorithms_dec(self, ctx: SMTMRParser.Algorithms_decContext):
+    def enterMethod_dec(self, ctx: SMTMRParser.Method_decContext):
+        print('( method_dec ', end='')
+        return 0
+
+    def exitMethod_dec(self, ctx: SMTMRParser.Method_decContext):
         print(')', end='')
         return 0
     
     def enterAssert_dec(self, ctx: SMTMRParser.Assert_decContext):
-        print('( assert ', end='')
+        print('( assert_dec ', end='')
         return 0
     
     def exitAssert_dec(self, ctx: SMTMRParser.Assert_decContext):
@@ -65,67 +65,24 @@ class TestPrinter(SMTMRListener):
         print("%s " % (symbol), end='')
         return 0
     
-    def enterVars_dec(self, ctx: SMTMRParser.Vars_decContext):
-        print('( vars_dec ', end='')
+    def enterStatus(self, ctx: SMTMRParser.StatusContext):
+        symbol = ctx.getChild(0).getText()
+        print(":status %s " % (symbol), end='')
         return 0
     
-    def exitVars_dec(self, ctx: SMTMRParser.Vars_decContext):
+    def enterSubstTerm_dec(self, ctx: SMTMRParser.SubstTerm_decContext):
+        print('( substTerm_dec ', end='')
+        return 0
+    
+    def exitSubstTerm_dec(self, ctx: SMTMRParser.SubstTerm_decContext):
         print(')', end='')
         return 0
     
-    def enterTerms_dec(self, ctx: SMTMRParser.Terms_decContext):
-        print('( terms_dec ', end='')
-        return 0
-    
-    def exitTerms_dec(self, ctx: SMTMRParser.Terms_decContext):
-        print(')', end='')
-        return 0
-    
-    def enterVar_dec(self, ctx: SMTMRParser.Var_decContext):
-        print('( var_dec ', end='')
-        return 0
-    
-    def exitVar_dec(self, ctx: SMTMRParser.Var_decContext):
-        print(')', end='')
-        return 0
-    
-    def enterSort_term_dec(self, ctx: SMTMRParser.Sort_term_decContext):
-        print('( sort_term_dec ', end='')
-        return 0
-    
-    def exitSort_term_dec(self, ctx: SMTMRParser.Sort_term_decContext):
-        print(')', end='')
-        return 0
-    
-    def enterTerm_dec(self, ctx: SMTMRParser.Term_decContext):
-        print('( term_dec ', end='')
-        return 0
-
-    def exitTerm_dec(self, ctx: SMTMRParser.Term_decContext):
-        print(')', end='')
-        return 0
-    
-    def enterTerm(self, ctx: SMTMRParser.TermContext):
-        print("( term ", end='')
-        return 0
-    
-    def exitTerm(self, ctx: SMTMRParser.TermContext):
-        print(')', end='')
-        return 0
-
     def enterSort(self, ctx: SMTMRParser.SortContext):
         print("( sort ", end='')
         return 0
     
     def exitSort(self, ctx: SMTMRParser.SortContext):
-        print(')', end='')
-        return 0
-    
-    def enterAlgorithem_dec(self, ctx: SMTMRParser.Algorithem_decContext):
-        print("( algorithm_dec ", end='')
-        return 0
-    
-    def exitAlgorithem_dec(self, ctx: SMTMRParser.Algorithem_decContext):
         print(')', end='')
         return 0
     
@@ -136,12 +93,14 @@ class TestPrinter(SMTMRListener):
 
     def enterAttribute(self, ctx: SMTMRParser.AttributeContext):
         keyword = ctx.getChild(0).getText()
-        print("(attribute %s " % (keyword), end='')
+        value = ctx.getChild(1)
+        if value:
+            v = value.getText()
+            print("(attribute %s value=%s " % (keyword, v), end='')
+        else:
+            print("(attribute %s " % (keyword), end='')
         return 0
     
     def exitAttribute(self, ctx: SMTMRParser.AttributeContext):
         print(')', end='')
         return 0
-
-
-        

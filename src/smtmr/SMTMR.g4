@@ -36,32 +36,11 @@ PS_Not
 PS_Bool
     : 'Bool'
     ;
-PS_ContinuedExecution
-    : 'continued-execution'
-    ;
-PS_Error
-    : 'error'
-    ;
 PS_False
     : 'false'
     ;
-PS_ImmediateExit
-    : 'immediate-exit'
-    ;
-PS_Incomplete
-    : 'incomplete'
-    ;
 PS_Logic
     : 'logic'
-    ;
-PS_Memout
-    : 'memout'
-    ;
-PS_Sat
-    : 'sat'
-    ;
-PS_Success
-    : 'success'
     ;
 PS_Theory
     : 'theory'
@@ -69,14 +48,19 @@ PS_Theory
 PS_True
     : 'true'
     ;
-PS_Unknown
-    : 'unknown'
+
+
+// Status Symbols
+
+
+ST_Sat
+    : 'sat'
     ;
-PS_Unsupported
-    : 'unsupported'
-    ;
-PS_Unsat
+ST_Unsat
     : 'unsat'
+    ;
+ST_Unknown
+    : 'unknown'
     ;
 
 // RESERVED Words
@@ -123,26 +107,23 @@ GRW_String
     : 'string'
     ;
 
-GRW_Seeds
-    : 'seeds'
+GRW_Seed
+    : 'seed'
     ;
 GRW_Mutant
     : 'mutant'
     ;
-GRW_Replace
-    : 'replace'
+GRW_Notation
+    : 'notation'
     ;
-GRW_Algorithms
-    : 'algorithms'
+GRW_SubstTerm
+    : 'subst-term'
+    ;
+GRW_Method
+    : 'method'
     ;
 GRW_Assert
     : 'assert'
-    ;
-GRW_Vars
-    : 'vars'
-    ;
-GRW_Terms
-    : 'terms'
     ;
 
 
@@ -241,11 +222,11 @@ fragment WhiteSpaceChar
 
 // Predefined Keywords
 
-PK_Var
-    : ':var'
+PK_Gen
+    : ':gen'
     ;
-PK_Cons
-    : ':cons'
+PK_Fix
+    : ':fix'
     ;
 PK_Snippet
     : ':snippet'
@@ -254,20 +235,15 @@ PK_Seed
     : ':seed'
     ;
 
-RS_Model //  for model responses
-    : 'model'
-    ;
-
 UndefinedSymbol:
     Sym (Digit | Sym)*;
-
 
 // Parser Rules Start
 
 // Starting rule(s)
 
 start
-    : seeds_dec mutant_dec replace_dec* algorithms_dec? assert_dec EOF;
+    : seed_dec+ mutant_dec ( notation_dec | substTerm_dec | method_dec )* assert_dec EOF;
 
 simpleSymbol
     : predefSymbol
@@ -281,25 +257,15 @@ quotedSymbol
 predefSymbol
     : PS_Not
     | PS_Bool
-    | PS_ContinuedExecution
-    | PS_Error
     | PS_False
-    | PS_ImmediateExit
-    | PS_Incomplete
     | PS_Logic
-    | PS_Memout
-    | PS_Sat
-    | PS_Success
     | PS_Theory
     | PS_True
-    | PS_Unknown
-    | PS_Unsupported
-    | PS_Unsat
     ;
 
 predefKeyword
-    : PK_Var
-    | PK_Cons
+    : PK_Gen
+    | PK_Fix
     | PK_Snippet
     | PK_Seed
     ;
@@ -420,58 +386,44 @@ term
     | ParOpen GRW_Exclamation term attribute+ ParClose
     ;
 
+// Status
+
+status
+    : ST_Sat
+    | ST_Unsat
+    | ST_Unknown
+    ;
+
 // Metamorphic Relation Declarations
 
-
 formula_dec
-    : symbol symbol 
+    : symbol status 
     ;
 
-var_dec
-    : symbol ( symbol | attribute )
-    ;
-
-term_dec
-    : term term
-    ;
-
-sort_term_dec
-    : sort ( ParOpen term_dec ParClose )+
-    ;
-
-vars_dec
-    : GRW_Vars ( ParOpen var_dec ParClose )+
-    ;
-
-terms_dec
-    : GRW_Terms ( ParOpen sort_term_dec ParClose)+
-    ;
-
-
-seeds_dec
-    : ParOpen GRW_Seeds (ParOpen formula_dec ParClose)+ ParClose
+seed_dec
+    : ParOpen GRW_Seed formula_dec ParClose
     ;
 
 mutant_dec
     : ParOpen GRW_Mutant formula_dec ParClose
     ;
 
-replace_dec
-    : ParOpen GRW_Replace ParOpen vars_dec ParClose ParOpen terms_dec ParClose ParClose
+notation_dec
+    : ParOpen GRW_Notation symbol ( symbol | attribute ) ParClose
+    ;
+
+substTerm_dec
+    : ParOpen GRW_SubstTerm sort term term ParClose
     ;
 
 assert_dec
     : ParOpen GRW_Assert term ParClose
     ;
 
-// Extended Algorithm Declarations
+// Extended Methods Declarations
 
-algorithem_dec
-    : string symbol attribute
-    ;
-
-algorithms_dec
-    : ParOpen GRW_Algorithms ( ParOpen algorithem_dec ParClose )+ ParClose
+method_dec
+    : ParOpen GRW_Method string symbol attribute ParClose
     ;
 
 // Parser Rules End
