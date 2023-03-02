@@ -253,7 +253,7 @@ identifier
 attribute_value
 attribute
 sort
-qual_identifer
+qual_identifier
 var_binding
 sorted_var
 pattern

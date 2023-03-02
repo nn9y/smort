@@ -19,11 +19,6 @@ class SMTMRVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SMTMRParser#quotedSymbol.
-    def visitQuotedSymbol(self, ctx:SMTMRParser.QuotedSymbolContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by SMTMRParser#predefSymbol.
     def visitPredefSymbol(self, ctx:SMTMRParser.PredefSymbolContext):
         return self.visitChildren(ctx)
@@ -34,33 +29,13 @@ class SMTMRVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SMTMRParser#undefinedKeyword.
+    def visitUndefinedKeyword(self, ctx:SMTMRParser.UndefinedKeywordContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SMTMRParser#symbol.
     def visitSymbol(self, ctx:SMTMRParser.SymbolContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by SMTMRParser#numeral.
-    def visitNumeral(self, ctx:SMTMRParser.NumeralContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by SMTMRParser#decimal.
-    def visitDecimal(self, ctx:SMTMRParser.DecimalContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by SMTMRParser#hexadecimal.
-    def visitHexadecimal(self, ctx:SMTMRParser.HexadecimalContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by SMTMRParser#binary.
-    def visitBinary(self, ctx:SMTMRParser.BinaryContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by SMTMRParser#string.
-    def visitString(self, ctx:SMTMRParser.StringContext):
         return self.visitChildren(ctx)
 
 
@@ -104,8 +79,8 @@ class SMTMRVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SMTMRParser#qual_identifer.
-    def visitQual_identifer(self, ctx:SMTMRParser.Qual_identiferContext):
+    # Visit a parse tree produced by SMTMRParser#qual_identifier.
+    def visitQual_identifier(self, ctx:SMTMRParser.Qual_identifierContext):
         return self.visitChildren(ctx)
 
 
@@ -134,13 +109,13 @@ class SMTMRVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SMTMRParser#status.
-    def visitStatus(self, ctx:SMTMRParser.StatusContext):
+    # Visit a parse tree produced by SMTMRParser#formula_dec.
+    def visitFormula_dec(self, ctx:SMTMRParser.Formula_decContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SMTMRParser#formula_dec.
-    def visitFormula_dec(self, ctx:SMTMRParser.Formula_decContext):
+    # Visit a parse tree produced by SMTMRParser#substTerm_pair.
+    def visitSubstTerm_pair(self, ctx:SMTMRParser.SubstTerm_pairContext):
         return self.visitChildren(ctx)
 
 
@@ -159,8 +134,8 @@ class SMTMRVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SMTMRParser#substTerm_dec.
-    def visitSubstTerm_dec(self, ctx:SMTMRParser.SubstTerm_decContext):
+    # Visit a parse tree produced by SMTMRParser#substTermGroup_dec.
+    def visitSubstTermGroup_dec(self, ctx:SMTMRParser.SubstTermGroup_decContext):
         return self.visitChildren(ctx)
 
 

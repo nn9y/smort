@@ -639,7 +639,7 @@ class SMTLIBv2Parser ( Parser ):
     RULE_attribute_value = 17
     RULE_attribute = 18
     RULE_sort = 19
-    RULE_qual_identifer = 20
+    RULE_qual_identifier = 20
     RULE_var_binding = 21
     RULE_sorted_var = 22
     RULE_pattern = 23
@@ -719,7 +719,7 @@ class SMTLIBv2Parser ( Parser ):
                    "predefSymbol", "predefKeyword", "symbol", "numeral", 
                    "decimal", "hexadecimal", "binary", "string", "keyword", 
                    "spec_constant", "s_expr", "index", "identifier", "attribute_value", 
-                   "attribute", "sort", "qual_identifer", "var_binding", 
+                   "attribute", "sort", "qual_identifier", "var_binding", 
                    "sorted_var", "pattern", "match_case", "term", "sort_symbol_decl", 
                    "meta_spec_constant", "fun_symbol_decl", "par_fun_symbol_decl", 
                    "theory_attribute", "theory_decl", "logic_attribue", 
@@ -904,6 +904,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitStart" ):
                 listener.exitStart(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitStart" ):
+                return visitor.visitStart(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1017,6 +1023,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitGeneralReservedWord" ):
                 listener.exitGeneralReservedWord(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitGeneralReservedWord" ):
+                return visitor.visitGeneralReservedWord(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1067,6 +1079,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitSimpleSymbol" ):
                 listener.exitSimpleSymbol(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSimpleSymbol" ):
+                return visitor.visitSimpleSymbol(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1121,6 +1139,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitQuotedSymbol" ):
                 listener.exitQuotedSymbol(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitQuotedSymbol" ):
+                return visitor.visitQuotedSymbol(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1207,6 +1231,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitPredefSymbol" ):
                 listener.exitPredefSymbol(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPredefSymbol" ):
+                return visitor.visitPredefSymbol(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1375,6 +1405,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitPredefKeyword" ):
                 listener.exitPredefKeyword(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPredefKeyword" ):
+                return visitor.visitPredefKeyword(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1426,6 +1462,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitSymbol" ):
                 listener.exitSymbol(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSymbol" ):
+                return visitor.visitSymbol(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1481,6 +1523,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitNumeral" ):
                 listener.exitNumeral(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitNumeral" ):
+                return visitor.visitNumeral(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1521,6 +1569,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitDecimal" ):
                 listener.exitDecimal(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDecimal" ):
+                return visitor.visitDecimal(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1563,6 +1617,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitHexadecimal" ):
                 listener.exitHexadecimal(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitHexadecimal" ):
+                return visitor.visitHexadecimal(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1604,6 +1664,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitBinary" ):
                 listener.exitBinary(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitBinary" ):
+                return visitor.visitBinary(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1644,6 +1710,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitString" ):
                 listener.exitString(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitString" ):
+                return visitor.visitString(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1693,6 +1765,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitKeyword" ):
                 listener.exitKeyword(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitKeyword" ):
+                return visitor.visitKeyword(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1766,6 +1844,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitSpec_constant" ):
                 listener.exitSpec_constant(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSpec_constant" ):
+                return visitor.visitSpec_constant(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1858,6 +1942,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitS_expr" ):
                 listener.exitS_expr(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitS_expr" ):
+                return visitor.visitS_expr(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1940,6 +2030,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitIndex" ):
                 listener.exitIndex(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitIndex" ):
+                return visitor.visitIndex(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2010,6 +2106,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitIdentifier" ):
                 listener.exitIdentifier(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitIdentifier" ):
+                return visitor.visitIdentifier(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2102,6 +2204,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitAttribute_value" ):
                 listener.exitAttribute_value(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitAttribute_value" ):
+                return visitor.visitAttribute_value(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2179,6 +2287,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitAttribute" ):
                 listener.exitAttribute(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitAttribute" ):
+                return visitor.visitAttribute(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2249,6 +2363,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitSort" ):
                 listener.exitSort(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSort" ):
+                return visitor.visitSort(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2299,7 +2419,7 @@ class SMTLIBv2Parser ( Parser ):
         return localctx
 
 
-    class Qual_identiferContext(ParserRuleContext):
+    class Qual_identifierContext(ParserRuleContext):
         __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -2324,23 +2444,29 @@ class SMTLIBv2Parser ( Parser ):
             return self.getToken(SMTLIBv2Parser.ParClose, 0)
 
         def getRuleIndex(self):
-            return SMTLIBv2Parser.RULE_qual_identifer
+            return SMTLIBv2Parser.RULE_qual_identifier
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterQual_identifer" ):
-                listener.enterQual_identifer(self)
+            if hasattr( listener, "enterQual_identifier" ):
+                listener.enterQual_identifier(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitQual_identifer" ):
-                listener.exitQual_identifer(self)
+            if hasattr( listener, "exitQual_identifier" ):
+                listener.exitQual_identifier(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitQual_identifier" ):
+                return visitor.visitQual_identifier(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
 
-    def qual_identifer(self):
+    def qual_identifier(self):
 
-        localctx = SMTLIBv2Parser.Qual_identiferContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 40, self.RULE_qual_identifer)
+        localctx = SMTLIBv2Parser.Qual_identifierContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 40, self.RULE_qual_identifier)
         try:
             self.state = 309
             self._errHandler.sync(self)
@@ -2407,6 +2533,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitVar_binding" ):
                 listener.exitVar_binding(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVar_binding" ):
+                return visitor.visitVar_binding(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2465,6 +2597,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitSorted_var" ):
                 listener.exitSorted_var(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSorted_var" ):
+                return visitor.visitSorted_var(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2521,6 +2659,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitPattern" ):
                 listener.exitPattern(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPattern" ):
+                return visitor.visitPattern(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2604,6 +2748,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitMatch_case" ):
                 listener.exitMatch_case(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMatch_case" ):
+                return visitor.visitMatch_case(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2641,8 +2791,8 @@ class SMTLIBv2Parser ( Parser ):
             return self.getTypedRuleContext(SMTLIBv2Parser.Spec_constantContext,0)
 
 
-        def qual_identifer(self):
-            return self.getTypedRuleContext(SMTLIBv2Parser.Qual_identiferContext,0)
+        def qual_identifier(self):
+            return self.getTypedRuleContext(SMTLIBv2Parser.Qual_identifierContext,0)
 
 
         def ParOpen(self, i:int=None):
@@ -2718,6 +2868,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitTerm" ):
                 listener.exitTerm(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitTerm" ):
+                return visitor.visitTerm(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2739,7 +2895,7 @@ class SMTLIBv2Parser ( Parser ):
             elif la_ == 2:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 339
-                self.qual_identifer()
+                self.qual_identifier()
                 pass
 
             elif la_ == 3:
@@ -2747,7 +2903,7 @@ class SMTLIBv2Parser ( Parser ):
                 self.state = 340
                 self.match(SMTLIBv2Parser.ParOpen)
                 self.state = 341
-                self.qual_identifer()
+                self.qual_identifier()
                 self.state = 343 
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
@@ -2949,6 +3105,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitSort_symbol_decl" ):
                 listener.exitSort_symbol_decl(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSort_symbol_decl" ):
+                return visitor.visitSort_symbol_decl(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3012,6 +3174,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitMeta_spec_constant" ):
                 listener.exitMeta_spec_constant(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMeta_spec_constant" ):
+                return visitor.visitMeta_spec_constant(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3088,6 +3256,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitFun_symbol_decl" ):
                 listener.exitFun_symbol_decl(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFun_symbol_decl" ):
+                return visitor.visitFun_symbol_decl(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3249,6 +3423,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitPar_fun_symbol_decl" ):
                 listener.exitPar_fun_symbol_decl(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPar_fun_symbol_decl" ):
+                return visitor.visitPar_fun_symbol_decl(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3397,6 +3577,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitTheory_attribute" ):
                 listener.exitTheory_attribute(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitTheory_attribute" ):
+                return visitor.visitTheory_attribute(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3548,6 +3734,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitTheory_decl" ):
                 listener.exitTheory_decl(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitTheory_decl" ):
+                return visitor.visitTheory_decl(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3640,6 +3832,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitLogic_attribue" ):
                 listener.exitLogic_attribue(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitLogic_attribue" ):
+                return visitor.visitLogic_attribue(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3761,6 +3959,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitLogic" ):
                 listener.exitLogic(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitLogic" ):
+                return visitor.visitLogic(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3832,6 +4036,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitSort_dec" ):
                 listener.exitSort_dec(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSort_dec" ):
+                return visitor.visitSort_dec(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3889,6 +4099,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitSelector_dec" ):
                 listener.exitSelector_dec(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSelector_dec" ):
+                return visitor.visitSelector_dec(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3950,6 +4166,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitConstructor_dec" ):
                 listener.exitConstructor_dec(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitConstructor_dec" ):
+                return visitor.visitConstructor_dec(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4032,6 +4254,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitDatatype_dec" ):
                 listener.exitDatatype_dec(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDatatype_dec" ):
+                return visitor.visitDatatype_dec(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4162,6 +4390,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitFunction_dec" ):
                 listener.exitFunction_dec(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunction_dec" ):
+                return visitor.visitFunction_dec(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -4246,6 +4480,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitFunction_def" ):
                 listener.exitFunction_def(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunction_def" ):
+                return visitor.visitFunction_def(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -4316,6 +4556,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitProp_literal" ):
                 listener.exitProp_literal(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitProp_literal" ):
+                return visitor.visitProp_literal(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -4380,6 +4626,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitScript" ):
                 listener.exitScript(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitScript" ):
+                return visitor.visitScript(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -4434,6 +4686,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitCmd_assert" ):
                 listener.exitCmd_assert(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_assert" ):
+                return visitor.visitCmd_assert(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -4476,6 +4734,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitCmd_checkSat" ):
                 listener.exitCmd_checkSat(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_checkSat" ):
+                return visitor.visitCmd_checkSat(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4530,6 +4794,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitCmd_checkSatAssuming" ):
                 listener.exitCmd_checkSatAssuming(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_checkSatAssuming" ):
+                return visitor.visitCmd_checkSatAssuming(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4595,6 +4865,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitCmd_declareConst" ):
                 listener.exitCmd_declareConst(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_declareConst" ):
+                return visitor.visitCmd_declareConst(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -4647,6 +4923,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitCmd_declareDatatype" ):
                 listener.exitCmd_declareDatatype(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_declareDatatype" ):
+                return visitor.visitCmd_declareDatatype(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4718,6 +5000,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitCmd_declareDatatypes" ):
                 listener.exitCmd_declareDatatypes(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_declareDatatypes" ):
+                return visitor.visitCmd_declareDatatypes(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4810,6 +5098,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitCmd_declareFun" ):
                 listener.exitCmd_declareFun(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_declareFun" ):
+                return visitor.visitCmd_declareFun(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -4878,6 +5172,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitCmd_declareSort" ):
                 listener.exitCmd_declareSort(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_declareSort" ):
+                return visitor.visitCmd_declareSort(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -4927,6 +5227,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitCmd_defineFun" ):
                 listener.exitCmd_defineFun(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_defineFun" ):
+                return visitor.visitCmd_defineFun(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -4973,6 +5279,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitCmd_defineFunRec" ):
                 listener.exitCmd_defineFunRec(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_defineFunRec" ):
+                return visitor.visitCmd_defineFunRec(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5042,6 +5354,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitCmd_defineFunsRec" ):
                 listener.exitCmd_defineFunsRec(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_defineFunsRec" ):
+                return visitor.visitCmd_defineFunsRec(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5134,6 +5452,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitCmd_defineSort" ):
                 listener.exitCmd_defineSort(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_defineSort" ):
+                return visitor.visitCmd_defineSort(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -5198,6 +5522,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitCmd_echo" ):
                 listener.exitCmd_echo(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_echo" ):
+                return visitor.visitCmd_echo(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -5241,6 +5571,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitCmd_exit" ):
                 listener.exitCmd_exit(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_exit" ):
+                return visitor.visitCmd_exit(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -5282,6 +5618,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitCmd_getAssertions" ):
                 listener.exitCmd_getAssertions(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_getAssertions" ):
+                return visitor.visitCmd_getAssertions(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -5322,6 +5664,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitCmd_getAssignment" ):
                 listener.exitCmd_getAssignment(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_getAssignment" ):
+                return visitor.visitCmd_getAssignment(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5368,6 +5716,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitCmd_getInfo" ):
                 listener.exitCmd_getInfo(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_getInfo" ):
+                return visitor.visitCmd_getInfo(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -5410,6 +5764,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitCmd_getModel" ):
                 listener.exitCmd_getModel(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_getModel" ):
+                return visitor.visitCmd_getModel(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5456,6 +5816,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitCmd_getOption" ):
                 listener.exitCmd_getOption(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_getOption" ):
+                return visitor.visitCmd_getOption(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -5499,6 +5865,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitCmd_getProof" ):
                 listener.exitCmd_getProof(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_getProof" ):
+                return visitor.visitCmd_getProof(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -5540,6 +5912,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitCmd_getUnsatAssumptions" ):
                 listener.exitCmd_getUnsatAssumptions(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_getUnsatAssumptions" ):
+                return visitor.visitCmd_getUnsatAssumptions(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -5580,6 +5958,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitCmd_getUnsatCore" ):
                 listener.exitCmd_getUnsatCore(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_getUnsatCore" ):
+                return visitor.visitCmd_getUnsatCore(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5634,6 +6018,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitCmd_getValue" ):
                 listener.exitCmd_getValue(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_getValue" ):
+                return visitor.visitCmd_getValue(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5697,6 +6087,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitCmd_pop" ):
                 listener.exitCmd_pop(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_pop" ):
+                return visitor.visitCmd_pop(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -5744,6 +6140,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitCmd_push" ):
                 listener.exitCmd_push(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_push" ):
+                return visitor.visitCmd_push(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -5787,6 +6189,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitCmd_reset" ):
                 listener.exitCmd_reset(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_reset" ):
+                return visitor.visitCmd_reset(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -5827,6 +6235,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitCmd_resetAssertions" ):
                 listener.exitCmd_resetAssertions(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_resetAssertions" ):
+                return visitor.visitCmd_resetAssertions(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5872,6 +6286,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitCmd_setInfo" ):
                 listener.exitCmd_setInfo(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_setInfo" ):
+                return visitor.visitCmd_setInfo(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5920,6 +6340,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitCmd_setLogic" ):
                 listener.exitCmd_setLogic(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_setLogic" ):
+                return visitor.visitCmd_setLogic(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -5966,6 +6392,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitCmd_setOption" ):
                 listener.exitCmd_setOption(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCmd_setOption" ):
+                return visitor.visitCmd_setOption(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6132,6 +6564,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitCommand" ):
                 listener.exitCommand(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCommand" ):
+                return visitor.visitCommand(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6478,6 +6916,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitB_value" ):
                 listener.exitB_value(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitB_value" ):
+                return visitor.visitB_value(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -6579,6 +7023,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitOption" ):
                 listener.exitOption(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitOption" ):
+                return visitor.visitOption(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6762,6 +7212,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitInfo_flag" ):
                 listener.exitInfo_flag(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitInfo_flag" ):
+                return visitor.visitInfo_flag(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -6855,6 +7311,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitError_behaviour" ):
                 listener.exitError_behaviour(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitError_behaviour" ):
+                return visitor.visitError_behaviour(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -6908,6 +7370,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitReason_unknown" ):
                 listener.exitReason_unknown(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitReason_unknown" ):
+                return visitor.visitReason_unknown(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6983,6 +7451,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitModel_response" ):
                 listener.exitModel_response(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitModel_response" ):
+                return visitor.visitModel_response(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7091,6 +7565,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitInfo_response" ):
                 listener.exitInfo_response(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitInfo_response" ):
+                return visitor.visitInfo_response(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -7197,6 +7677,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitValuation_pair" ):
                 listener.exitValuation_pair(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitValuation_pair" ):
+                return visitor.visitValuation_pair(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -7255,6 +7741,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitT_valuation_pair" ):
                 listener.exitT_valuation_pair(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitT_valuation_pair" ):
+                return visitor.visitT_valuation_pair(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -7308,6 +7800,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitCheck_sat_response" ):
                 listener.exitCheck_sat_response(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCheck_sat_response" ):
+                return visitor.visitCheck_sat_response(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -7355,6 +7853,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitEcho_response" ):
                 listener.exitEcho_response(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitEcho_response" ):
+                return visitor.visitEcho_response(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7406,6 +7910,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitGet_assertions_response" ):
                 listener.exitGet_assertions_response(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitGet_assertions_response" ):
+                return visitor.visitGet_assertions_response(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7471,6 +7981,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitGet_assignment_response" ):
                 listener.exitGet_assignment_response(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitGet_assignment_response" ):
+                return visitor.visitGet_assignment_response(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -7534,6 +8050,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitGet_info_response" ):
                 listener.exitGet_info_response(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitGet_info_response" ):
+                return visitor.visitGet_info_response(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7603,6 +8125,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitGet_model_response" ):
                 listener.exitGet_model_response(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitGet_model_response" ):
+                return visitor.visitGet_model_response(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7686,6 +8214,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitGet_option_response" ):
                 listener.exitGet_option_response(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitGet_option_response" ):
+                return visitor.visitGet_option_response(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -7727,6 +8261,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitGet_proof_response" ):
                 listener.exitGet_proof_response(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitGet_proof_response" ):
+                return visitor.visitGet_proof_response(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7778,6 +8318,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitGet_unsat_assump_response" ):
                 listener.exitGet_unsat_assump_response(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitGet_unsat_assump_response" ):
+                return visitor.visitGet_unsat_assump_response(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7843,6 +8389,12 @@ class SMTLIBv2Parser ( Parser ):
             if hasattr( listener, "exitGet_unsat_core_response" ):
                 listener.exitGet_unsat_core_response(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitGet_unsat_core_response" ):
+                return visitor.visitGet_unsat_core_response(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -7906,6 +8458,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitGet_value_response" ):
                 listener.exitGet_value_response(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitGet_value_response" ):
+                return visitor.visitGet_value_response(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -8003,6 +8561,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitSpecific_success_response" ):
                 listener.exitSpecific_success_response(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSpecific_success_response" ):
+                return visitor.visitSpecific_success_response(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -8131,6 +8695,12 @@ class SMTLIBv2Parser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitGeneral_response" ):
                 listener.exitGeneral_response(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitGeneral_response" ):
+                return visitor.visitGeneral_response(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 

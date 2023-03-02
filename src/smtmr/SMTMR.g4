@@ -48,20 +48,16 @@ PS_Theory
 PS_True
     : 'true'
     ;
-
-
-// Status Symbols
-
-
-ST_Sat
+PS_Sat
     : 'sat'
     ;
-ST_Unsat
+PS_Unsat
     : 'unsat'
     ;
-ST_Unknown
+PS_Unknown
     : 'unknown'
     ;
+
 
 // RESERVED Words
 
@@ -116,8 +112,8 @@ GRW_Mutant
 GRW_Notation
     : 'notation'
     ;
-GRW_SubstTerm
-    : 'subst-term'
+GRW_SubstTermGroup
+    : 'subst-term-group'
     ;
 GRW_Method
     : 'method'
@@ -181,7 +177,6 @@ fragment Sym
     ;
 
 
-
 fragment BinaryDigit
     : [01]
     ;
@@ -225,8 +220,11 @@ fragment WhiteSpaceChar
 PK_Gen
     : ':gen'
     ;
-PK_Fix
-    : ':fix'
+PK_Var
+    : ':var'
+    ;
+PK_Cons
+    : ':cons'
     ;
 PK_Snippet
     : ':snippet'
@@ -243,15 +241,11 @@ UndefinedSymbol:
 // Starting rule(s)
 
 start
-    : seed_dec+ mutant_dec ( notation_dec | substTerm_dec | method_dec )* assert_dec EOF;
+    : seed_dec+ mutant_dec ( notation_dec | substTermGroup_dec | method_dec )* assert_dec EOF;
 
 simpleSymbol
     : predefSymbol
     | UndefinedSymbol
-    ;
-
-quotedSymbol
-    : QuotedSymbol
     ;
 
 predefSymbol
@@ -261,53 +255,41 @@ predefSymbol
     | PS_Logic
     | PS_Theory
     | PS_True
+    | PS_Sat
+    | PS_Unsat
+    | PS_Unknown
     ;
 
 predefKeyword
     : PK_Gen
-    | PK_Fix
+    | PK_Var
+    | PK_Cons
     | PK_Snippet
     | PK_Seed
     ;
 
+undefinedKeyword
+    : Colon simpleSymbol
+    ;
+
 symbol
     : simpleSymbol
-    | quotedSymbol
-    ;
-
-numeral
-    : Numeral
-    ;
-
-decimal
-    : Decimal
-    ;
-
-hexadecimal
-    : HexDecimal
-    ;
-
-binary
-    : Binary
-    ;
-
-string
-    : String
+    | QuotedSymbol
     ;
 
 keyword
     : predefKeyword
-    | Colon simpleSymbol
+    | undefinedKeyword
     ;
 
 // S-expression
 
 spec_constant
-    : numeral
-    | decimal
-    | hexadecimal
-    | binary
-    | string
+    : Numeral
+    | Decimal
+    | HexDecimal
+    | Binary
+    | String
     ;
 
 
@@ -321,7 +303,7 @@ s_expr
 // Identifiers
 
 index
-    : numeral
+    : Numeral
     | symbol
     ;
 
@@ -353,7 +335,7 @@ sort
 
 // Terms and Formulas
 
-qual_identifer
+qual_identifier
     : identifier
     | ParOpen GRW_As identifier sort ParClose
     ;
@@ -377,8 +359,8 @@ match_case
 
 term
     : spec_constant
-    | qual_identifer
-    | ParOpen qual_identifer term+ ParClose
+    | qual_identifier
+    | ParOpen qual_identifier term+ ParClose
     | ParOpen GRW_Let ParOpen var_binding+ ParClose term ParClose
     | ParOpen GRW_Forall ParOpen sorted_var+ ParClose term ParClose
     | ParOpen GRW_Exists ParOpen sorted_var+ ParClose term ParClose
@@ -386,18 +368,14 @@ term
     | ParOpen GRW_Exclamation term attribute+ ParClose
     ;
 
-// Status
-
-status
-    : ST_Sat
-    | ST_Unsat
-    | ST_Unknown
-    ;
-
 // Metamorphic Relation Declarations
 
 formula_dec
-    : symbol status 
+    : symbol symbol 
+    ;
+
+substTerm_pair
+    : ParOpen term term ParClose
     ;
 
 seed_dec
@@ -409,11 +387,11 @@ mutant_dec
     ;
 
 notation_dec
-    : ParOpen GRW_Notation symbol ( symbol | attribute ) ParClose
+    : ParOpen GRW_Notation symbol ( symbol | attribute ) attribute* ParClose
     ;
 
-substTerm_dec
-    : ParOpen GRW_SubstTerm sort term term ParClose
+substTermGroup_dec
+    : ParOpen GRW_SubstTermGroup ParOpen sorted_var+ ParClose substTerm_pair+ ParClose
     ;
 
 assert_dec
@@ -423,7 +401,7 @@ assert_dec
 // Extended Methods Declarations
 
 method_dec
-    : ParOpen GRW_Method string symbol attribute ParClose
+    : ParOpen GRW_Method String symbol attribute ParClose
     ;
 
 // Parser Rules End

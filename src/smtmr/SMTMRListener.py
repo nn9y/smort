@@ -26,15 +26,6 @@ class SMTMRListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SMTMRParser#quotedSymbol.
-    def enterQuotedSymbol(self, ctx:SMTMRParser.QuotedSymbolContext):
-        pass
-
-    # Exit a parse tree produced by SMTMRParser#quotedSymbol.
-    def exitQuotedSymbol(self, ctx:SMTMRParser.QuotedSymbolContext):
-        pass
-
-
     # Enter a parse tree produced by SMTMRParser#predefSymbol.
     def enterPredefSymbol(self, ctx:SMTMRParser.PredefSymbolContext):
         pass
@@ -53,57 +44,21 @@ class SMTMRListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SMTMRParser#undefinedKeyword.
+    def enterUndefinedKeyword(self, ctx:SMTMRParser.UndefinedKeywordContext):
+        pass
+
+    # Exit a parse tree produced by SMTMRParser#undefinedKeyword.
+    def exitUndefinedKeyword(self, ctx:SMTMRParser.UndefinedKeywordContext):
+        pass
+
+
     # Enter a parse tree produced by SMTMRParser#symbol.
     def enterSymbol(self, ctx:SMTMRParser.SymbolContext):
         pass
 
     # Exit a parse tree produced by SMTMRParser#symbol.
     def exitSymbol(self, ctx:SMTMRParser.SymbolContext):
-        pass
-
-
-    # Enter a parse tree produced by SMTMRParser#numeral.
-    def enterNumeral(self, ctx:SMTMRParser.NumeralContext):
-        pass
-
-    # Exit a parse tree produced by SMTMRParser#numeral.
-    def exitNumeral(self, ctx:SMTMRParser.NumeralContext):
-        pass
-
-
-    # Enter a parse tree produced by SMTMRParser#decimal.
-    def enterDecimal(self, ctx:SMTMRParser.DecimalContext):
-        pass
-
-    # Exit a parse tree produced by SMTMRParser#decimal.
-    def exitDecimal(self, ctx:SMTMRParser.DecimalContext):
-        pass
-
-
-    # Enter a parse tree produced by SMTMRParser#hexadecimal.
-    def enterHexadecimal(self, ctx:SMTMRParser.HexadecimalContext):
-        pass
-
-    # Exit a parse tree produced by SMTMRParser#hexadecimal.
-    def exitHexadecimal(self, ctx:SMTMRParser.HexadecimalContext):
-        pass
-
-
-    # Enter a parse tree produced by SMTMRParser#binary.
-    def enterBinary(self, ctx:SMTMRParser.BinaryContext):
-        pass
-
-    # Exit a parse tree produced by SMTMRParser#binary.
-    def exitBinary(self, ctx:SMTMRParser.BinaryContext):
-        pass
-
-
-    # Enter a parse tree produced by SMTMRParser#string.
-    def enterString(self, ctx:SMTMRParser.StringContext):
-        pass
-
-    # Exit a parse tree produced by SMTMRParser#string.
-    def exitString(self, ctx:SMTMRParser.StringContext):
         pass
 
 
@@ -179,12 +134,12 @@ class SMTMRListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SMTMRParser#qual_identifer.
-    def enterQual_identifer(self, ctx:SMTMRParser.Qual_identiferContext):
+    # Enter a parse tree produced by SMTMRParser#qual_identifier.
+    def enterQual_identifier(self, ctx:SMTMRParser.Qual_identifierContext):
         pass
 
-    # Exit a parse tree produced by SMTMRParser#qual_identifer.
-    def exitQual_identifer(self, ctx:SMTMRParser.Qual_identiferContext):
+    # Exit a parse tree produced by SMTMRParser#qual_identifier.
+    def exitQual_identifier(self, ctx:SMTMRParser.Qual_identifierContext):
         pass
 
 
@@ -233,21 +188,21 @@ class SMTMRListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SMTMRParser#status.
-    def enterStatus(self, ctx:SMTMRParser.StatusContext):
-        pass
-
-    # Exit a parse tree produced by SMTMRParser#status.
-    def exitStatus(self, ctx:SMTMRParser.StatusContext):
-        pass
-
-
     # Enter a parse tree produced by SMTMRParser#formula_dec.
     def enterFormula_dec(self, ctx:SMTMRParser.Formula_decContext):
         pass
 
     # Exit a parse tree produced by SMTMRParser#formula_dec.
     def exitFormula_dec(self, ctx:SMTMRParser.Formula_decContext):
+        pass
+
+
+    # Enter a parse tree produced by SMTMRParser#substTerm_pair.
+    def enterSubstTerm_pair(self, ctx:SMTMRParser.SubstTerm_pairContext):
+        pass
+
+    # Exit a parse tree produced by SMTMRParser#substTerm_pair.
+    def exitSubstTerm_pair(self, ctx:SMTMRParser.SubstTerm_pairContext):
         pass
 
 
@@ -278,12 +233,12 @@ class SMTMRListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SMTMRParser#substTerm_dec.
-    def enterSubstTerm_dec(self, ctx:SMTMRParser.SubstTerm_decContext):
+    # Enter a parse tree produced by SMTMRParser#substTermGroup_dec.
+    def enterSubstTermGroup_dec(self, ctx:SMTMRParser.SubstTermGroup_decContext):
         pass
 
-    # Exit a parse tree produced by SMTMRParser#substTerm_dec.
-    def exitSubstTerm_dec(self, ctx:SMTMRParser.SubstTerm_decContext):
+    # Exit a parse tree produced by SMTMRParser#substTermGroup_dec.
+    def exitSubstTermGroup_dec(self, ctx:SMTMRParser.SubstTermGroup_decContext):
         pass
 
 

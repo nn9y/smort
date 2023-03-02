@@ -188,12 +188,12 @@ class SMTLIBv2Listener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SMTLIBv2Parser#qual_identifer.
-    def enterQual_identifer(self, ctx:SMTLIBv2Parser.Qual_identiferContext):
+    # Enter a parse tree produced by SMTLIBv2Parser#qual_identifier.
+    def enterQual_identifier(self, ctx:SMTLIBv2Parser.Qual_identifierContext):
         pass
 
-    # Exit a parse tree produced by SMTLIBv2Parser#qual_identifer.
-    def exitQual_identifer(self, ctx:SMTLIBv2Parser.Qual_identiferContext):
+    # Exit a parse tree produced by SMTLIBv2Parser#qual_identifier.
+    def exitQual_identifier(self, ctx:SMTLIBv2Parser.Qual_identifierContext):
         pass
 
 
