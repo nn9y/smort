@@ -1,7 +1,7 @@
 import copy
 from enum import Enum
 
-class AstException(Exception):
+class SMTMRException(Exception):
     pass
 
 class Status(Enum):

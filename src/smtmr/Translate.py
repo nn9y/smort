@@ -3,15 +3,15 @@ import sys
 from antlr4 import *
 from SMTMRLexer import SMTMRLexer
 from SMTMRParser import SMTMRParser
-from AstVisitor import AstVisitor
+from Translator import Translator
 
 def generate_ast(stream):
     lexer = SMTMRLexer(stream)
     stream = CommonTokenStream(lexer)
     parser = SMTMRParser(stream)
     tree = parser.start()
-    visitor = AstVisitor()
-    smtmr = visitor.visitStart(tree)
+    translator = Translator()
+    smtmr = translator.visitStart(tree)
     print(smtmr)
 
 def main(argv):

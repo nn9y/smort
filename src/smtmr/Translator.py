@@ -1,10 +1,10 @@
 
 from SMTMRParser import SMTMRParser
 from SMTMRVisitor import SMTMRVisitor
-from Ast import *
+from SMTMR import *
 
 
-class AstVisitor(SMTMRVisitor):
+class Translator(SMTMRVisitor):
     def __init__(self):
         self.seeds = {}
         self.mutant = None
@@ -279,15 +279,15 @@ class AstVisitor(SMTMRVisitor):
         elif self._is_notation(symbol):
             conflict = True
         if conflict:
-            raise AstException(f"'{symbol}' has already defined")
+            raise  SMTMRException(f"'{symbol}' has already defined")
     
     def _check_valid_seed(self, symbol):
         if not self._is_seed(symbol):
-            raise AstException(f"'{symbol}' is not a seed")
+            raise  SMTMRException(f"'{symbol}' is not a seed")
     
     def _check_valid_notation(self, symbol):
         if not self._is_notation(symbol):
-            raise AstException(f"'{symbol}' is not a notation")
+            raise  SMTMRException(f"'{symbol}' is not a notation")
     
  
     def _is_seed(self, symbol):
