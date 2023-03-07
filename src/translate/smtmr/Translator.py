@@ -1,7 +1,7 @@
-
 from SMTMRParser import SMTMRParser
 from SMTMRVisitor import SMTMRVisitor
-from SMTMR import *
+from MR import *
+from SMTMR.src.translate.Ast import *
 
 
 class Translator(SMTMRVisitor):
@@ -65,15 +65,22 @@ class Translator(SMTMRVisitor):
     
     def visitSpec_constant(self, ctx: SMTMRParser.Spec_constantContext):
         if ctx.Numeral():
-            return int(ctx.Numeral().getText())
+            # return int(ctx.Numeral().getText())
+            return [SpecConstant.NUMERAL, ctx.Numeral().getText()]
         elif ctx.Decimal():
-            return float(ctx.Decimal().getText())
+            # return float(ctx.Decimal().getText())
+            return [SpecConstant.DECIMAL, ctx.Decimal().getText()]
         elif ctx.HexDecimal():
-            return int(ctx.HexDecimal().getText().replace('#', '0'), 16)
+            # number_of_digits = len(ctx.HexDecimal().getText()) - 2
+            # return int(ctx.HexDecimal().getText().replace('#', '0'), 16)
+            return [SpecConstant.HEXDECIMAL, ctx.HexDecimal().getText()]
         elif ctx.Binary():
-            return int(ctx.Binary().getText(), 2)
+            # number_of_digits = len(ctx.HexDecimal().getText()) - 2
+            # return int(ctx.Binary().getText().replace('#', '0'), 2)
+            return [SpecConstant.BINARY, ctx.Binary().getText()]
         else:
-            return ctx.String().getText()
+            # return ctx.String().getText()
+            return [SpecConstant.STRING, ctx.String().getText()]
     
     def visitS_expr(self, ctx: SMTMRParser.S_exprContext):
         if ctx.spec_constant():
@@ -125,9 +132,8 @@ class Translator(SMTMRVisitor):
     
     def visitSort(self, ctx: SMTMRParser.SortContext):
         id_ = self.visitIdentifier(ctx.identifier())
-        subsorts = None
+        subsorts = []
         if ctx.ParOpen():
-            subsorts = []
             for sort_ctx in ctx.sort():
                 subsorts.append(self.visitSort(sort_ctx))
         return Sort(id_, subsorts)

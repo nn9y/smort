@@ -128,12 +128,12 @@ Numeral
     | [1-9] Digit*
     ;
 
-Binary:
-    BinaryDigit+
+Binary
+    : '#0' BinaryDigit+
     ;
 
 HexDecimal
-    : '#x' HexDigit HexDigit HexDigit HexDigit
+    : '#x' HexDigit+
     ;
 
 Decimal

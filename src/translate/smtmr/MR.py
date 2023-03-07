@@ -14,7 +14,7 @@ def text_to_status(text):
         status = Status(text)
         return status
     except ValueError:
-        raise AstException(f"'{text}' is not a valid status")
+        raise SMTMRException(f"'{text}' is not a valid status")
 
 class Quantifier(Enum):
     FORALL = 'forall'
@@ -27,6 +27,12 @@ class MRKeyword(Enum):
     SNIPPET = ':snippet'
     SEED = ':seed'
 
+class SpecConstant(Enum):
+    NUMERAL = 'numeral'
+    DECIMAL = 'decimal'
+    HEXADECIMAL = 'hexadecimal'
+    BINARY = 'binary'
+    STRING = 'string'
 
 class SExperssion:
     def __init__(
@@ -49,20 +55,6 @@ class SExperssion:
             str_ += " sub-s_exprs->"
             for subsexpr in self.subsexpr:
                 str_ += " " + subsexpr.__str__()
-        str_ += "]"
-        return str_
-
-class Identifier:
-    def __init__(self, symbol, indices=None):
-        self.symbol = symbol
-        self.indices = indices
-    
-    def __str__(self):
-        str_ = "[Identifier: symbol->" + self.symbol
-        if self.indices:
-            str_ += " indices->"
-            for index in self.indices:
-                str_ += " " + str(index)
         str_ += "]"
         return str_
 
@@ -97,20 +89,6 @@ class Attribute:
         str_ = "[Attr: keyword->" + self.keyword 
         if self.value:
             str_ += " value->" + self.value.__str__()
-        str_ += "]"
-        return str_
-
-class Sort:
-    def __init__(self, id_=None, subsorts=None):
-        self.id_ = id_
-        self.subsorts = subsorts
-    
-    def __str__(self):
-        str_ = "[sort: id->" + self.id_.__str__()
-        if self.subsorts:
-            str_ += " subsorts->"
-            for sort in self.subsorts:
-                str_ += " " + sort.__str__()
         str_ += "]"
         return str_
 
