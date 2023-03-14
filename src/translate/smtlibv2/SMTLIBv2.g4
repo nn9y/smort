@@ -514,10 +514,6 @@ simpleSymbol
     | UndefinedSymbol
     ;
 
-quotedSymbol
-    : QuotedSymbol
-    ;
-
 predefSymbol
     : PS_Not
     | PS_Bool
@@ -585,7 +581,7 @@ predefKeyword
 
 symbol
     : simpleSymbol
-    | quotedSymbol
+    | QuotedSymbol
     ;
 
 numeral
@@ -621,6 +617,7 @@ spec_constant
     | hexadecimal
     | binary
     | string
+    | b_value
     ;
 
 
@@ -678,7 +675,9 @@ var_binding
 sorted_var
     : ParOpen symbol sort ParClose
     ;
-pattern : symbol
+
+pattern
+    : symbol
     | ParOpen symbol symbol+ ParClose
     ;
 

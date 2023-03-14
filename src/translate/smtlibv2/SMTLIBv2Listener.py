@@ -35,15 +35,6 @@ class SMTLIBv2Listener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SMTLIBv2Parser#quotedSymbol.
-    def enterQuotedSymbol(self, ctx:SMTLIBv2Parser.QuotedSymbolContext):
-        pass
-
-    # Exit a parse tree produced by SMTLIBv2Parser#quotedSymbol.
-    def exitQuotedSymbol(self, ctx:SMTLIBv2Parser.QuotedSymbolContext):
-        pass
-
-
     # Enter a parse tree produced by SMTLIBv2Parser#predefSymbol.
     def enterPredefSymbol(self, ctx:SMTLIBv2Parser.PredefSymbolContext):
         pass

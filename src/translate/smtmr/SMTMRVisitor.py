@@ -44,6 +44,16 @@ class SMTMRVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SMTMRParser#status.
+    def visitStatus(self, ctx:SMTMRParser.StatusContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SMTMRParser#b_value.
+    def visitB_value(self, ctx:SMTMRParser.B_valueContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SMTMRParser#spec_constant.
     def visitSpec_constant(self, ctx:SMTMRParser.Spec_constantContext):
         return self.visitChildren(ctx)

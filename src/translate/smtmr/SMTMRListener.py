@@ -71,6 +71,24 @@ class SMTMRListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SMTMRParser#status.
+    def enterStatus(self, ctx:SMTMRParser.StatusContext):
+        pass
+
+    # Exit a parse tree produced by SMTMRParser#status.
+    def exitStatus(self, ctx:SMTMRParser.StatusContext):
+        pass
+
+
+    # Enter a parse tree produced by SMTMRParser#b_value.
+    def enterB_value(self, ctx:SMTMRParser.B_valueContext):
+        pass
+
+    # Exit a parse tree produced by SMTMRParser#b_value.
+    def exitB_value(self, ctx:SMTMRParser.B_valueContext):
+        pass
+
+
     # Enter a parse tree produced by SMTMRParser#spec_constant.
     def enterSpec_constant(self, ctx:SMTMRParser.Spec_constantContext):
         pass

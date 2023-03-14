@@ -282,6 +282,21 @@ keyword
     | undefinedKeyword
     ;
 
+// Status
+
+status
+    : PS_Sat
+    | PS_Unsat
+    | PS_Unknown
+    ;
+
+// Boolean value
+
+b_value
+    : PS_True
+    | PS_False
+    ;
+
 // S-expression
 
 spec_constant
@@ -290,6 +305,7 @@ spec_constant
     | HexDecimal
     | Binary
     | String
+    | b_value
     ;
 
 
@@ -371,7 +387,7 @@ term
 // Metamorphic Relation Declarations
 
 formula_dec
-    : symbol symbol 
+    : symbol status 
     ;
 
 substTerm_pair

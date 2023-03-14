@@ -41,21 +41,12 @@ class Translator(SMTMRVisitor):
             self.methods,
             self.assert_term
         ) 
-    
-    def visitSimpleSymbol(self, ctx: SMTMRParser.SimpleSymbolContext):
-        if ctx.predefSymbol():
-            return ctx.predefSymbol().getChild(0).getText()
-        else:
-            return ctx.UndefinedSymbol().getText()
-    
+ 
     def visitUndefinedKeyword(self, ctx: SMTMRParser.UndefinedKeywordContext):
-        return ctx.Colon().getText() + self.visitSimpleSymbol(ctx.simpleSymbol())
+        return ctx.Colon().getText() + ctx.simpleSymbol().getText()
     
     def visitSymbol(self, ctx: SMTMRParser.SymbolContext):
-        if ctx.simpleSymbol():
-            return self.visitSimpleSymbol(ctx.simpleSymbol())
-        else:
-            return ctx.QuotedSymbol().getText()
+        return ctx.getChild(0).getText()
     
     def visitKeyword(self, ctx: SMTMRParser.KeywordContext):
         if ctx.predefKeyword():
@@ -65,30 +56,32 @@ class Translator(SMTMRVisitor):
     
     def visitSpec_constant(self, ctx: SMTMRParser.Spec_constantContext):
         if ctx.Numeral():
-            # return int(ctx.Numeral().getText())
-            return [SpecConstant.NUMERAL, ctx.Numeral().getText()]
+            return SpecConstant(SpecConstType.NUMERAL, int(ctx.Numeral().getText()))
         elif ctx.Decimal():
-            # return float(ctx.Decimal().getText())
-            return [SpecConstant.DECIMAL, ctx.Decimal().getText()]
+            return SpecConstant(SpecConstType.DECIMAL, float(ctx.Decimal().getText()))
         elif ctx.HexDecimal():
             # number_of_digits = len(ctx.HexDecimal().getText()) - 2
-            # return int(ctx.HexDecimal().getText().replace('#', '0'), 16)
-            return [SpecConstant.HEXDECIMAL, ctx.HexDecimal().getText()]
+            # int(ctx.HexDecimal().getText().replace('#', '0'), 16)
+            return SpecConstant(SpecConstType.HEXDECIMAL, ctx.HexDecimal().getText())
         elif ctx.Binary():
             # number_of_digits = len(ctx.HexDecimal().getText()) - 2
-            # return int(ctx.Binary().getText().replace('#', '0'), 2)
-            return [SpecConstant.BINARY, ctx.Binary().getText()]
+            # int(ctx.Binary().getText().replace('#', '0'), 2)
+            return SpecConstant(SpecConstType.BINARY, ctx.Binary().getText())
+        elif ctx.String():
+            return SpecConstant(SpecConstType.STRING, ctx.String().getText())
         else:
-            # return ctx.String().getText()
-            return [SpecConstant.STRING, ctx.String().getText()]
-    
+            return SpecConstant(
+                SpecConstType.B_VALUE,
+                True if ctx.b_value().getText() == "true" else False
+            ) 
+ 
     def visitS_expr(self, ctx: SMTMRParser.S_exprContext):
         if ctx.spec_constant():
-            return SExperssion(value=self.visitSpec_constant(ctx.spec_constant()), is_spec_const=True)
+            return SExperssion(value=self.visitSpec_constant(ctx.spec_constant()))
         elif ctx.symbol():
-            return SExperssion(value=self.visitSymbol(ctx.symbol()), is_symbol=True)
+            return SExperssion(value=self.visitSymbol(ctx.symbol()))
         elif ctx.keyword():
-            return SExperssion(value=self.visitKeyword(ctx.keyword()), is_keyword=True)
+            return SExperssion(value=self.visitKeyword(ctx.keyword()))
         else:
             subsexprs = []
             if ctx.s_expr():
@@ -104,18 +97,17 @@ class Translator(SMTMRVisitor):
     
     def visitIdentifier(self, ctx: SMTMRParser.IdentifierContext):
         symbol = self.visitSymbol(ctx.symbol())
-        indices = None
+        indices = []
         if ctx.GRW_Underscore():
-            indices = []
             for index_ctx in ctx.index():
                 indices.append(self.visitIndex(index_ctx))
         return Identifier(symbol, indices)
         
     def visitAttribute_value(self, ctx: SMTMRParser.Attribute_valueContext):
         if ctx.spec_constant():
-            return AttributeValue(value=self.visitSpec_constant(ctx.spec_constant()), is_spec_const=True)
+            return AttributeValue(value=self.visitSpec_constant(ctx.spec_constant()))
         elif ctx.symbol():
-            return AttributeValue(value=self.visitSymbol(ctx.symbol()), is_symbol=True)
+            return AttributeValue(value=self.visitSymbol(ctx.symbol()))
         else:
             sexprs = []
             if ctx.s_expr():
@@ -129,7 +121,7 @@ class Translator(SMTMRVisitor):
         if ctx.attribute_value():
             attribute_value = self.visitAttribute_value(ctx.attribute_value())
         return Attribute(keyword, attribute_value)
-    
+ 
     def visitSort(self, ctx: SMTMRParser.SortContext):
         id_ = self.visitIdentifier(ctx.identifier())
         subsorts = []
@@ -140,10 +132,7 @@ class Translator(SMTMRVisitor):
     
     def visitQual_identifier(self, ctx: SMTMRParser.Qual_identifierContext):
         id_ = self.visitIdentifier(ctx.identifier())
-        sort = None
-        if ctx.GRW_As():
-            sort = self.visitSort(ctx.sort())
-        # TODO check sort
+        sort = self.visitSort(ctx.sort()) if ctx.GRW_As() else None
         return [id_, sort]
     
     def visitVar_binding(self, ctx: SMTMRParser.Var_bindingContext):
@@ -161,7 +150,7 @@ class Translator(SMTMRVisitor):
                     subterms.append(self.visitSymbol(symbol_ctx))
             return Expr(op=op, sort=None, subterms=subterms)
         else:
-            return Var(id_=self.visitSymbol(ctx.symbol(0)))
+            return Var(name=self.visitSymbol(ctx.symbol(0)))
     
     def visitMatch_case(self, ctx: SMTMRParser.Match_caseContext):
         return [self.visitPattern(ctx.pattern()), self.visitTerm(ctx.term())]
@@ -180,7 +169,7 @@ class Translator(SMTMRVisitor):
                     subterms.append(self.visitTerm(term_ctx))
                 return Expr(op=id_, sort=sort, subterms=subterms)
             else:
-                return Var(id_=id_, sort=sort)
+                return Var(name=id_, sort=sort)
         elif ctx.GRW_Let():
             var_bindings = []
             for vb_ctx in ctx.var_binding():
@@ -222,11 +211,10 @@ class Translator(SMTMRVisitor):
             return AnnotatedTerm(term=term, annotations=annotations)
     
     def visitFormula_dec(self, ctx: SMTMRParser.Formula_decContext):
-        symbol = self.visitSymbol(ctx.symbol(0)) 
+        symbol = self.visitSymbol(ctx.symbol()) 
         self._check_conflicted_decl(symbol)
         status = None
-        status_text = self.visitSymbol(ctx.symbol(1))
-        status = text_to_status(status_text)
+        status = Status(ctx.status().getText())
         return [symbol, status]
 
     def visitSubstTerm_pair(self, ctx: SMTMRParser.SubstTerm_pairContext):

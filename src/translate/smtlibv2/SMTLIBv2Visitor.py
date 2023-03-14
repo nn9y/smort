@@ -24,11 +24,6 @@ class SMTLIBv2Visitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SMTLIBv2Parser#quotedSymbol.
-    def visitQuotedSymbol(self, ctx:SMTLIBv2Parser.QuotedSymbolContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by SMTLIBv2Parser#predefSymbol.
     def visitPredefSymbol(self, ctx:SMTLIBv2Parser.PredefSymbolContext):
         return self.visitChildren(ctx)
