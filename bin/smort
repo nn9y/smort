@@ -1,0 +1,49 @@
+#! /usr/bin/env python3
+
+import os
+import sys
+import signal
+import inspect
+
+from smort.src.base.checkargs import run_checks
+from smort.src.base.errors import raise_runtime_error
+from smort.src.base.ArgParser import build_parser
+from smort.src.base.exitcodes import OK_BUGS, OK_NOBUGS, ERR_USAGE, ERR_INTERNAL
+from smort.src.base.helptext import *
+from smort.src.base.utils import stats_control_c, silent_control_c 
+from smort.src.core.Fuzzer import Fuzzer
+
+
+def main():
+    current_dir = os.getcwd()
+    parser = build_parser(current_dir)
+
+
+    if len(sys.argv) == 1:
+        print(f"{header}\n\n{usage}\n{short_description}", flush=True)
+        exit(ERR_USAGE)
+    elif "-h" in sys.argv or "--help" in sys.argv:
+        print(f"{header}\n\n{usage}\n{long_description}\n{options}\n", flush=True)
+        exit(OK_NOBUGS)
+    else:
+        args = run_checks(parser)
+        try:
+            fuzzer = Fuzzer(args)
+
+            if not args.quiet:
+                signal.signal(signal.SIGINT, stats_control_c)
+            else:
+                signal.signal(signal.SIGINT, silent_control_c)
+
+            fuzzer.run()
+            # TODO
+            # exit
+
+        except Exception as e:
+            trace = inspect.trace()
+            raise_runtime_error(trace, sys.argv, e)
+            exit(ERR_INTERNAL)
+
+
+if __name__ == "__main__":
+    main()
