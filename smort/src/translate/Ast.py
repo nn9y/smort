@@ -1,8 +1,8 @@
 import copy
 from inspect import isfunction
 
-from smort.src.common.StrEnum import StrEnum
-from smort.src.common.utils import list2str
+from smort.src.msic.StrEnum import StrEnum
+from smort.src.msic.utils import list2str
 from smort.src.translate.utils import *
 
 ### !!! TODO !!!

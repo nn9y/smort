@@ -1,7 +1,7 @@
 import random
 import importlib
 
-from smort.src.common.utils import cartesian_product
+from smort.src.msic.utils import cartesian_product
 from smort.src.translate.smtlibv2.Script import Script
 
 

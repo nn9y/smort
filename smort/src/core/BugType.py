@@ -1,4 +1,4 @@
-from smort.src.common.StrEnum import StrEnum
+from smort.src.msic.StrEnum import StrEnum
 
 class BugType(StrEnum):
     CRASH = 'crash'

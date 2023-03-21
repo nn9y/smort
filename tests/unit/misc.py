@@ -1,4 +1,4 @@
-from smort.src.common.utils import *
+from smort.src.msic.utils import *
 from smort.src.translate.Ast import Sort
 
 
