@@ -1,8 +1,6 @@
 import os
-import random
-import string
 
-from smort.src.base.exitcodes import OK_NOBUGS, OK_BUGS, ERR_USAGE, ERR_EXHAUSTED_DISK
+from smort.src.base.exitcodes import ERR_USAGE, ERR_EXHAUSTED_DISK
 
 
 def create_folder(folder_path):
@@ -44,29 +42,4 @@ def stats_control_c(sig, frame, fuzzer):
 
 def silent_control_c(sig, frame, fuzzer):
     fuzzer.printsum_exit(True)
-
-
-def random_string(length=5):
-    return "".join(random.sample(string.ascii_letters + string.digits, length))
-
-
-def plain(cli):
-    plain_cli = ""
-    for token in cli.split(" "):
-        plain_cli += token.split("/")[-1]
-    return escape(plain_cli)
-
-
-def escape(s):
-    s = s.replace(".", "")
-    s = s.replace("=", "")
-    return s
-
-
-def in_list(stdout, stderr, lst):
-    stdstream = f"{stdout} {stderr}"
-    for err in lst:
-        if err in stdstream:
-            return True
-    return False
 
