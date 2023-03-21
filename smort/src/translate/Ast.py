@@ -510,12 +510,12 @@ class Term:
     def __str__(self):
         match self.term_type:
             case TermType.LET:
-                return f"(let ({list2str(self.var_bindings, layers=2)}) ({self.subterms[0]}))"
+                return f"(let ({list2str(self.var_bindings)}) ({self.subterms[0]}))"
             case TermType.QUANT:
-                return f"({self.quantifier} ({list2str(self.sorted_vars, layers=2)}) {self.subterms[0]})"
+                return f"({self.quantifier} ({list2str(self.sorted_vars)}) {self.subterms[0]})"
             case TermType.MATCH:
                 # TODO
-                return f"(match {self.subterms[0]} ({list2str(self.match_cases, 3)}))"
+                return f"(match {self.subterms[0]} ({list2str(self.match_cases)}))"
             case TermType.ANNOT:
                 return f"(! {self.subterms[0]} {list2str(self.annotations)})"
             case TermType.CONST:

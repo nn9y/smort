@@ -247,7 +247,7 @@ class Translator(SMTMRVisitor):
             term, repl = self.visitSubst_pair(stp_ctx, local_vars)        
             subst_term_pairs.append([term, repl])
         return SubstTemplate(attributes=attributes, sorted_vars=sorted_vars, repl_pairs=subst_term_pairs)
-    
+ 
     def visitFuse_dec(self, ctx: SMTMRParser.Fuse_decContext):
         return self.visitTerm_template(ctx.term_template())
 

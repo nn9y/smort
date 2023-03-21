@@ -48,7 +48,7 @@ def log_num_targets_seeds(targets, seeds_tuples):
 
 
 def log_processing_seeds(seeds_tuple):
-    logging.debug(f"Processing seed {list2str(seeds_tuple, 1, ', ')}")
+    logging.debug(f"Processing seed {list2str(seeds_tuple, separator=', ')}")
 
 
 def log_generation_attempt(iterations):

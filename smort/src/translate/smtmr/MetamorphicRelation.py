@@ -51,7 +51,7 @@ class SubstTemplate:
     
     def __str__(self):
         return f"(subst-template {list2str(self.attributes)}\
-({list2str(self.sorted_vars, 2)}) ({list2str(self.repl_pairs, 2)}))"
+({list2str(self.sorted_vars)}) ({list2str(self.repl_pairs)}))"
 
     def __repr__(self):
         return self.__str__()
@@ -80,9 +80,7 @@ class MetamorphicRelation:
         self.subst_templates = subst_templates
         self.methods = methods
         self.fuse_term = fuse_term
-        # TODO
-        self.snpt_on_index = None
-    
+ 
     def get_oracle(self):
         """
         Oracle: status of mutant
@@ -91,13 +89,13 @@ class MetamorphicRelation:
  
     def __str__(self):
         seed_decls = [(symbol, self.seed_status_list[index]) for symbol, index in self.index_of_seed.items()]
-        mr_str = list2str(seed_decls, 2, '\n')
+        mr_str = list2str(seed_decls, separator='\n')
 
         mr_str += f"\n({self.mutant[0]} {self.mutant[1]})"
 
         if self.notations:
             notation_decls = [(symbol, info) for symbol, info in self.notations.items()]
-            mr_str += "\n" + list2str(notation_decls, 2, '\n')
+            mr_str += "\n" + list2str(notation_decls, separator='\n')
 
         if self.subst_templates:
             mr_str += "\n" + list2str(self.subst_templates, separator='\n')

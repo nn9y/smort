@@ -127,7 +127,7 @@ class ConstructorDec:
         self.sdecs = sdecs
     
     def __str__(self):
-        return f"({self.name} {list2str(self.sdecs, layers=2)})"
+        return f"({self.name} {list2str(self.sdecs)})"
     
     def __repr__(self):
         return self.__str__()
@@ -191,7 +191,7 @@ class DeclareDataTypes:
 
     def __str__(self):
         return f"(declare-datatypes \
-({list2str(self.sort_decs, layers=2)}) ({list2str(self.datatype_decs)}))"
+({list2str(self.sort_decs)}) ({list2str(self.datatype_decs)}))"
 
     def __repr__(self):
         return self.__str__()
@@ -282,7 +282,7 @@ class FunDecl:
         self.sort = sort
 
     def __str__(self):
-        return f"{self.symbol} ({list2str(self.sorted_vars, 2)}) {str(self.sort)}"
+        return f"{self.symbol} ({list2str(self.sorted_vars)}) {str(self.sort)}"
 
     def __repr__(self):
         return self.__str__()
