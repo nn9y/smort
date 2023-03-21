@@ -9,11 +9,14 @@ class Status(StrEnum):
 
 
 class SMTMRKeyword(StrEnum):
+    # in notation
     GEN     = ':gen'
     VAR     = ':var'
     CONS    = ':cons'
+    # in method
     SNIPPET = ':snippet'
     SEED    = ':seed'
+    # in template
     FREE    = ':free'
     BOUND   = ':bound'
 
@@ -36,13 +39,19 @@ class NotationInfo:
 
 
 class SubstTemplate:
-    def __init__(self, sorted_vars, repl_pairs):
+    def __init__(self, attributes, sorted_vars, repl_pairs):
+        self.attributes = attributes
         self.sorted_vars = sorted_vars
         self.repl_pairs = repl_pairs 
+
+        self.free = False
+        for attr in self.attributes:
+            if attr.keyword == SMTMRKeyword.FREE:
+                self.free = True
     
     def __str__(self):
-        return f"(subst-template \
-({list2str(self.sorted_vars, 2)}) {list2str(self.repl_pairs, 2)})"
+        return f"(subst-template {list2str(self.attributes)}\
+({list2str(self.sorted_vars, 2)}) ({list2str(self.repl_pairs, 2)}))"
 
     def __repr__(self):
         return self.__str__()
@@ -62,11 +71,10 @@ class Method:
 
 
 class MetamorphicRelation:
-    def __init__(self, seed_status_list, index_of_seed, mutant, notations, subst_templates, methods, fuse_term):
+    def __init__(self, seed_status_list, index_of_seed, seed_on_index, mutant, notations, subst_templates, methods, fuse_term):
         self.seed_status_list = seed_status_list
         self.index_of_seed = index_of_seed
-        # TODO
-        self.seed_on_index = None
+        self.seed_on_index = seed_on_index 
         self.mutant = mutant
         self.notations = notations
         self.subst_templates = subst_templates
@@ -76,6 +84,9 @@ class MetamorphicRelation:
         self.snpt_on_index = None
     
     def get_oracle(self):
+        """
+        Oracle: status of mutant
+        """
         return self.mutant[1]
  
     def __str__(self):

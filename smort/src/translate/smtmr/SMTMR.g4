@@ -392,6 +392,12 @@ term
     // | ParOpen GRW_Exclamation term attribute+ ParClose
     ;
 
+term_template
+    : spec_constant
+    | symbol 
+    | ParOpen symbol term_template+ ParClose
+    ;
+
 // Metamorphic Relation Declarations
 
 formula_dec
@@ -411,15 +417,15 @@ mutant_dec
     ;
 
 notation_dec
-    : ParOpen GRW_Notation symbol ( symbol | attribute ) attribute+ ParClose
+    : ParOpen GRW_Notation symbol ( symbol | attribute ) attribute* ParClose
     ;
 
 substTemplate_dec
-    : ParOpen GRW_SubstTemplate ParOpen sorted_var+ ParClose subst_pair+ ParClose
+    : ParOpen GRW_SubstTemplate attribute* ParOpen sorted_var+ ParClose ParOpen subst_pair+  ParClose ParClose
     ;
 
 fuse_dec
-    : ParOpen GRW_Fuse term ParClose
+    : ParOpen GRW_Fuse term_template ParClose
     ;
 
 // Extended Methods Declarations

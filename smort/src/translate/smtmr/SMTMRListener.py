@@ -179,6 +179,15 @@ class SMTMRListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SMTMRParser#term_template.
+    def enterTerm_template(self, ctx:SMTMRParser.Term_templateContext):
+        pass
+
+    # Exit a parse tree produced by SMTMRParser#term_template.
+    def exitTerm_template(self, ctx:SMTMRParser.Term_templateContext):
+        pass
+
+
     # Enter a parse tree produced by SMTMRParser#formula_dec.
     def enterFormula_dec(self, ctx:SMTMRParser.Formula_decContext):
         pass

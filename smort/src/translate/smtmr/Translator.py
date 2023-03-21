@@ -2,7 +2,7 @@ from smort.src.translate.smtmr.SMTMRParser import SMTMRParser
 from smort.src.translate.smtmr.SMTMRVisitor import SMTMRVisitor
 from smort.src.translate.smtmr.MetamorphicRelation import *
 from smort.src.translate.theory.signatures import *
-from src.translate.Ast import *
+from smort.src.translate.Ast import *
 
 
 class SMTMRException(Exception):
@@ -14,6 +14,7 @@ class Translator(SMTMRVisitor):
     def __init__(self):
         self.seed_status_list = []
         self.index_of_seed = {}
+        self.seed_on_index = {} 
         self.mutant = None
         self.notations = {}
         self.subst_templates = []
@@ -28,6 +29,7 @@ class Translator(SMTMRVisitor):
                 symbol, status = self.visitSeed_dec(child)
                 self.seed_status_list.append(status)
                 self.index_of_seed[symbol] = seed_idx
+                self.seed_on_index[seed_idx] = symbol 
                 seed_idx += 1
             elif isinstance(child, SMTMRParser.Mutant_decContext):
                 self.mutant = self.visitMutant_dec(child)
@@ -46,6 +48,7 @@ class Translator(SMTMRVisitor):
         return MetamorphicRelation(
             self.seed_status_list,
             self.index_of_seed,
+            self.seed_on_index,
             self.mutant,
             self.notations,
             self.subst_templates,
@@ -57,7 +60,10 @@ class Translator(SMTMRVisitor):
         return ctx.Colon().getText() + ctx.simpleSymbol().getText()
     
     def visitSymbol(self, ctx: SMTMRParser.SymbolContext):
-        return ctx.getChild(0).getText()
+        # TODO
+        # convert symbol to Identifier object
+        # for convenience of comparing
+        return Identifier(ctx.getChild(0).getText())
     
     def visitKeyword(self, ctx: SMTMRParser.KeywordContext):
         if ctx.predefKeyword():
@@ -149,26 +155,43 @@ class Translator(SMTMRVisitor):
     def visitSorted_var(self, ctx: SMTMRParser.Sorted_varContext):
         return [self.visitSymbol(ctx.symbol()), self.visitSort(ctx.sort())]
 
-    def visitTerm(self, ctx: SMTMRParser.TermContext):
+    def visitTerm(self, ctx: SMTMRParser.TermContext, local_vars):
         if ctx.spec_constant():
             spec_constant = self.visitSpec_constant(ctx.spec_constant())
-            fun = self._well_sorted_term(spec_constant, [], None)
-            return Const(name=spec_constant, sort=fun.output)
+            ret_sort = self._well_sorted_term(spec_constant, [], None, local_vars)
+            return Const(name=spec_constant, sort=ret_sort)
         elif ctx.qual_identifier():
             id_, sort = self.visitQual_identifier(ctx.qual_identifier())
-            subterms = None
+            qual_id = True if sort else False
             if ctx.ParOpen(): 
                 subterms = []
                 input_list = []
                 for term_ctx in ctx.term():
-                    subterm = self.visitTerm(term_ctx)
+                    # in current grammar of SMTMR, visiting term does not modify local_vars
+                    subterm = self.visitTerm(term_ctx, local_vars)
                     subterms.appen(subterm)
                     input_list.append(subterm.sort)
-                fun = self._well_sorted_term(id_, input_list, sort)
-                return Expr(name=id_, subterms=subterms, sort=fun.output)
+                ret_sort = self._well_sorted_term(id_, input_list, sort)
+                return Expr(name=id_, subterms=subterms, sort=ret_sort, qual_id=qual_id)
             else:
-                fun = self._well_sorted_term(id_, [], sort)
-                return Var(name=id_, sort=fun.output) 
+                sort = self._well_sorted_term(id_, [], sort)
+                return Var(name=id_, sort=ret_sort, qual_id=qual_id)
+    
+    def visitTerm_template(self, ctx: SMTMRParser.Term_templateContext):
+        if ctx.spec_constant():
+            spec_constant = self.visitSpec_constant(ctx.spec_constant())
+            return Const(name=spec_constant)
+        elif ctx.symbol():
+            sym = self.visitSymbol(ctx.symbol())
+            self._check_valid_formula_symbol(sym)
+            if ctx.ParOpen(): 
+                subterms = []
+                for tt_ctx in ctx.term_template():
+                    subtt = self.visitTerm_template(tt_ctx)
+                    subterms.appen(subtt)
+                return Expr(name=sym, subterms=subterms)
+            else:
+                return Var(name=sym)
     
     def visitFormula_dec(self, ctx: SMTMRParser.Formula_decContext):
         symbol = self.visitSymbol(ctx.symbol()) 
@@ -176,8 +199,15 @@ class Translator(SMTMRVisitor):
         status = Status(ctx.status().getText())
         return [symbol, status]
 
-    def visitSubst_pair(self, ctx: SMTMRParser.SubstTerm_pairContext):
-        return [self.visitTerm(ctx.term(0)), self.visitTerm(ctx.term(1))]
+    def visitSubst_pair(self, ctx: SMTMRParser.SubstTerm_pairContext, local_vars):
+        # in current grammar of SMTMR, visiting term does not modify local_vars
+        # _local_vars = copy.deepcopy(local_vars)
+        # term = self.visitTerm(ctx.term(0), _local_vars)
+        term = self.visitTerm(ctx.term(0), local_vars)
+        # _local_vars = copy.deepcopy(local_vars)
+        # repl = self.visitTerm(ctx.term(1), _local_vars)
+        repl = self.visitTerm(ctx.term(1), local_vars)
+        return [term, repl]
 
     def visitSeed_dec(self, ctx: SMTMRParser.Seed_decContext):
         return self.visitFormula_dec(ctx.formula_dec())
@@ -201,23 +231,25 @@ class Translator(SMTMRVisitor):
                     attributes.append(attr)
         return symbol, NotationInfo(formula_in, attributes)
     
-    def visitSubstTemplate_dec(self, ctx: SMTMRParser.SubstTermGroup_decContext):
+    def visitSubstTemplate_dec(self, ctx: SMTMRParser.SubstTemplate_decContext):
+        attributes = []
+        for attr_ctx in ctx.attribute():
+            attributes.append(self.visitAttribute(attr_ctx))
+        local_vars = {}
         sorted_vars = []
         for sv_ctx in ctx.sorted_var():
             symbol, sort = self.visitSorted_var(sv_ctx)
             self._check_valid_notation(symbol)
+            local_vars[symbol] = sort
             sorted_vars.append([symbol, sort])
         subst_term_pairs = []
         for stp_ctx in ctx.substTerm_pair():
-            term, repl = self.visitSubstTerm_pair(stp_ctx)        
-            # TODO check symbols and sorts
+            term, repl = self.visitSubst_pair(stp_ctx, local_vars)        
             subst_term_pairs.append([term, repl])
-        return SubstTemplate(sorted_vars=sorted_vars, repl_pairs=subst_term_pairs)
+        return SubstTemplate(attributes=attributes, sorted_vars=sorted_vars, repl_pairs=subst_term_pairs)
     
-    def visitFuse_dec(self, ctx: SMTMRParser.Assert_decContext):
-        # TODO special terms
-        # and check symbols
-        return self.visitTerm(ctx.term())
+    def visitFuse_dec(self, ctx: SMTMRParser.Fuse_decContext):
+        return self.visitTerm_template(ctx.term_template())
 
     def visitMethod_dec(self, ctx: SMTMRParser.Method_decContext):
         method_name = ctx.String().getText()
@@ -225,13 +257,34 @@ class Translator(SMTMRVisitor):
         formula_attribute = self.visitAttribute(ctx.attribute())
         return Method(name=method_name, formula=formula_symbol, attribute=formula_attribute)
     
-    def _well_sorted_term(self, name, input_list=None, output=None):
+    def _check_valid_formula_symbol(self, symbol):
+        if str(symbol) in self.index_of_seed:
+            return
+        for method in self.methods:
+            if str(symbol) == str(method.formula):
+                return
+        for sym, info in self.notations.items():
+            if str(symbol) == str(sym):
+                for attr in info.attributes:
+                    if attr == SMTMRKeyword.GEN:
+                        return
+        raise SMTMRException(f"symbol '{symbol}' is not a valid seed symbol, \
+symbol returned by extended method, or notation with :gen attributes")
+    
+    def _well_sorted_term(self, name, input_list=None, output=None, local_vars=None):
+        if str(name) in local_vars:
+            # sorted symbols declared in each subst template
+            if (
+                (output and local_vars[str(name)] == output)
+                or not output
+            ):
+                return local_vars[str(name)] 
         # predefined signatures
+        # constants, functions
         fun = match_fun_in_signatures(name, input_list, output, all_funs)
         if fun:
-            return fun
-        else:
-            raise SMTMRException(f"function ({name} {list2str(input_list)}) is not declared")
+            return fun.output
+        raise SMTMRException(f"signature ({name} {list2str(input_list)}) is not defined")
 
     def _check_conflicted_decl(self, symbol):
         conflict = False

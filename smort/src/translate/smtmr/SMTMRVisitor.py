@@ -104,6 +104,11 @@ class SMTMRVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SMTMRParser#term_template.
+    def visitTerm_template(self, ctx:SMTMRParser.Term_templateContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SMTMRParser#formula_dec.
     def visitFormula_dec(self, ctx:SMTMRParser.Formula_decContext):
         return self.visitChildren(ctx)
