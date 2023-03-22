@@ -77,7 +77,7 @@ class Identifier:
     
     def __str__(self):
         return (
-            f"( _ {self.symbol} {list2str(self.indices)})"
+            f"(_ {self.symbol} {list2str(self.indices)})"
             if len(self.indices) > 0
             else self.symbol
         )

@@ -161,7 +161,7 @@ def fixedSizeBitVectors_theory():
                         [BIT_VECTOR, BIT_VECTOR],
                         BIT_VECTOR,
                         None,
-                        add_number_of_binary_digits_in_bitvecs
+                        add_bitvecs_indices 
                     ),
         "extract":  indexed_fun(
                         "extract",
@@ -169,7 +169,7 @@ def fixedSizeBitVectors_theory():
                         [BIT_VECTOR],
                         BIT_VECTOR,
                         extract_bound_of_bitvec,
-                        get_extract_length_from_bitvec
+                        get_extract_length_of_bitvec
                     ),
         "bvnot":    indexed_fun(
                         "bvnot",
@@ -177,7 +177,7 @@ def fixedSizeBitVectors_theory():
                         [BIT_VECTOR],
                         BIT_VECTOR,
                         None,
-                        get_indices_of_first_input
+                        get_indices_of_first_indexed_input
                     ),
         "bvneg":    indexed_fun(
                         "bvneg", 
@@ -185,70 +185,70 @@ def fixedSizeBitVectors_theory():
                         [BIT_VECTOR],
                         BIT_VECTOR,
                         None,
-                        get_indices_of_first_input
+                        get_indices_of_first_indexed_input
                     ),
         "bvand":    indexed_fun(
                         "bvand", 
                         0,
                         [BIT_VECTOR, BIT_VECTOR],
                         BIT_VECTOR,
-                        eq_input_indices,
-                        get_indices_of_first_input
+                        eq_input_indices(0, 2, 2),
+                        get_indices_of_first_indexed_input
                     ), 
         "bvadd":    indexed_fun(
                         "bvadd",
                         0,
                         [BIT_VECTOR, BIT_VECTOR],
                         BIT_VECTOR,
-                        eq_input_indices,
-                        get_indices_of_first_input
+                        eq_input_indices(0, 2, 2),
+                        get_indices_of_first_indexed_input
                     ),
         "bvmul":    indexed_fun(
                         "bvmul", 
                         0,
                         [BIT_VECTOR, BIT_VECTOR],
                         BIT_VECTOR,
-                        eq_input_indices,
-                        get_indices_of_first_input
+                        eq_input_indices(0, 2, 2),
+                        get_indices_of_first_indexed_input
                     ),
         "bvudiv":   indexed_fun(
                         "bvudiv", 
                         0,
                         [BIT_VECTOR, BIT_VECTOR],
                         BIT_VECTOR,
-                        eq_input_indices,
-                        get_indices_of_first_input
+                        eq_input_indices(0, 2, 2),
+                        get_indices_of_first_indexed_input
                     ),
         "bvurem":   indexed_fun(
                         "bvurem", 
                         0,
                         [BIT_VECTOR, BIT_VECTOR],
                         BIT_VECTOR,
-                        eq_input_indices,
-                        get_indices_of_first_input
+                        eq_input_indices(0, 2, 2),
+                        get_indices_of_first_indexed_input
                     ),
         "bvshl":    indexed_fun(
                         "bvshl", 
                         0,
                         [BIT_VECTOR, BIT_VECTOR],
                         BIT_VECTOR,
-                        eq_input_indices,
-                        get_indices_of_first_input
+                        eq_input_indices(0, 2, 2),
+                        get_indices_of_first_indexed_input
                     ),
         "bvlshr":   indexed_fun(
                         "bvlshr", 
                         0,
                         [BIT_VECTOR, BIT_VECTOR],
                         BIT_VECTOR,
-                        eq_input_indices,
-                        get_indices_of_first_input
+                        eq_input_indices(0, 2, 2),
+                        get_indices_of_first_indexed_input
                     ),
         "bvult":    indexed_fun(
                         "bvult", 
                         0,
                         [BIT_VECTOR, BIT_VECTOR],
                         BOOL,
-                        eq_input_indices,
+                        eq_input_indices(0, 2, 2),
                     ),
     }
 
@@ -378,7 +378,7 @@ def floatingPoints_theory():
                         [FLOATING_POINT],
                         FLOATING_POINT,
                         None,
-                        get_indices_of_first_input
+                        get_indices_of_first_indexed_input
                     ),
         "fp.neg":   indexed_fun(
                         "fp.neg",
@@ -386,62 +386,62 @@ def floatingPoints_theory():
                         [FLOATING_POINT],
                         FLOATING_POINT,
                         None,
-                        get_indices_of_first_input
+                        get_indices_of_first_indexed_input
                     ),
         "fp.add":   indexed_fun(
                         "fp.add",
                         0,
                         [ROUNDING_MODE, FLOATING_POINT, FLOATING_POINT],
                         FLOATING_POINT,
-                        eq_input_indices,
-                        get_indices_of_first_input
+                        eq_input_indices(1, 3, 3),
+                        get_indices_of_first_indexed_input
                     ),
         "fp.sub":   indexed_fun(
                         "fp.sub",
                         [ROUNDING_MODE, FLOATING_POINT, FLOATING_POINT],
                         FLOATING_POINT,
-                        eq_input_indices,
-                        get_indices_of_first_input
+                        eq_input_indices(1, 3, 3),
+                        get_indices_of_first_indexed_input
                     ),
         "fp.mul":   indexed_fun(
                         "fp.mul",
                         0,
                         [ROUNDING_MODE, FLOATING_POINT, FLOATING_POINT],
                         FLOATING_POINT,
-                        eq_input_indices,
-                        get_indices_of_first_input
+                        eq_input_indices(1, 3, 3),
+                        get_indices_of_first_indexed_input
                     ),
         "fp.div":   indexed_fun(
                         "fp.div",
                         0,
                         [ROUNDING_MODE, FLOATING_POINT, FLOATING_POINT],
                         FLOATING_POINT,
-                        eq_input_indices,
-                        get_indices_of_first_input
+                        eq_input_indices(1, 3, 3),
+                        get_indices_of_first_indexed_input
                     ),
         "fp.fma":   indexed_fun(
                         "fp.fma",
                         0,
                         [ROUNDING_MODE, FLOATING_POINT, FLOATING_POINT, FLOATING_POINT],
                         FLOATING_POINT,
-                        eq_input_indices,
-                        get_indices_of_first_input
+                        eq_input_indices(1, 4, 4),
+                        get_indices_of_first_indexed_input
                     ),
         "fp.sqrt":  indexed_fun(
                         "fp.sqrt",
                         0,
                         [ROUNDING_MODE, FLOATING_POINT],
                         FLOATING_POINT,
-                        eq_input_indices,
-                        get_indices_of_first_input
+                        None,
+                        get_indices_of_first_indexed_input
                     ),
         "fp.rem":   indexed_fun(
                         "fp.rem",
                         0,
                         [FLOATING_POINT, FLOATING_POINT],
                         FLOATING_POINT,
-                        eq_input_indices,
-                        get_indices_of_first_input
+                        eq_input_indices(0, 2, 2),
+                        get_indices_of_first_indexed_input
                     ),
         "fp.roundToIntegral": 
                     indexed_fun(
@@ -449,52 +449,52 @@ def floatingPoints_theory():
                         0,
                         [ROUNDING_MODE, FLOATING_POINT],
                         FLOATING_POINT,
-                        eq_input_indices,
-                        get_indices_of_first_input
+                        None,
+                        get_indices_of_first_indexed_input
                     ),
         "fp.min":   indexed_fun(
                         "fp.min",
                         0,
                         [FLOATING_POINT, FLOATING_POINT],
                         FLOATING_POINT,
-                        eq_input_indices,
-                        get_indices_of_first_input
+                        eq_input_indices(0, 2, 2),
+                        get_indices_of_first_indexed_input
                     ),
         "fp.max":   indexed_fun(
                         "fp.max",
                         0,
                         [FLOATING_POINT, FLOATING_POINT],
                         FLOATING_POINT,
-                        eq_input_indices,
-                        get_indices_of_first_input
+                        eq_input_indices(0, 2, 2),
+                        get_indices_of_first_indexed_input
                     ),
         "fp.leq":   indexed_fun(
                         "fp.leq",
                         0,
                         [FLOATING_POINT, FLOATING_POINT],
                         BOOL,
-                        eq_input_indices,
+                        eq_input_indices(0, 2, 2),
                     ),
         "fp.lt":    indexed_fun(
                         "fp.lt",
                         0,
                         [FLOATING_POINT, FLOATING_POINT],
                         BOOL,
-                        eq_input_indices,
+                        eq_input_indices(0, 2, 2),
                     ),
         "fp.geq":   indexed_fun(
                         "fp.geq",
                         0,
                         [FLOATING_POINT, FLOATING_POINT],
                         BOOL,
-                        eq_input_indices,
+                        eq_input_indices(0, 2, 2),
                     ),
         "fp.gt":    indexed_fun(
                         "fp.gt",
                         0,
                         [FLOATING_POINT, FLOATING_POINT],
                         BOOL,
-                        eq_input_indices,
+                        eq_input_indices(0, 2, 2),
                     ),
         "fp.eq":    indexed_fun(
                         "fp.eq",
