@@ -3,6 +3,7 @@ import pytest
 from smort.src.msic.utils import *
 from smort.src.translate.Ast import Sort
 from smort.src.translate.theory.utils import *
+from smort.src.translate.theory.Fun import sort_with_arity
 
 
 def test_list2str():
@@ -21,6 +22,7 @@ def test_list2str():
     sorted_var_list = [['a', a_sort], ['b_d', b_sort], ['ckk', c_sort]]
     svl_str = "(a a) (b_d b) (ckk (c a b))"
     assert list2str(sorted_var_list) == svl_str 
+
 
 def test_constraints_and_get_output_indices():
     # numeral_greater_than_x
@@ -72,15 +74,15 @@ def test_constraints_and_get_output_indices():
     assert f3([], [[2], [1, 2], [1, 2]]) == True
     f3 = eq_input_indices(1, 3, 3) 
     assert f3([], [[2], [1, 3], [1, 2]]) == False 
-    with pytest.raises(ValueError):
+    with pytest.raises(TheoryException):
         f3 = eq_input_indices(-1, 1, 1)
-    with pytest.raises(ValueError):
+    with pytest.raises(TheoryException):
         f3 = eq_input_indices(1, 1, 1)
-    with pytest.raises(ValueError):
+    with pytest.raises(TheoryException):
         f3 = eq_input_indices(0, 1, 0)
-    with pytest.raises(ValueError):
+    with pytest.raises(TheoryException):
         f3 = eq_input_indices(2, 1, 1)
-    with pytest.raises(ValueError):
+    with pytest.raises(TheoryException):
         f3 = eq_input_indices('0', '3', 3)
     # bitvec_bound_of_fp
     assert bitvec_bound_of_fp([], [[1], [2], [3]]) == True
@@ -120,9 +122,9 @@ def test_constraints_and_get_output_indices():
     # get_number_of_binary_digits
     f4 = get_number_of_binary_digits(2)
     assert f4('#b001', []) == [3] 
-    with pytest.raises(ValueError):
+    with pytest.raises(TheoryException):
         f4 = get_number_of_binary_digits(1) 
-    with pytest.raises(ValueError):
+    with pytest.raises(TheoryException):
         f4 = get_number_of_binary_digits(3) 
     f4 = get_number_of_binary_digits(16)
     assert f4('#xF001', []) == [16] 
@@ -156,3 +158,91 @@ def test_merge_dicts():
     dict3 = {'g': 1, 'h': 2, 'i': 3}
     dict_merged = {'a': [1, 4], 'b': [2, 3, 4, 6], 'c': [3, 5, 7], 'g': [1], 'h': [2], 'i': [3]}
     assert merge_multi_dict([dict1, dict2, dict3]) == dict_merged
+
+
+def test_sort_with_arity():
+    f1 = sort_with_arity("f1", 0)
+    s1 = Sort(Identifier("f1"))
+    assert f1 == s1
+    with pytest.raises(TheoryException):
+        f1 = sort_with_arity("", -1) 
+    with pytest.raises(TheoryException):
+        f1 = sort_with_arity("", -4) 
+    f1 = sort_with_arity("f1", 2)
+    assert isfunction(f1)
+    s2 = f1(["A", "B"])
+    assert isinstance(s2, Sort)
+    s1 = Sort(Identifier("s1"))
+    s2 = Sort(Identifier("s2"))
+    s3 = f1([s1, s2])
+    assert isinstance(s3, Sort)
+
+
+def test_get_par_dict():
+    A = "A"
+    B = "B"
+    X = "X"
+    Y = "Y"
+
+    s1 = Sort(Identifier("s1"))
+    s2 = Sort(Identifier("s2"))
+
+    s3 = sort_with_arity("s3", 2)([A, B])
+    s4 = sort_with_arity("s4", 1)([A])
+    s5 = sort_with_arity("s5", 1)([B])
+    s6 = sort_with_arity("s6", 2)([X, Y])
+
+    _s3 = sort_with_arity("s3", 2)([s1, s2])
+    _s4 = sort_with_arity("s4", 1)([s1])
+    _s4_ = sort_with_arity("s4", 2)([s1, s2])
+    _s5 = sort_with_arity("s5", 1)([s2])
+    _s6 = sort_with_arity("s6", 2)([_s3, _s4])
+
+    input_list = [s3, s4, s5]
+    sort_list = [_s3, _s4, _s5]
+    d = {A: s1, B: s2}
+    assert get_par_dict(input_list, sort_list) == d
+    sort_list = [_s3, _s4]
+    with pytest.raises(TheoryException):
+        get_par_dict(input_list, sort_list)
+    input_list = [A, s3, s4, s5]
+    sort_list = [s2, _s3, _s4, _s5]
+    with pytest.raises(TheoryException):
+        get_par_dict(input_list, sort_list)
+    input_list = [A, s3, s4, s5]
+    sort_list = [A, _s3, _s4, _s5]
+    with pytest.raises(TheoryException):
+        get_par_dict(input_list, sort_list)
+    input_list = [A, s3, s4, s5]
+    sort_list = [s1, _s4, _s4, _s5]
+    with pytest.raises(TheoryException):
+        get_par_dict(input_list, sort_list)
+    input_list = [A, s3, s4, s5]
+    sort_list = [s1, _s3, _s4_, _s5]
+    with pytest.raises(TheoryException):
+        get_par_dict(input_list, sort_list)
+    input_list = [A, s3, _s4, s5]
+    sort_list = [s1, _s3, _s4, _s5]
+    assert get_par_dict(input_list, sort_list) == d
+    input_list = [A, s3, _s4, s5]
+    sort_list = [s1, _s3, _s5, _s5]
+    with pytest.raises(TheoryException):
+        get_par_dict(input_list, sort_list)
+    input_list = [A, s3, s4, s5]
+    sort_list = [s1, _s3, 1, _s5]
+    with pytest.raises(TheoryException):
+        get_par_dict(input_list, sort_list)
+    input_list = [A, s3, s4, s5]
+    sort_list = [s1, _s3, sort_with_arity("s4", 2), _s5]
+    with pytest.raises(TheoryException):
+        get_par_dict(input_list, sort_list)
+    input_list = [A, s3, sort_with_arity("s4", 2), s5]
+    sort_list = [s1, _s3, _s4, _s5]
+    with pytest.raises(TheoryException):
+        get_par_dict(input_list, sort_list)
+    input_list = [A, s3, _s4, s5, s6]
+    sort_list = [s1, _s3, _s4, _s5, _s6]
+    d = {A: s1, B: s2, X: _s3, Y: _s4}
+    assert get_par_dict(input_list, sort_list) == d
+
+    

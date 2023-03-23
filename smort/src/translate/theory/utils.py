@@ -4,6 +4,10 @@ from collections import defaultdict
 from smort.src.translate.Ast import *
 
 
+class TheoryException(Exception):
+    pass
+
+
 def merge_disjoint_dict(dict_list):
     """
     merge dicts, assmuing keys in dicts are all different
@@ -32,29 +36,51 @@ def merge_multi_dict(dict_list):
     return merged_dict
 
 
-def get_par_dict(par_list, sort_list):
-    if len(par_list) != len(sort_list):
-        return {}
+def get_par_dict(input_list_containing_par, sort_list):
+    """
+    return a dict mapping parsort symbol to sort instance
+    """
+    if len(input_list_containing_par) != len(sort_list):
+        raise TheoryException("sort_list should match input_list")
     par_dict = {}
-    for i in range(len(par_list)):
-        if len(par_list[i].subsorts) > 0:
-            if not par_list[i].same_parametric_type(sort_list[i]):
-                return {}
+    for i, input_sort in enumerate(input_list_containing_par):
+        sort = sort_list[i]
+        if not isinstance(sort, Sort):
+            raise TheoryException("each sort in sort_list should be an Sort instance")
+        if isinstance(input_sort, str):
+            # single parameter placeholder
+            if input_sort in par_dict:
+                if par_dict[input_sort] !=  sort:
+                    raise TheoryException("Inconsistency found in parameter assignment")
             else:
-                for j in len(par_list[i].subsorts):
-                    par = par_list[i].subsorts[j]
-                    sort = sort_list[i].subsorts[j]
-                    if (
-                        (isinstance(par, Sort) and (par != sort))
-                        or (not isinstance(sort, Sort))
-                    ):
-                        return {}
-                    if not isinstance(par, Sort) and isinstance(sort, Sort):
-                        if par in par_dict:
-                            if par_dict[par] != sort:
-                                return {}
+                par_dict[input_sort] = sort 
+        elif isinstance(input_sort, Sort):
+            if len(input_sort.parsorts) > 0:
+                if not input_sort.same_parametric_type(sort):
+                    raise TheoryException("sort_list should match input_list")
+                else:
+                    for j, par in enumerate(input_sort.parsorts):
+                        parsort = sort.parsorts[j]
+                        if isinstance(parsort, Sort):
+                            if isinstance(par, Sort) and (par == parsort):
+                                continue
+                            if isinstance(par, str):
+                                if par in par_dict:
+                                    if par_dict[par] != parsort:
+                                        raise TheoryException("inconsistency found in parameter assignment")
+                                else:
+                                    par_dict[par] = parsort
+                            else:
+                                raise TheoryException("sort_list should match input_list")
                         else:
-                            par_dict[par] = sort
+                            raise TheoryException("each element of input_list.parsort should be an Sort instance")
+            elif input_sort == sort:
+                continue
+            else:
+                raise TheoryException("sort_list should match input_list")
+        else:
+            raise TheoryException("each element of input_list should be object of Sort or string")
+
     return par_dict
 
 
@@ -116,7 +142,7 @@ def eq_input_indices(a, b, c):
     - a < b <= c
     """
     if not (is_numeral(a) and is_numeral(b)) or (a < 0) or (a >= b) or (b > c):
-        raise ValueError("a, b, c must be an non-negative integer, and a < b <= c") 
+        raise TheoryException("a, b, c must be an non-negative integer, and a < b <= c") 
     def _eq_input_indices(op_indices, input_indices_list):
         if len(op_indices) != 0:
             return False
@@ -215,13 +241,13 @@ def get_number_of_binary_digits(carry):
     Converting HEX, BINARY constant to index of BitVec
     """
     if carry % 2 != 0:
-        raise ValueError("'carry' should be divisible by 2")
+        raise TheoryException("'carry' should be divisible by 2")
     def _get_number_of_binary_digits(spec_const_value, input_indices_list):
         # spec_const_value is original text of a binary or hexadecimal 
         #   compare to op_indices, spec_const_value is just value, not list of values
         # assuming text format has been checked by parser already
-        # The correspondence between spec_const_value and carry
-        #   is guaranteed by the user
+        # ⚠️ The correspondence between spec_const_value and carry
+        #   is guaranteed by the caller 
         if not (is_string(spec_const_value) or len(input_indices_list) == 0):
             return False
         number_of_digits = len(spec_const_value) - 2

@@ -10,9 +10,6 @@ from smort.src.translate.theory.utils import *
 ### name type check and dealing in Fun's members
 ###
 
-class TheoryException(Exception):
-    pass
-
 
 class Fun:
     def __init__(self, name, input_list, output, par_list=None, constraints=None, get_output_indices=None):
@@ -107,14 +104,21 @@ def sort_with_arity(symbol, arity):
     sort with arity >= 0
     """
     if arity < 0:
-        raise TheoryException(f"get arity {arity}, should be positive")
+        raise TheoryException(f"'arity' should be non-negative integer")
     if arity == 0:
         return Sort(Identifier(symbol))
-    def parametric_sort(pars):
+    def _parametric_sort(pars):
+        """
+        called in construction of parametric functions to fill parameter placeholder (string)
+        """
+        if not isinstance(pars, list):
+            raise TheoryException("'pars' should be a list of sort") 
         if len(pars) != arity:
             raise TheoryException(f"length of 'pars' is {len(pars)}, but it should be {arity}")
+        # ⚠️ type(element of list) should be Sort instance (or string, that is, parameter),
+        #       is guaranteed by the caller
         return Sort(Identifier(symbol), pars)
-    return parametric_sort
+    return _parametric_sort
 
 
 def indexed_sort(symbol, indices_len, constraint=None):
