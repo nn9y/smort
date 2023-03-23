@@ -23,5 +23,5 @@ _funs_dicts = [ints_funs, reals_funs, reals_ints_funs,
 
 
 # all sorts and funs defined
-all_sorts = merge_sorts_dict(_sorts_dicts)
-all_funs = merge_funs_dict(_funs_dicts)
+all_sorts = merge_disjoint_dict(_sorts_dicts)
+all_funs = merge_multi_dict(_funs_dicts)

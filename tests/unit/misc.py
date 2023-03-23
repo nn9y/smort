@@ -22,7 +22,7 @@ def test_list2str():
     svl_str = "(a a) (b_d b) (ckk (c a b))"
     assert list2str(sorted_var_list) == svl_str 
 
-def test_constraints():
+def test_constraints_and_get_output_indices():
     # numeral_greater_than_x
     f1 = numeral_greater_than_x(0, 1)
     assert f1([3], [1]) == True
@@ -142,3 +142,17 @@ def test_constraints():
     # get_indices_from_op
     assert get_indices_from_op([1, 3], []) == [1, 3]
     assert get_indices_from_op([5], []) == [5]
+
+def test_merge_dicts():
+    # merge_disjoint_dict
+    dict1 = {'a': 1, 'b': 2, 'c': 3}
+    dict2 = {'d': 1, 'e': 2, 'f': 3}
+    dict3 = {'g': 1, 'h': 2, 'i': 3}
+    dict_merged = {'a': 1, 'b': 2, 'c': 3, 'd': 1, 'e': 2, 'f': 3, 'g': 1, 'h': 2, 'i': 3}
+    assert merge_disjoint_dict([dict1, dict2, dict3]) == dict_merged
+    # merge_multi_dict
+    dict1 = {'a': 1, 'b': [2, 3, 4], 'c': 3}
+    dict2 = {'a': 4, 'b': 6, 'c': [5, 7]}
+    dict3 = {'g': 1, 'h': 2, 'i': 3}
+    dict_merged = {'a': [1, 4], 'b': [2, 3, 4, 6], 'c': [3, 5, 7], 'g': [1], 'h': [2], 'i': [3]}
+    assert merge_multi_dict([dict1, dict2, dict3]) == dict_merged

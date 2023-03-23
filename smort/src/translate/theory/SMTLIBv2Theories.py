@@ -26,7 +26,7 @@ def core_theory():
     # repl_dicts = [{A: sort} for sort in sorts]
     # funs.update(get_all_instances(funs, prefixes, repl_dicts))
     repl_dicts = [{A: sort} for sort in sorts]
-    funs = merge_funs_dict([funs, get_all_instances(funs, repl_dicts)])
+    funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
     
     return [sorts, funs]
 
@@ -36,7 +36,7 @@ def ints_theory():
     sorts = {
         INT_NAME: INT,
     }
-    sorts = merge_sorts_dict([sorts, core_sorts])
+    sorts = merge_disjoint_dict([sorts, core_sorts])
     funs = {
         # :funs
         str(SpecConstType.NUMERAL): Fun(SpecConstant(SpecConstant.NUMERAL, None), [], INT),
@@ -63,13 +63,13 @@ def ints_theory():
                     ),
     }
 
-    funs = merge_funs_dict([funs, core_funs])
+    funs = merge_multi_dict([funs, core_funs])
 
     # prefixes = [ pascal_case_to_snake_case(sort.id_.symbol) for sort in sorts ]
     # repl_dicts = [{A: sort} for sort in sorts]
     # funs.update(get_all_instances(funs, prefixes, repl_dicts))
     repl_dicts = [{A: sort} for sort in sorts]
-    funs = merge_funs_dict([funs, get_all_instances(funs, repl_dicts)])
+    funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
 
     return [sorts, funs]
 
@@ -79,7 +79,7 @@ def reals_theory():
     sorts = {
         REAL_NAME: REAL,
     }
-    sorts = merge_sorts_dict([sorts, core_sorts])
+    sorts = merge_disjoint_dict([sorts, core_sorts])
     # :funs
     funs = {
         str(SpecConstType.NUMERAL): Fun(SpecConstant(SpecConstant.NUMERAL, None), [], REAL),
@@ -97,13 +97,13 @@ def reals_theory():
         ">": Fun(Identifier(">"), [REAL, REAL], BOOL),
     }
 
-    funs = merge_funs_dict([funs, core_funs])
+    funs = merge_multi_dict([funs, core_funs])
 
     # prefixes = [ pascal_case_to_snake_case(sort.id_.symbol) for sort in sorts ]
     # repl_dicts = [{A: sort} for sort in sorts]
     # funs.update(get_all_instances(funs, prefixes, repl_dicts))
     repl_dicts = [{A: sort} for sort in sorts]
-    funs = merge_funs_dict([funs, get_all_instances(funs, repl_dicts)])
+    funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
 
     return sorts, funs
 
@@ -112,9 +112,9 @@ def reals_ints_theory():
     reals_sorts, reals_funs = reals_theory()
     del reals_funs[SpecConstType.NUMERAL.value]
     # :sorts
-    sorts = merge_sorts_dict([ints_sorts, reals_sorts])
+    sorts = merge_disjoint_dict([ints_sorts, reals_sorts])
     # :funs
-    funs = merge_funs_dict([ints_funs, reals_funs])
+    funs = merge_multi_dict([ints_funs, reals_funs])
     funs["to_real"] = Fun(Identifier("to_real"), [INT], REAL)
     funs["to_int"] = Fun(Identifier("to_int"), [REAL], INT)
     funs["is_int"] = Fun(Identifier("is_int"), [REAL], BOOL)
@@ -123,7 +123,7 @@ def reals_ints_theory():
     # repl_dicts = [{A: sort} for sort in sorts]
     # funs.update(get_all_instances(funs, prefixes, repl_dicts))
     repl_dicts = [{A: sort} for sort in sorts]
-    funs = merge_funs_dict([funs, get_all_instances(funs, repl_dicts)])
+    funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
 
     return sorts, funs
 
@@ -133,7 +133,7 @@ def fixedSizeBitVectors_theory():
     sorts = {
         BIT_VECTOR_NAME: BIT_VECTOR,
     }
-    sorts = merge_sorts_dict([sorts, core_sorts])
+    sorts = merge_disjoint_dict([sorts, core_sorts])
     # :funs_description
     funs = {
         # Bitvector literals
@@ -252,13 +252,13 @@ def fixedSizeBitVectors_theory():
                     ),
     }
 
-    funs = merge_funs_dict([funs, core_funs])
+    funs = merge_multi_dict([funs, core_funs])
 
     # prefixes = [ pascal_case_to_snake_case(sort.id_.symbol) for sort in sorts ]
     # repl_dicts = [{A: sort} for sort in sorts]
     # funs.update(get_all_instances(funs, prefixes, repl_dicts))
     repl_dicts = [{A: sort} for sort in sorts]
-    funs = merge_funs_dict([funs, get_all_instances(funs, repl_dicts)])
+    funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
 
     return sorts, funs
 
@@ -275,7 +275,7 @@ def floatingPoints_theory():
         FLOAT64_NAME: FLOAT64,
         FLOAT128_NAME: FLOAT128,
     }
-    sorts = merge_sorts_dict([sorts, core_sorts])
+    sorts = merge_disjoint_dict([sorts, core_sorts])
     funs = {
         # :funs
         #   Constants for rounging modes
@@ -623,13 +623,13 @@ def floatingPoints_theory():
                     ),
     }
 
-    funs = merge_funs_dict([funs, core_funs])
+    funs = merge_multi_dict([funs, core_funs])
 
     # prefixes = [ pascal_case_to_snake_case(sort.id_.symbol) for sort in sorts ]
     # repl_dicts = [{A: sort} for sort in sorts]
     # funs.update(get_all_instances(funs, prefixes, repl_dicts))
     repl_dicts = [{A: sort} for sort in sorts]
-    funs = merge_funs_dict([funs, get_all_instances(funs, repl_dicts)])
+    funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
 
     return sorts, funs
 
@@ -641,7 +641,7 @@ def strings_theory():
         REG_LAN_NAME: REG_LAN,
         INT_NAME: INT,
     }
-    sorts = merge_sorts_dict([sorts, core_sorts])
+    sorts = merge_disjoint_dict([sorts, core_sorts])
     funs = {
     # :funs_description
     #   strings consisting of exactly one character
@@ -742,13 +742,13 @@ def strings_theory():
             Fun(Identifier("str.from_int"), [INT], STRING),
     }
 
-    funs = merge_funs_dict([funs, core_funs])
+    funs = merge_multi_dict([funs, core_funs])
 
     # prefixes = [ pascal_case_to_snake_case(sort.id_.symbol) for sort in sorts ]
     # repl_dicts = [{A: sort} for sort in sorts]
     # funs.update(get_all_instances(funs, prefixes, repl_dicts))
     repl_dicts = [{A: sort} for sort in sorts]
-    funs = merge_funs_dict([funs, get_all_instances(funs, repl_dicts)])
+    funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
 
     return sorts, funs
 
@@ -760,7 +760,7 @@ def arraysEX_theory():
     sorts = {
         ARRAY_NAME: ARRAY,
     }
-    sorts = merge_sorts_dict([sorts, core_sorts])
+    sorts = merge_disjoint_dict([sorts, core_sorts])
     # parameters
     X = "X"
     Y = "Y"
@@ -778,7 +778,7 @@ def arraysEX_theory():
                         [X, Y]
                     ),
     }
-    funs = merge_funs_dict([funs, core_funs])
+    funs = merge_multi_dict([funs, core_funs])
 
     # Infinite funs be be generated
     # TODO

@@ -1,30 +1,36 @@
 from math import sqrt
+from collections import defaultdict
 
 from smort.src.translate.Ast import *
 
 
-def merge_sorts_dict(dict_list):
+def merge_disjoint_dict(dict_list):
+    """
+    merge dicts, assmuing keys in dicts are all different
+    """
     merged_dict = {}
-    for sorts_dict in dict_list:
-        for key, value in sorts_dict:
-            if not key in merged_dict:
-                merged_dict[key] = value
+    for _dict in dict_list:
+        merged_dict.update(_dict)
+        # for key, value in _dict:
+        #     if not key in merged_dict:
+        #         merged_dict[key] = value
     return merged_dict
 
 
-def merge_funs_dict(dict_list):
-    merged_dict = {}
-    for funs_dict in dict_list:
-        for key, value in funs_dict:
-            if not isinstance(value, list):
-                if (key in merged_dict) and (value in merged_dict[key]):
-                    continue
-                value = [value]
-            if key in merged_dict:
-                merged_dict[key] = merged_dict[key] + value 
+def merge_multi_dict(dict_list):
+    """
+    merge dicts, values with the same key are combined into a list
+    no nested list
+    """
+    merged_dict = defaultdict(list)
+    for _dict in dict_list:
+        for key, value in _dict.items():
+            if isinstance(value, list):
+                merged_dict[key].extend(value)
             else:
-                merged_dict[key] = value
+                merged_dict[key].append(value)
     return merged_dict
+
 
 def get_par_dict(par_list, sort_list):
     if len(par_list) != len(sort_list):
@@ -51,13 +57,17 @@ def get_par_dict(par_list, sort_list):
                             par_dict[par] = sort
     return par_dict
 
+
+
 # constraints
 
 def is_numeral(n):
     return isinstance(n, int)
 
+
 def is_string(s):
     return isinstance(s, str)
+
 
 def numeral_greater_than_x(x, count):
     def f(*indices_list):
