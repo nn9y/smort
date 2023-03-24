@@ -10,7 +10,7 @@ def core_theory():
         BOOL_NAME: BOOL
     }
     funs = {
-        str(SpecConstType.B_VALUE): Fun(SpecConstant(SpecConstType.B_VALUE, None), [], BOOL),
+        str(SpecConstType.B_VALUE): Fun(SpecConstType.B_VALUE, [], BOOL),
         "not": Fun(Identifier("not"), [BOOL], BOOL),
         "=>": Fun(Identifier("=>"), [BOOL, BOOL], BOOL),
         "and": Fun(Identifier("and"), [BOOL, BOOL], BOOL),
@@ -39,7 +39,7 @@ def ints_theory():
     sorts = merge_disjoint_dict([sorts, core_sorts])
     funs = {
         # :funs
-        str(SpecConstType.NUMERAL): Fun(SpecConstant(SpecConstant.NUMERAL, None), [], INT),
+        str(SpecConstType.NUMERAL): Fun(SpecConstType.NUMERAL, [], INT),
         "-": [
             Fun(Identifier("-"), [INT], INT),
             Fun(Identifier("-"), [INT, INT], INT)
@@ -82,8 +82,8 @@ def reals_theory():
     sorts = merge_disjoint_dict([sorts, core_sorts])
     # :funs
     funs = {
-        str(SpecConstType.NUMERAL): Fun(SpecConstant(SpecConstant.NUMERAL, None), [], REAL),
-        str(SpecConstType.DECIMAL): Fun(SpecConstant(SpecConstant.DECIMAL, None), [], REAL),
+        str(SpecConstType.NUMERAL): Fun(SpecConstType.NUMERAL, [], REAL),
+        str(SpecConstType.DECIMAL): Fun(SpecConstType.DECIMAL, [], REAL),
         "-": [
             Fun(Identifier("-"), [REAL], REAL),
             Fun(Identifier("-"), [REAL, REAL], REAL)
@@ -139,7 +139,7 @@ def fixedSizeBitVectors_theory():
         # Bitvector literals
         str(SpecConstType.BINARY): 
                     indexed_fun(
-                        SpecConstant(SpecConstType.BINARY, None),
+                        SpecConstType.BINARY,
                         0,
                         [],
                         BIT_VECTOR,
@@ -148,7 +148,7 @@ def fixedSizeBitVectors_theory():
                     ),
         str(SpecConstType.HEXADECIMAL): 
                     indexed_fun(
-                        SpecConstant(SpecConstType.HEXADECIMAL, None),
+                        SpecConstType.HEXADECIMAL,
                         0,
                         [],
                         BIT_VECTOR,
@@ -303,7 +303,7 @@ def floatingPoints_theory():
         #   Bitvector literals
         str(SpecConstType.BINARY): 
                     indexed_fun(
-                        SpecConstant(SpecConstType.BINARY, None),
+                        SpecConstType.BINARY,
                         0,
                         [],
                         BIT_VECTOR,
@@ -312,7 +312,7 @@ def floatingPoints_theory():
                     ),
         str(SpecConstType.HEXADECIMAL): 
                     indexed_fun(
-                        SpecConstant(SpecConstType.HEXADECIMAL, None),
+                        SpecConstType.HEXADECIMAL,
                         0,
                         [],
                         BIT_VECTOR,
@@ -653,7 +653,7 @@ def strings_theory():
                         hex_is_char,
                     ),
     #   string iterals "<STRING>"
-        str(SpecConstType.STRING): Fun(SpecConstant(SpecConstType.STRING, None), [], STRING),
+        str(SpecConstType.STRING): Fun(SpecConstType.STRING, [], STRING),
     # :funs
     # Core functions
     #   String functions

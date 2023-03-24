@@ -23,7 +23,7 @@ class SpecConstType(StrEnum):
 
 
 class SpecConstant:
-    def __init__(self, const_type, value):
+    def __init__(self, const_type, value=None):
         self.const_type = const_type
         self.value = value
     

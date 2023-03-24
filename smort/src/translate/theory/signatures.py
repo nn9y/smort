@@ -18,7 +18,7 @@ def match_fun_in_signatures(name, input_list=[], output=None, signatures=all_fun
                 instance = None
                 if isinstance(fun.name.indices, dict):
                     # Indexed Fun
-                    if fun.match_indexed_type(name, input_list):
+                    if fun.match_indexed_term(name, input_list):
                         instance = fun.get_indexed_instance(
                                     indices, 
                                     [inp.indices for inp in input_list]
@@ -28,7 +28,7 @@ def match_fun_in_signatures(name, input_list=[], output=None, signatures=all_fun
                     par_dict = fun.get_par_dict(name, input_list)
                     instance = generate_one_instance(fun, par_dict)
                 else:
-                    if fun.match(name, input_list, output):
+                    if fun.match_term(name, input_list, output):
                         return fun
                 
                 if (instance
