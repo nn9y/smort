@@ -3,16 +3,17 @@ from smort.src.translate.theory.available_theories import *
 
 def match_fun_in_signatures(name, input_list=[], output=None, signatures=all_funs):
     name_type = type(name)
-    indices = []
     if name_type == SpecConstant:
+        symbol = name.const_type
         indices = name.value 
     elif name_type == Identifier:
+        symbol = name.symbol
         indices = name.indices
     else:
         return None
 
-    if name in signatures:
-        fun_list = signatures[name]
+    if str(symbol) in signatures:
+        fun_list = signatures[symbol]
         for fun in fun_list:
             if isinstance(fun.name, name_type):
                 instance = None
@@ -23,7 +24,7 @@ def match_fun_in_signatures(name, input_list=[], output=None, signatures=all_fun
                                     indices, 
                                     [inp.indices for inp in input_list]
                                 )
-                if fun.par_list:
+                elif fun.par_list:
                     # parametric Fun
                     par_dict = fun.get_par_dict(name, input_list)
                     instance = generate_one_instance(fun, par_dict)

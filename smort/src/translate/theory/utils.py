@@ -100,8 +100,23 @@ def is_string(s):
     return isinstance(s, str)
 
 
+def is_numerals(count):
+    """
+    no limit of numerals
+    """
+    def  _is_numerals(*indices_list):
+        indices = indices_list[0]
+        if len(indices) != count:
+            return False
+        for i in range(count):
+            if not is_numeral(indices[i]):
+                return False
+        return True
+    return _is_numerals
+
+
 def numeral_greater_than_x(x, count):
-    def f(*indices_list):
+    def _numeral_greater_than_x(*indices_list):
         """
         indices_list: in order to match:
             op_indices
@@ -114,7 +129,7 @@ def numeral_greater_than_x(x, count):
             if not (is_numeral(indices[i]) and indices[i] > x):
                 return False
         return True
-    return f
+    return _numeral_greater_than_x 
 
 
 def extract_bound_of_bitvec(op_indices, input_indices_list):

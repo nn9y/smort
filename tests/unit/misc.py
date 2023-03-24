@@ -5,6 +5,7 @@ from smort.src.translate.Ast import Sort
 from smort.src.translate.theory.utils import *
 from smort.src.translate.theory.Fun import *
 from smort.src.translate.theory.Fun import _get_repl_sort 
+from smort.src.translate.theory.signatures import match_fun_in_signatures 
 
 
 def test_list2str():
@@ -353,3 +354,13 @@ def test_get_all_instances():
     }
     assert get_all_instances(funs, dicts) == {}
 
+
+def test_match_fun_in_signatures():
+    BOOL = Sort(Identifier('Bool'))
+    INT = Sort(Identifier('Int'))
+    ite = Fun(Identifier("ite"), [BOOL, INT, INT], INT)
+    assert match_fun_in_signatures(Identifier('ite'), [BOOL, INT, INT]) == ite
+    band = Fun(Identifier("and"), [BOOL, BOOL], BOOL)
+    assert match_fun_in_signatures(Identifier('and'), [BOOL, BOOL]) == band 
+    assert match_fun_in_signatures(Identifier('and'), [BOOL, BOOL], BOOL) == band 
+    assert match_fun_in_signatures(Identifier('and'), [BOOL, BOOL], INT) == None 

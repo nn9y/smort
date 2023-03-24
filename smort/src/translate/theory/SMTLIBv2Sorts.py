@@ -49,10 +49,10 @@ Y = "Y"
 # synonyms
 
 synonym2fp = {
-    FLOAT16_NAME: FLOATING_POINT([5, 11]),
-    FLOAT32_NAME: FLOATING_POINT([8, 24]),
-    FLOAT64_NAME: FLOATING_POINT([11, 53]),
-    FLOAT128_NAME: FLOATING_POINT([15, 113]),
+    FLOAT16_NAME: FLOATING_POINT.get_indexed_instance([5, 11]),
+    FLOAT32_NAME: FLOATING_POINT.get_indexed_instance([8, 24]),
+    FLOAT64_NAME: FLOATING_POINT.get_indexed_instance([11, 53]),
+    FLOAT128_NAME: FLOATING_POINT.get_indexed_instance([15, 113]),
 }
 
 # TODO

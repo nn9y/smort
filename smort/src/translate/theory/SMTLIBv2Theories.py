@@ -398,6 +398,7 @@ def floatingPoints_theory():
                     ),
         "fp.sub":   indexed_fun(
                         "fp.sub",
+                        0,
                         [ROUNDING_MODE, FLOATING_POINT, FLOATING_POINT],
                         FLOATING_POINT,
                         eq_input_indices(1, 3, 3),
@@ -721,14 +722,14 @@ def strings_theory():
                         1,
                         [REG_LAN],
                         REG_LAN,
-                        numeral_greater_than_x(-sys.maxint-1, 1) 
+                        is_numerals(1),
                     ),
         "re.loop":  indexed_fun(
                         "re.loop",
                         2,
                         [REG_LAN],
                         REG_LAN,
-                        numeral_greater_than_x(-sys.maxint-1, 2) 
+                        is_numerals(2),
                     ),
         "str.is_digit":
             Fun(Identifier("str.is_digit"), [STRING], BOOL),
