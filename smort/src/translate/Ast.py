@@ -71,6 +71,11 @@ class Identifier:
             return False
         if self.symbol != other.symbol:
             return False
+        self_len = self.indices["len"] if isinstance(self.indices, dict) else len(self.indices)
+        other_len = other.indices["len"] if isinstance(other.indices, dict) else len(other.indices)
+        if self_len == 0 and other_len == 0:
+            # special case for 'len' = 0 and []
+            return True
         if self.indices != other.indices:
             return False
         return True 
@@ -102,7 +107,10 @@ class Sort:
     def get_parametric_instance(self, parsort_dict):
         parsorts_instance = []
         for par in self.parsorts:
-            if par in parsort_dict:
+            if isinstance(par, Sort):
+                # assuming parsort cannot be nested parametric sort template
+                parsorts_instance.append(par)
+            elif isinstance(par, str) and (par in parsort_dict):
                 parsorts_instance.append(parsort_dict[par])
             else:
                 return None

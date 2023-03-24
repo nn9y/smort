@@ -4,6 +4,7 @@ from smort.src.msic.utils import *
 from smort.src.translate.Ast import Sort
 from smort.src.translate.theory.utils import *
 from smort.src.translate.theory.Fun import *
+from smort.src.translate.theory.Fun import _get_repl_sort 
 
 
 def test_list2str():
@@ -268,4 +269,87 @@ def test_get_par_dict():
     d = {A: s1, B: s2, X: _s3, Y: _s4}
     assert get_par_dict(input_list, sort_list) == d
 
-    
+
+def test_get_repl_sort():
+    s1 = Sort(Identifier('s1'))
+    s2 = Sort(Identifier('s2'), [s1])
+    sx = 'A'
+    d = {'A': s1}
+    assert _get_repl_sort(sx, d) == s1
+    d = {'B': s1}
+    assert _get_repl_sort(sx, d) == None 
+    d = {'A': s1, 'B': s1}
+    assert _get_repl_sort(sx, d) == s1
+    sy = Sort(Identifier('sy'))
+    _sy = Sort(Identifier('sy'))
+    assert _get_repl_sort(sy, d) == _sy 
+    sy = Sort(Identifier('sy'), [s1, 'A'])
+    d = {'A': s2}
+    _sy = Sort(Identifier('sy'), [s1, s2])
+    assert _get_repl_sort(sy, d) == _sy 
+    assert str(_get_repl_sort(sy, d)) == '(sy s1 (s2 s1))'
+ 
+
+def test_generate_one_instance():
+    A = 'A'
+    B = 'B'
+    t1 = indexed_fun("+", 0, [A, A], A, None, None, [A])
+    INT = Sort(Identifier("Int"))
+    BOOL = Sort(Identifier("Bool"))
+    f1 = Fun(Identifier("+"), [INT, INT], INT)
+    d = {A: INT}
+    assert generate_one_instance(t1, d) == f1 
+    d = {A: INT, B: BOOL}
+    assert generate_one_instance(t1, d) == f1 
+    t1 = indexed_fun("+", 0, [B, A], A, None, None, [A, B])
+    f1 = Fun(Identifier("+"), [BOOL, INT], INT)
+    assert generate_one_instance(t1, d) == f1 
+    d = get_par_dict([B, A], [BOOL, INT])
+    assert generate_one_instance(t1, d) == f1 
+    d = {'X': INT, B: BOOL}
+    assert generate_one_instance(t1, d) == None 
+    d = {A: INT, 'Y': BOOL}
+    assert generate_one_instance(t1, d) == None 
+
+
+def test_get_all_instances():
+    A = 'A'
+    BOOL = Sort(Identifier('Bool'))
+    INT = Sort(Identifier('Int'))
+    REAL = Sort(Identifier('Real'))
+    funs = {
+        "xor": Fun(Identifier("xor"), [BOOL, BOOL], BOOL),
+        "=": Fun(Identifier("="), [A, A], BOOL, [A]),
+        "distinct": Fun(Identifier("distinct"), [A, A], BOOL, [A]),
+        "ite": Fun(Identifier("ite"), [BOOL, A, A], A, [A]),
+    }
+    dicts = [{A: INT}, {A: REAL}]
+    res = {
+        "=": [Fun(Identifier("="), [INT, INT], BOOL), 
+              Fun(Identifier("="), [REAL, REAL], BOOL)],
+        "distinct": [Fun(Identifier("distinct"), [INT, INT], BOOL),
+                    Fun(Identifier("distinct"), [REAL, REAL], BOOL)],
+        "ite": [Fun(Identifier("ite"), [BOOL, INT, INT], INT),
+                Fun(Identifier("ite"), [BOOL, REAL, REAL], REAL)]
+    }
+    assert get_all_instances(funs, dicts) == res
+    funs = {
+        "+": Fun(Identifier("+"), [INT, INT], INT),
+        "*": Fun(Identifier("*"), [INT, INT], INT),
+        "div": Fun(Identifier("div"), [INT, INT], INT),
+        "mod": Fun(Identifier("mod"), [INT, INT], INT),
+        "abs": Fun(Identifier("abs"), [INT], INT),
+        "<=": Fun(Identifier("<="), [INT, INT], BOOL),
+        "<": Fun(Identifier("<"), [INT, INT], BOOL),
+        ">=": Fun(Identifier(">="), [INT, INT], BOOL),
+        ">": Fun(Identifier(">"), [INT, INT], BOOL),
+        "divisible": indexed_fun(
+                        "divisible",
+                        1,
+                        [INT],
+                        BOOL,
+                        numeral_greater_than_x(0, 1),
+                    ),
+    }
+    assert get_all_instances(funs, dicts) == {}
+

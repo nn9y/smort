@@ -1,6 +1,7 @@
 import copy
 import re
 from inspect import isfunction
+from collections import defaultdict
 
 from smort.src.translate.Ast import *
 from smort.src.translate.theory.utils import *
@@ -171,22 +172,24 @@ def indexed_fun(
 # parametric function is marked by non-empty par_list
 
 
-def get_all_instances(funs, repl_dicts):
-    instances = {}
+def get_all_instances(funs: dict, repl_dicts: list):
+    """
+    find parametric templates in funs and get all instances of them by repl_dicts
+    """
+    instances = defaultdict(list) 
     for keyname, fun in funs.items():
         if not isinstance(fun, list):
             fun = [fun]
         for f in fun:
             if f.par_list:
+            # parametric template
                 for i in range(len(repl_dicts)):
                     instance = generate_one_instance(
-                        fun,
+                        f,
                         repl_dicts[i],
                     )
-                    if keyname in instance:
-                        instance[keyname] = instance[keyname] + [instance]
-                    else:
-                        instances[keyname] = [instance]
+                    if instance:
+                        instances[keyname].append(instance)
     return instances
 
 
@@ -196,30 +199,30 @@ def generate_one_instance(template: Fun, repl_dict):
     """
     repl_input_list = []
     for sort in template.input_list:
-        repl_sort = _get_repl_sort(sort, template.par_list, repl_dict)
+        repl_sort = _get_repl_sort(sort, repl_dict)
         if repl_sort:
             repl_input_list.append(repl_sort)
         else:
             return None
-    repl_output = _get_repl_sort(template.output, template.par_list, repl_dict)
+    repl_output = _get_repl_sort(template.output, repl_dict)
     if not repl_output:
         return None
     name = copy.deepcopy(template.name) 
     return Fun(name, repl_input_list, repl_output)
 
 
-def _get_repl_sort(sort, par_list, repl_dict):
-    if sort in par_list:
-        if sort in repl_dict:
-            return repl_dict[sort]
-        else:
-            return None
+def _get_repl_sort(sort, repl_dict):
+    """
+    replace parameters by sort in repl_dict
+    """
+    if isinstance(sort, str) and (sort in repl_dict):
+        return repl_dict[sort]
     elif isinstance(sort, Sort):
         if len(sort.parsorts) > 0:
             repl_sort = sort.get_parametric_instance(repl_dict)
             return repl_sort
         else:
-            return sort
+            return copy.deepcopy(sort)
     else:
         return None
 
