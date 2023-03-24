@@ -44,12 +44,12 @@ class SpecConstant:
 
 
 class Identifier:
-    def __init__(self, symbol, indices=[]):
+    def __init__(self, symbol: str, indices=[]):
         self.symbol = symbol
-        self.indices = indices
-    
+        self.indices = indices  # dict{'len': <int>} or list
+ 
     def get_indexed_instance(self, indices, constraint=None):
-        if self.indices:
+        if isinstance(self.indices, list):
             return copy.deepcopy(self)
         if isfunction(constraint) and (not constraint(indices)):
             return None
@@ -78,7 +78,7 @@ class Identifier:
     def __str__(self):
         return (
             f"(_ {self.symbol} {list2str(self.indices)})"
-            if len(self.indices) > 0
+            if isinstance(self.indices, list) and len(self.indices) > 0
             else self.symbol
         )
 
@@ -89,41 +89,50 @@ class Identifier:
 class Sort:
     def __init__(self, id_=None, parsorts=[], constraint=None):
         self.id_ = id_ 
-        self.parsorts = parsorts
+        self.parsorts = parsorts    # list of Sort or str
         self.constraint = constraint
- 
-    def get_parametric_instance(self, parsort_dict):
-        if len(self.parsorts) != len(parsort_dict):
-            return None
-        else:
-            parsorts_instance = []
-            for par in self.parsorts:
-                if par in parsort_dict:
-                    parsorts_instance.append(parsort_dict[par])
-                else:
-                    return None
-            return Sort(self.id_, parsorts_instance)
- 
+
     def get_indexed_instance(self, indices):
         id_instance = self.id_.get_indexed_instance(indices, self.constraint)
         if id_instance:
             return Sort(id_instance, copy.deepcopy(self.parsorts))
         else:
             return None
-    
+
+    def get_parametric_instance(self, parsort_dict):
+        parsorts_instance = []
+        for par in self.parsorts:
+            if par in parsort_dict:
+                parsorts_instance.append(parsort_dict[par])
+            else:
+                return None
+        return Sort(copy.deepcopy(self.id_), parsorts_instance)
+ 
     def same_indexed_type(self, other):
+        """
+        - id_ should be same indexed type
+        - element in parsorts:
+            - if both are Sort: should be same indexed type
+            - if one is str: ignore 
+        """
         if not isinstance(other, Sort):
             return False
         if not self.id_.same_indexed_type(other.id_):
             return False
         if len(self.parsorts) != len(other.parsorts):
             return False
-        for i in range(len(self.parsorts)):
-            if not self.parsorts[i].same_indexed_type(other.parsorts[i]):
+        for i, parsort in enumerate(self.parsorts):
+            if isinstance(parsort, str) or isinstance(other.parsorts[i], str):
+                continue
+            elif not parsort.same_indexed_type(other.parsorts[i]):
                 return False
         return True
 
     def same_parametric_type(self, other):
+        """
+        - id_ should be same indexed type
+        - length of parsorts should equal:
+        """
         if isfunction(other):
             if other(self.parsorts):
                 return True
@@ -137,7 +146,11 @@ class Sort:
         return False
     
     def same_type(self, other):
-        return self.same_indexed_type(other) or self.same_parametric_type(other)
+        """
+        (same_indexed_type) or (same_parametric_type)
+        but the constraints of the latter are contained in the former
+        """
+        return self.same_parametric_type(other)
  
     def __eq__(self, other):
         if not isinstance(other, Sort):

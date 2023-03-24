@@ -3,7 +3,7 @@ import pytest
 from smort.src.msic.utils import *
 from smort.src.translate.Ast import Sort
 from smort.src.translate.theory.utils import *
-from smort.src.translate.theory.Fun import sort_with_arity
+from smort.src.translate.theory.Fun import *
 
 
 def test_list2str():
@@ -177,6 +177,38 @@ def test_sort_with_arity():
     s3 = f1([s1, s2])
     assert isinstance(s3, Sort)
 
+def test_indexed_sort():
+    s1 = indexed_sort("s1", 1, None)
+    assert type(s1) == Sort
+    assert type(s1.id_.indices) == dict
+    assert s1.constraint == None 
+    with pytest.raises(TheoryException):
+        s1 = indexed_sort("s1", 0, None)
+    s1 = indexed_sort("s1", 1, numeral_greater_than_x(1, 1))
+    assert type(s1) == Sort
+    assert type(s1.id_.indices) == dict
+    assert isfunction(s1.constraint)
+
+def test_indexed_fun():
+    s1 = indexed_sort("s1", 1, None)
+    f1 = indexed_fun("f1", 1, [], s1)
+    assert type(f1) == Fun 
+    assert type(f1.name.indices) == dict
+    assert f1.constraints == None 
+    assert f1.get_output_indices == None 
+    assert f1.par_list == None 
+    s1 = Sort("s1")
+    f1 = indexed_fun("f1", 0, [], s1)
+    assert type(f1) == Fun 
+    assert type(f1.name.indices) == dict
+    assert str(f1.name) == "f1"
+    with pytest.raises(TheoryException):
+        f1 = indexed_fun("f1", -1, [], s1)
+    f1 = indexed_fun("f1", 0, [], s1, extract_bound_of_bitvec, get_number_of_binary_digits(2), ["A", "B"])
+    assert isfunction(f1.constraints)
+    assert isfunction(f1.get_output_indices)
+    assert type(f1.par_list) == list 
+
 
 def test_get_par_dict():
     A = "A"
@@ -203,43 +235,34 @@ def test_get_par_dict():
     d = {A: s1, B: s2}
     assert get_par_dict(input_list, sort_list) == d
     sort_list = [_s3, _s4]
-    with pytest.raises(TheoryException):
-        get_par_dict(input_list, sort_list)
+    assert get_par_dict(input_list, sort_list) == {}
     input_list = [A, s3, s4, s5]
     sort_list = [s2, _s3, _s4, _s5]
-    with pytest.raises(TheoryException):
-        get_par_dict(input_list, sort_list)
+    assert get_par_dict(input_list, sort_list) == {}
     input_list = [A, s3, s4, s5]
     sort_list = [A, _s3, _s4, _s5]
-    with pytest.raises(TheoryException):
-        get_par_dict(input_list, sort_list)
+    assert get_par_dict(input_list, sort_list) == {}
     input_list = [A, s3, s4, s5]
     sort_list = [s1, _s4, _s4, _s5]
-    with pytest.raises(TheoryException):
-        get_par_dict(input_list, sort_list)
+    assert get_par_dict(input_list, sort_list) == {}
     input_list = [A, s3, s4, s5]
     sort_list = [s1, _s3, _s4_, _s5]
-    with pytest.raises(TheoryException):
-        get_par_dict(input_list, sort_list)
+    assert get_par_dict(input_list, sort_list) == {}
     input_list = [A, s3, _s4, s5]
     sort_list = [s1, _s3, _s4, _s5]
     assert get_par_dict(input_list, sort_list) == d
     input_list = [A, s3, _s4, s5]
     sort_list = [s1, _s3, _s5, _s5]
-    with pytest.raises(TheoryException):
-        get_par_dict(input_list, sort_list)
+    assert get_par_dict(input_list, sort_list) == {}
     input_list = [A, s3, s4, s5]
     sort_list = [s1, _s3, 1, _s5]
-    with pytest.raises(TheoryException):
-        get_par_dict(input_list, sort_list)
+    assert get_par_dict(input_list, sort_list) == {}
     input_list = [A, s3, s4, s5]
     sort_list = [s1, _s3, sort_with_arity("s4", 2), _s5]
-    with pytest.raises(TheoryException):
-        get_par_dict(input_list, sort_list)
+    assert get_par_dict(input_list, sort_list) == {}
     input_list = [A, s3, sort_with_arity("s4", 2), s5]
     sort_list = [s1, _s3, _s4, _s5]
-    with pytest.raises(TheoryException):
-        get_par_dict(input_list, sort_list)
+    assert get_par_dict(input_list, sort_list) == {}
     input_list = [A, s3, _s4, s5, s6]
     sort_list = [s1, _s3, _s4, _s5, _s6]
     d = {A: s1, B: s2, X: _s3, Y: _s4}

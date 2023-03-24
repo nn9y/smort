@@ -15,9 +15,6 @@ def merge_disjoint_dict(dict_list):
     merged_dict = {}
     for _dict in dict_list:
         merged_dict.update(_dict)
-        # for key, value in _dict:
-        #     if not key in merged_dict:
-        #         merged_dict[key] = value
     return merged_dict
 
 
@@ -38,26 +35,29 @@ def merge_multi_dict(dict_list):
 
 def get_par_dict(input_list_containing_par, sort_list):
     """
-    return a dict mapping parsort symbol to sort instance
+    return a dict mapping parsort symbol to sort instance, return {} if cannot get mapping
     """
     if len(input_list_containing_par) != len(sort_list):
-        raise TheoryException("sort_list should match input_list")
+        return {}
+        # raise TheoryException("sort_list should match input_list")
     par_dict = {}
     for i, input_sort in enumerate(input_list_containing_par):
         sort = sort_list[i]
         if not isinstance(sort, Sort):
-            raise TheoryException("each sort in sort_list should be an Sort instance")
+            return {}
+            # raise TheoryException("each sort in sort_list should be an Sort instance")
         if isinstance(input_sort, str):
             # single parameter placeholder
             if input_sort in par_dict:
                 if par_dict[input_sort] !=  sort:
-                    raise TheoryException("Inconsistency found in parameter assignment")
+                    return {}
+                    # raise TheoryException("Inconsistency found in parameter assignment")
             else:
                 par_dict[input_sort] = sort 
         elif isinstance(input_sort, Sort):
             if len(input_sort.parsorts) > 0:
                 if not input_sort.same_parametric_type(sort):
-                    raise TheoryException("sort_list should match input_list")
+                    return {}
                 else:
                     for j, par in enumerate(input_sort.parsorts):
                         parsort = sort.parsorts[j]
@@ -67,19 +67,24 @@ def get_par_dict(input_list_containing_par, sort_list):
                             if isinstance(par, str):
                                 if par in par_dict:
                                     if par_dict[par] != parsort:
-                                        raise TheoryException("inconsistency found in parameter assignment")
+                                        return {}
+                                        # raise TheoryException("inconsistency found in parameter assignment")
                                 else:
                                     par_dict[par] = parsort
                             else:
-                                raise TheoryException("sort_list should match input_list")
+                                return {}
+                                # raise TheoryException("sort_list should match input_list")
                         else:
-                            raise TheoryException("each element of input_list.parsort should be an Sort instance")
+                            return {}
+                            # raise TheoryException("each element of input_list.parsort should be an Sort instance")
             elif input_sort == sort:
                 continue
             else:
-                raise TheoryException("sort_list should match input_list")
+                return {}
+                # raise TheoryException("sort_list should match input_list")
         else:
-            raise TheoryException("each element of input_list should be object of Sort or string")
+            return {}
+            # raise TheoryException("each element of input_list should be object of Sort or string")
 
     return par_dict
 
@@ -236,19 +241,19 @@ def hex_is_char(op_indices, input_indices_list):
 
 # get output sort indices, assuming input has been checked
 
-def get_number_of_binary_digits(carry):
+def get_number_of_binary_digits(carry: int):
     """
     Converting HEX, BINARY constant to index of BitVec
     """
     if carry % 2 != 0:
         raise TheoryException("'carry' should be divisible by 2")
-    def _get_number_of_binary_digits(spec_const_value, input_indices_list):
+    def _get_number_of_binary_digits(spec_const_value: str, input_indices_list):
         # spec_const_value is original text of a binary or hexadecimal 
         #   compare to op_indices, spec_const_value is just value, not list of values
         # assuming text format has been checked by parser already
         # ⚠️ The correspondence between spec_const_value and carry
         #   is guaranteed by the caller 
-        if not (is_string(spec_const_value) or len(input_indices_list) == 0):
+        if len(input_indices_list) != 0:
             return False
         number_of_digits = len(spec_const_value) - 2
         return [number_of_digits * int((sqrt(carry)))]

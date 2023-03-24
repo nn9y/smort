@@ -99,46 +99,76 @@ class Fun:
 
 
 
-def sort_with_arity(symbol, arity):
+
+def indexed_sort(symbol: str, indices_len, constraint=None):
+    """
+    type(indices) == dict is a marker for indexed sort template 
+    constraint: function that indices of sort should satisfy
+    """
+    if indices_len <= 0:
+        raise TheoryException("'indices_len' should be an positive number")
+    return Sort(Identifier(symbol, {"len": indices_len}), [], constraint)
+
+
+def sort_with_arity(symbol: str, arity: int):
     """
     sort with arity >= 0
     """
     if arity < 0:
-        raise TheoryException(f"'arity' should be non-negative integer")
+        raise TheoryException("'arity' should be non-negative integer")
     if arity == 0:
         return Sort(Identifier(symbol))
-    def _parametric_sort(pars):
+    def _parametric_sort(pars: list):
         """
         called in construction of parametric functions to fill parameter placeholder (string)
         """
-        if not isinstance(pars, list):
-            raise TheoryException("'pars' should be a list of sort") 
         if len(pars) != arity:
-            raise TheoryException(f"length of 'pars' is {len(pars)}, but it should be {arity}")
-        # ⚠️ type(element of list) should be Sort instance (or string, that is, parameter),
-        #       is guaranteed by the caller
+            raise TheoryException(f"length of 'pars' should be {arity}")
         return Sort(Identifier(symbol), pars)
     return _parametric_sort
 
 
-def indexed_sort(symbol, indices_len, constraint=None):
-    """
-    type(indices) == dict is a marker for indexed sort 
-    """
-    if constraint and (not isfunction(constraint)):
-        raise TheoryException(f"type of 'constraint' is {type(constraint)}, but it should be None or function")
-    return Sort(Identifier(symbol, {"len": indices_len}), [], constraint)
+def indexed_sort_with_arity(symbol: str, indices_len, arity, constraint=None):
+    if indices_len <= 0:
+        raise TheoryException("'indices_len' should be an positive number")
+    if arity < 0:
+        raise TheoryException("'arity' should be non-negative integer")
+    id_ = Identifier(symbol, {"len": indices_len})
+    if arity == 0:
+        return Sort(id_, [], constraint)
+    def _indexed_parametric_sort(pars: list):
+        if len(pars) != arity:
+            raise TheoryException(f"length of 'pars' should be {arity}")
+        return Sort(id_, pars, constraint)
+    return _indexed_parametric_sort
 
 
-def indexed_fun(op_symbol, op_indices_len, input_list, output, constraints=None, get_output_indices=None, par_list=None):
+def indexed_fun(
+        name_symbol: str,
+        name_indices_len,
+        input_list,
+        output,
+        constraints=None,
+        get_output_indices=None,
+        par_list=None):
     """
-    type(op.indices) == dict is a marker for indexed fun
+    if any identifier in nameerator or sort list of function is indexed, this is an indexed fun
+        type(name.indices) == dict is a marker for indexed fun, it can be 0
     """
-    if constraints and (not isfunction(constraints)):
-        raise TheoryException(f"type of 'constraints' is {type(constraints)}, but it should be None or function")
-    if get_output_indices and (not isfunction(get_output_indices)):
-        raise TheoryException(f"type of 'get_output_indices' is {type(get_output_indices)}, but it should be None or function")
-    return Fun(Identifier(op_symbol, {"len": op_indices_len}), input_list, output, par_list, constraints, get_output_indices)
+    if name_indices_len < 0:
+        raise TheoryException("'name_indices_len' should be an non-negative number")
+    return Fun(
+        Identifier(name_symbol, {"len": name_indices_len}),
+        input_list,
+        output,
+        par_list,
+        constraints,
+        get_output_indices
+    )
+
+
+# parametric sort is marked by non-empty parsorts
+# parametric function is marked by non-empty par_list
 
 
 def get_all_instances(funs, repl_dicts):
@@ -159,7 +189,11 @@ def get_all_instances(funs, repl_dicts):
                         instances[keyname] = [instance]
     return instances
 
-def generate_one_instance(template, repl_dict):
+
+def generate_one_instance(template: Fun, repl_dict):
+    """
+    generate fun instance by replacing parameters in template using repl_dict 
+    """
     repl_input_list = []
     for sort in template.input_list:
         repl_sort = _get_repl_sort(sort, template.par_list, repl_dict)
@@ -172,6 +206,7 @@ def generate_one_instance(template, repl_dict):
         return None
     name = copy.deepcopy(template.name) 
     return Fun(name, repl_input_list, repl_output)
+
 
 def _get_repl_sort(sort, par_list, repl_dict):
     if sort in par_list:
@@ -187,6 +222,7 @@ def _get_repl_sort(sort, par_list, repl_dict):
             return sort
     else:
         return None
+
 
 def pascal_case_to_snake_case(camel_case: str):
     snake_case = re.sub(r"(?P<key>[A-Z])", r"_\g<key>", camel_case)
