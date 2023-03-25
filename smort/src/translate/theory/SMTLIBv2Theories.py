@@ -10,7 +10,7 @@ def core_theory():
         BOOL_NAME: BOOL
     }
     funs = {
-        str(SpecConstType.B_VALUE): Fun(SpecConstType.B_VALUE, [], BOOL),
+        str(SpecConstType.B_VALUE): Fun(SpecConstant(SpecConstType.B_VALUE, None), [], BOOL),
         "not": Fun(Identifier("not"), [BOOL], BOOL),
         "=>": Fun(Identifier("=>"), [BOOL, BOOL], BOOL),
         "and": Fun(Identifier("and"), [BOOL, BOOL], BOOL),
@@ -39,7 +39,7 @@ def ints_theory():
     sorts = merge_disjoint_dict([sorts, core_sorts])
     funs = {
         # :funs
-        str(SpecConstType.NUMERAL): Fun(SpecConstType.NUMERAL, [], INT),
+        str(SpecConstType.NUMERAL): Fun(SpecConstant(SpecConstType.NUMERAL, None), [], INT),
         "-": [
             Fun(Identifier("-"), [INT], INT),
             Fun(Identifier("-"), [INT, INT], INT)
@@ -82,8 +82,8 @@ def reals_theory():
     sorts = merge_disjoint_dict([sorts, core_sorts])
     # :funs
     funs = {
-        str(SpecConstType.NUMERAL): Fun(SpecConstType.NUMERAL, [], REAL),
-        str(SpecConstType.DECIMAL): Fun(SpecConstType.DECIMAL, [], REAL),
+        str(SpecConstType.NUMERAL): Fun(SpecConstant(SpecConstType.NUMERAL, None), [], REAL),
+        str(SpecConstType.DECIMAL): Fun(SpecConstant(SpecConstType.DECIMAL, None), [], REAL),
         "-": [
             Fun(Identifier("-"), [REAL], REAL),
             Fun(Identifier("-"), [REAL, REAL], REAL)
@@ -654,7 +654,7 @@ def strings_theory():
                         hex_is_char,
                     ),
     #   string iterals "<STRING>"
-        str(SpecConstType.STRING): Fun(SpecConstType.STRING, [], STRING),
+        str(SpecConstType.STRING): Fun(SpecConstant(SpecConstType.STRING, None), [], STRING),
     # :funs
     # Core functions
     #   String functions

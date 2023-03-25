@@ -104,8 +104,8 @@ class SMTMRVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SMTMRParser#term_template.
-    def visitTerm_template(self, ctx:SMTMRParser.Term_templateContext):
+    # Visit a parse tree produced by SMTMRParser#boolean_term_template.
+    def visitBoolean_term_template(self, ctx:SMTMRParser.Boolean_term_templateContext):
         return self.visitChildren(ctx)
 
 

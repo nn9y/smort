@@ -17,8 +17,8 @@ def match_fun_in_signatures(name, input_list=[], output=None, signatures=all_fun
         for fun in fun_list:
             if isinstance(fun.name, name_type):
                 instance = None
-                if isinstance(fun.name.indices, dict):
-                    # Indexed Fun
+                if isinstance(fun.name.indices, dict) or (fun.name.indices == None):
+                    # Indexed Fun (name is an Identifier) or name is a SpecConstant
                     if fun.match_indexed_term(name, input_list):
                         instance = fun.get_indexed_instance(
                                     indices, 

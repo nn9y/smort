@@ -392,10 +392,9 @@ term
     // | ParOpen GRW_Exclamation term attribute+ ParClose
     ;
 
-term_template
-    : spec_constant
-    | symbol 
-    | ParOpen symbol term_template+ ParClose
+boolean_term_template
+    : symbol 
+    | ParOpen symbol boolean_term_template+ ParClose
     ;
 
 // Metamorphic Relation Declarations
@@ -425,7 +424,7 @@ substTemplate_dec
     ;
 
 fuse_dec
-    : ParOpen GRW_Fuse term_template ParClose
+    : ParOpen GRW_Fuse boolean_term_template ParClose
     ;
 
 // Extended Methods Declarations

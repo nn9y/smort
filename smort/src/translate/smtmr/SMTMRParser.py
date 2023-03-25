@@ -12,7 +12,7 @@ else:
 def serializedATN():
     with StringIO() as buf:
         buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\62")
-        buf.write("\u0114\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7")
+        buf.write("\u0113\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7")
         buf.write("\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t\13\4\f\t\f\4\r\t\r\4\16")
         buf.write("\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22\4\23\t\23")
         buf.write("\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31")
@@ -30,25 +30,25 @@ def serializedATN():
         buf.write("\3\21\5\21\u00a5\n\21\3\22\3\22\3\22\3\22\3\22\3\22\3")
         buf.write("\22\5\22\u00ae\n\22\3\23\3\23\3\23\3\23\3\23\3\24\3\24")
         buf.write("\3\24\3\24\3\24\6\24\u00ba\n\24\r\24\16\24\u00bb\3\24")
-        buf.write("\3\24\5\24\u00c0\n\24\3\25\3\25\3\25\3\25\3\25\6\25\u00c7")
-        buf.write("\n\25\r\25\16\25\u00c8\3\25\3\25\5\25\u00cd\n\25\3\26")
-        buf.write("\3\26\3\26\3\27\3\27\3\27\3\27\3\27\3\30\3\30\3\30\3\30")
+        buf.write("\3\24\5\24\u00c0\n\24\3\25\3\25\3\25\3\25\6\25\u00c6\n")
+        buf.write("\25\r\25\16\25\u00c7\3\25\3\25\5\25\u00cc\n\25\3\26\3")
+        buf.write("\26\3\26\3\27\3\27\3\27\3\27\3\27\3\30\3\30\3\30\3\30")
         buf.write("\3\30\3\31\3\31\3\31\3\31\3\31\3\32\3\32\3\32\3\32\3\32")
-        buf.write("\5\32\u00e6\n\32\3\32\7\32\u00e9\n\32\f\32\16\32\u00ec")
-        buf.write("\13\32\3\32\3\32\3\33\3\33\3\33\7\33\u00f3\n\33\f\33\16")
-        buf.write("\33\u00f6\13\33\3\33\3\33\6\33\u00fa\n\33\r\33\16\33\u00fb")
-        buf.write("\3\33\3\33\3\33\6\33\u0101\n\33\r\33\16\33\u0102\3\33")
+        buf.write("\5\32\u00e5\n\32\3\32\7\32\u00e8\n\32\f\32\16\32\u00eb")
+        buf.write("\13\32\3\32\3\32\3\33\3\33\3\33\7\33\u00f2\n\33\f\33\16")
+        buf.write("\33\u00f5\13\33\3\33\3\33\6\33\u00f9\n\33\r\33\16\33\u00fa")
+        buf.write("\3\33\3\33\3\33\6\33\u0100\n\33\r\33\16\33\u0101\3\33")
         buf.write("\3\33\3\33\3\34\3\34\3\34\3\34\3\34\3\35\3\35\3\35\3\35")
         buf.write("\3\35\3\35\3\35\3\35\2\2\36\2\4\6\b\n\f\16\20\22\24\26")
         buf.write("\30\32\34\36 \"$&(*,.\60\62\64\668\2\6\3\2\t\21\3\2*\60")
-        buf.write("\3\2\17\21\4\2\13\13\16\16\2\u011c\2;\3\2\2\2\4M\3\2\2")
+        buf.write("\3\2\17\21\4\2\13\13\16\16\2\u011a\2;\3\2\2\2\4M\3\2\2")
         buf.write("\2\6O\3\2\2\2\bQ\3\2\2\2\nS\3\2\2\2\fX\3\2\2\2\16\\\3")
         buf.write("\2\2\2\20^\3\2\2\2\22`\3\2\2\2\24h\3\2\2\2\26u\3\2\2\2")
         buf.write("\30y\3\2\2\2\32\u0086\3\2\2\2\34\u0092\3\2\2\2\36\u0098")
         buf.write("\3\2\2\2 \u00a4\3\2\2\2\"\u00ad\3\2\2\2$\u00af\3\2\2\2")
-        buf.write("&\u00bf\3\2\2\2(\u00cc\3\2\2\2*\u00ce\3\2\2\2,\u00d1\3")
-        buf.write("\2\2\2.\u00d6\3\2\2\2\60\u00db\3\2\2\2\62\u00e0\3\2\2")
-        buf.write("\2\64\u00ef\3\2\2\2\66\u0107\3\2\2\28\u010c\3\2\2\2:<")
+        buf.write("&\u00bf\3\2\2\2(\u00cb\3\2\2\2*\u00cd\3\2\2\2,\u00d0\3")
+        buf.write("\2\2\2.\u00d5\3\2\2\2\60\u00da\3\2\2\2\62\u00df\3\2\2")
+        buf.write("\2\64\u00ee\3\2\2\2\66\u0106\3\2\2\28\u010b\3\2\2\2:<")
         buf.write("\5.\30\2;:\3\2\2\2<=\3\2\2\2=;\3\2\2\2=>\3\2\2\2>?\3\2")
         buf.write("\2\2?E\5\60\31\2@D\5\62\32\2AD\5\64\33\2BD\58\35\2C@\3")
         buf.write("\2\2\2CA\3\2\2\2CB\3\2\2\2DG\3\2\2\2EC\3\2\2\2EF\3\2\2")
@@ -94,41 +94,40 @@ def serializedATN():
         buf.write("\3\2\2\2\u00bb\u00bc\3\2\2\2\u00bc\u00bd\3\2\2\2\u00bd")
         buf.write("\u00be\7\5\2\2\u00be\u00c0\3\2\2\2\u00bf\u00b4\3\2\2\2")
         buf.write("\u00bf\u00b5\3\2\2\2\u00bf\u00b6\3\2\2\2\u00c0\'\3\2\2")
-        buf.write("\2\u00c1\u00cd\5\24\13\2\u00c2\u00cd\5\f\7\2\u00c3\u00c4")
-        buf.write("\7\4\2\2\u00c4\u00c6\5\f\7\2\u00c5\u00c7\5(\25\2\u00c6")
-        buf.write("\u00c5\3\2\2\2\u00c7\u00c8\3\2\2\2\u00c8\u00c6\3\2\2\2")
-        buf.write("\u00c8\u00c9\3\2\2\2\u00c9\u00ca\3\2\2\2\u00ca\u00cb\7")
-        buf.write("\5\2\2\u00cb\u00cd\3\2\2\2\u00cc\u00c1\3\2\2\2\u00cc\u00c2")
-        buf.write("\3\2\2\2\u00cc\u00c3\3\2\2\2\u00cd)\3\2\2\2\u00ce\u00cf")
-        buf.write("\5\f\7\2\u00cf\u00d0\5\20\t\2\u00d0+\3\2\2\2\u00d1\u00d2")
-        buf.write("\7\4\2\2\u00d2\u00d3\5&\24\2\u00d3\u00d4\5&\24\2\u00d4")
-        buf.write("\u00d5\7\5\2\2\u00d5-\3\2\2\2\u00d6\u00d7\7\4\2\2\u00d7")
-        buf.write("\u00d8\7\37\2\2\u00d8\u00d9\5*\26\2\u00d9\u00da\7\5\2")
-        buf.write("\2\u00da/\3\2\2\2\u00db\u00dc\7\4\2\2\u00dc\u00dd\7 \2")
-        buf.write("\2\u00dd\u00de\5*\26\2\u00de\u00df\7\5\2\2\u00df\61\3")
-        buf.write("\2\2\2\u00e0\u00e1\7\4\2\2\u00e1\u00e2\7!\2\2\u00e2\u00e5")
-        buf.write("\5\f\7\2\u00e3\u00e6\5\f\7\2\u00e4\u00e6\5\36\20\2\u00e5")
-        buf.write("\u00e3\3\2\2\2\u00e5\u00e4\3\2\2\2\u00e6\u00ea\3\2\2\2")
-        buf.write("\u00e7\u00e9\5\36\20\2\u00e8\u00e7\3\2\2\2\u00e9\u00ec")
-        buf.write("\3\2\2\2\u00ea\u00e8\3\2\2\2\u00ea\u00eb\3\2\2\2\u00eb")
-        buf.write("\u00ed\3\2\2\2\u00ec\u00ea\3\2\2\2\u00ed\u00ee\7\5\2\2")
-        buf.write("\u00ee\63\3\2\2\2\u00ef\u00f0\7\4\2\2\u00f0\u00f4\7\"")
-        buf.write("\2\2\u00f1\u00f3\5\36\20\2\u00f2\u00f1\3\2\2\2\u00f3\u00f6")
-        buf.write("\3\2\2\2\u00f4\u00f2\3\2\2\2\u00f4\u00f5\3\2\2\2\u00f5")
-        buf.write("\u00f7\3\2\2\2\u00f6\u00f4\3\2\2\2\u00f7\u00f9\7\4\2\2")
-        buf.write("\u00f8\u00fa\5$\23\2\u00f9\u00f8\3\2\2\2\u00fa\u00fb\3")
-        buf.write("\2\2\2\u00fb\u00f9\3\2\2\2\u00fb\u00fc\3\2\2\2\u00fc\u00fd")
-        buf.write("\3\2\2\2\u00fd\u00fe\7\5\2\2\u00fe\u0100\7\4\2\2\u00ff")
-        buf.write("\u0101\5,\27\2\u0100\u00ff\3\2\2\2\u0101\u0102\3\2\2\2")
-        buf.write("\u0102\u0100\3\2\2\2\u0102\u0103\3\2\2\2\u0103\u0104\3")
-        buf.write("\2\2\2\u0104\u0105\7\5\2\2\u0105\u0106\7\5\2\2\u0106\65")
-        buf.write("\3\2\2\2\u0107\u0108\7\4\2\2\u0108\u0109\7$\2\2\u0109")
-        buf.write("\u010a\5(\25\2\u010a\u010b\7\5\2\2\u010b\67\3\2\2\2\u010c")
-        buf.write("\u010d\7\4\2\2\u010d\u010e\7#\2\2\u010e\u010f\7\7\2\2")
-        buf.write("\u010f\u0110\5\f\7\2\u0110\u0111\5\36\20\2\u0111\u0112")
-        buf.write("\7\5\2\2\u01129\3\2\2\2\35=CEMX\\hquy\u0082\u0086\u008e")
-        buf.write("\u0092\u0098\u00a0\u00a4\u00ad\u00bb\u00bf\u00c8\u00cc")
-        buf.write("\u00e5\u00ea\u00f4\u00fb\u0102")
+        buf.write("\2\u00c1\u00cc\5\f\7\2\u00c2\u00c3\7\4\2\2\u00c3\u00c5")
+        buf.write("\5\f\7\2\u00c4\u00c6\5(\25\2\u00c5\u00c4\3\2\2\2\u00c6")
+        buf.write("\u00c7\3\2\2\2\u00c7\u00c5\3\2\2\2\u00c7\u00c8\3\2\2\2")
+        buf.write("\u00c8\u00c9\3\2\2\2\u00c9\u00ca\7\5\2\2\u00ca\u00cc\3")
+        buf.write("\2\2\2\u00cb\u00c1\3\2\2\2\u00cb\u00c2\3\2\2\2\u00cc)")
+        buf.write("\3\2\2\2\u00cd\u00ce\5\f\7\2\u00ce\u00cf\5\20\t\2\u00cf")
+        buf.write("+\3\2\2\2\u00d0\u00d1\7\4\2\2\u00d1\u00d2\5&\24\2\u00d2")
+        buf.write("\u00d3\5&\24\2\u00d3\u00d4\7\5\2\2\u00d4-\3\2\2\2\u00d5")
+        buf.write("\u00d6\7\4\2\2\u00d6\u00d7\7\37\2\2\u00d7\u00d8\5*\26")
+        buf.write("\2\u00d8\u00d9\7\5\2\2\u00d9/\3\2\2\2\u00da\u00db\7\4")
+        buf.write("\2\2\u00db\u00dc\7 \2\2\u00dc\u00dd\5*\26\2\u00dd\u00de")
+        buf.write("\7\5\2\2\u00de\61\3\2\2\2\u00df\u00e0\7\4\2\2\u00e0\u00e1")
+        buf.write("\7!\2\2\u00e1\u00e4\5\f\7\2\u00e2\u00e5\5\f\7\2\u00e3")
+        buf.write("\u00e5\5\36\20\2\u00e4\u00e2\3\2\2\2\u00e4\u00e3\3\2\2")
+        buf.write("\2\u00e5\u00e9\3\2\2\2\u00e6\u00e8\5\36\20\2\u00e7\u00e6")
+        buf.write("\3\2\2\2\u00e8\u00eb\3\2\2\2\u00e9\u00e7\3\2\2\2\u00e9")
+        buf.write("\u00ea\3\2\2\2\u00ea\u00ec\3\2\2\2\u00eb\u00e9\3\2\2\2")
+        buf.write("\u00ec\u00ed\7\5\2\2\u00ed\63\3\2\2\2\u00ee\u00ef\7\4")
+        buf.write("\2\2\u00ef\u00f3\7\"\2\2\u00f0\u00f2\5\36\20\2\u00f1\u00f0")
+        buf.write("\3\2\2\2\u00f2\u00f5\3\2\2\2\u00f3\u00f1\3\2\2\2\u00f3")
+        buf.write("\u00f4\3\2\2\2\u00f4\u00f6\3\2\2\2\u00f5\u00f3\3\2\2\2")
+        buf.write("\u00f6\u00f8\7\4\2\2\u00f7\u00f9\5$\23\2\u00f8\u00f7\3")
+        buf.write("\2\2\2\u00f9\u00fa\3\2\2\2\u00fa\u00f8\3\2\2\2\u00fa\u00fb")
+        buf.write("\3\2\2\2\u00fb\u00fc\3\2\2\2\u00fc\u00fd\7\5\2\2\u00fd")
+        buf.write("\u00ff\7\4\2\2\u00fe\u0100\5,\27\2\u00ff\u00fe\3\2\2\2")
+        buf.write("\u0100\u0101\3\2\2\2\u0101\u00ff\3\2\2\2\u0101\u0102\3")
+        buf.write("\2\2\2\u0102\u0103\3\2\2\2\u0103\u0104\7\5\2\2\u0104\u0105")
+        buf.write("\7\5\2\2\u0105\65\3\2\2\2\u0106\u0107\7\4\2\2\u0107\u0108")
+        buf.write("\7$\2\2\u0108\u0109\5(\25\2\u0109\u010a\7\5\2\2\u010a")
+        buf.write("\67\3\2\2\2\u010b\u010c\7\4\2\2\u010c\u010d\7#\2\2\u010d")
+        buf.write("\u010e\7\7\2\2\u010e\u010f\5\f\7\2\u010f\u0110\5\36\20")
+        buf.write("\2\u0110\u0111\7\5\2\2\u01119\3\2\2\2\35=CEMX\\hquy\u0082")
+        buf.write("\u0086\u008e\u0092\u0098\u00a0\u00a4\u00ad\u00bb\u00bf")
+        buf.write("\u00c7\u00cb\u00e4\u00e9\u00f3\u00fa\u0101")
         return buf.getvalue()
 
 
@@ -185,7 +184,7 @@ class SMTMRParser ( Parser ):
     RULE_qual_identifier = 16
     RULE_sorted_var = 17
     RULE_term = 18
-    RULE_term_template = 19
+    RULE_boolean_term_template = 19
     RULE_formula_dec = 20
     RULE_subst_pair = 21
     RULE_seed_dec = 22
@@ -199,7 +198,7 @@ class SMTMRParser ( Parser ):
                    "undefinedKeyword", "symbol", "keyword", "status", "b_value", 
                    "spec_constant", "s_expr", "index", "identifier", "attribute_value", 
                    "attribute", "sort", "qual_identifier", "sorted_var", 
-                   "term", "term_template", "formula_dec", "subst_pair", 
+                   "term", "boolean_term_template", "formula_dec", "subst_pair", 
                    "seed_dec", "mutant_dec", "notation_dec", "substTemplate_dec", 
                    "fuse_dec", "method_dec" ]
 
@@ -1765,16 +1764,12 @@ class SMTMRParser ( Parser ):
         return localctx
 
 
-    class Term_templateContext(ParserRuleContext):
+    class Boolean_term_templateContext(ParserRuleContext):
         __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-
-        def spec_constant(self):
-            return self.getTypedRuleContext(SMTMRParser.Spec_constantContext,0)
-
 
         def symbol(self):
             return self.getTypedRuleContext(SMTMRParser.SymbolContext,0)
@@ -1786,76 +1781,70 @@ class SMTMRParser ( Parser ):
         def ParClose(self):
             return self.getToken(SMTMRParser.ParClose, 0)
 
-        def term_template(self, i:int=None):
+        def boolean_term_template(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(SMTMRParser.Term_templateContext)
+                return self.getTypedRuleContexts(SMTMRParser.Boolean_term_templateContext)
             else:
-                return self.getTypedRuleContext(SMTMRParser.Term_templateContext,i)
+                return self.getTypedRuleContext(SMTMRParser.Boolean_term_templateContext,i)
 
 
         def getRuleIndex(self):
-            return SMTMRParser.RULE_term_template
+            return SMTMRParser.RULE_boolean_term_template
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterTerm_template" ):
-                listener.enterTerm_template(self)
+            if hasattr( listener, "enterBoolean_term_template" ):
+                listener.enterBoolean_term_template(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitTerm_template" ):
-                listener.exitTerm_template(self)
+            if hasattr( listener, "exitBoolean_term_template" ):
+                listener.exitBoolean_term_template(self)
 
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitTerm_template" ):
-                return visitor.visitTerm_template(self)
+            if hasattr( visitor, "visitBoolean_term_template" ):
+                return visitor.visitBoolean_term_template(self)
             else:
                 return visitor.visitChildren(self)
 
 
 
 
-    def term_template(self):
+    def boolean_term_template(self):
 
-        localctx = SMTMRParser.Term_templateContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 38, self.RULE_term_template)
+        localctx = SMTMRParser.Boolean_term_templateContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 38, self.RULE_boolean_term_template)
         self._la = 0 # Token type
         try:
-            self.state = 202
+            self.state = 201
             self._errHandler.sync(self)
-            la_ = self._interp.adaptivePredict(self._input,21,self._ctx)
-            if la_ == 1:
+            token = self._input.LA(1)
+            if token in [SMTMRParser.QuotedSymbol, SMTMRParser.PS_Not, SMTMRParser.PS_Bool, SMTMRParser.PS_False, SMTMRParser.PS_Logic, SMTMRParser.PS_Theory, SMTMRParser.PS_True, SMTMRParser.PS_Sat, SMTMRParser.PS_Unsat, SMTMRParser.PS_Unknown, SMTMRParser.UndefinedSymbol]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 191
-                self.spec_constant()
+                self.symbol()
                 pass
-
-            elif la_ == 2:
+            elif token in [SMTMRParser.ParOpen]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 192
-                self.symbol()
-                pass
-
-            elif la_ == 3:
-                self.enterOuterAlt(localctx, 3)
-                self.state = 193
                 self.match(SMTMRParser.ParOpen)
-                self.state = 194
+                self.state = 193
                 self.symbol()
-                self.state = 196 
+                self.state = 195 
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 while True:
-                    self.state = 195
-                    self.term_template()
-                    self.state = 198 
+                    self.state = 194
+                    self.boolean_term_template()
+                    self.state = 197 
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
-                    if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << SMTMRParser.ParOpen) | (1 << SMTMRParser.String) | (1 << SMTMRParser.QuotedSymbol) | (1 << SMTMRParser.PS_Not) | (1 << SMTMRParser.PS_Bool) | (1 << SMTMRParser.PS_False) | (1 << SMTMRParser.PS_Logic) | (1 << SMTMRParser.PS_Theory) | (1 << SMTMRParser.PS_True) | (1 << SMTMRParser.PS_Sat) | (1 << SMTMRParser.PS_Unsat) | (1 << SMTMRParser.PS_Unknown) | (1 << SMTMRParser.Numeral) | (1 << SMTMRParser.Binary) | (1 << SMTMRParser.HexDecimal) | (1 << SMTMRParser.Decimal) | (1 << SMTMRParser.UndefinedSymbol))) != 0)):
+                    if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << SMTMRParser.ParOpen) | (1 << SMTMRParser.QuotedSymbol) | (1 << SMTMRParser.PS_Not) | (1 << SMTMRParser.PS_Bool) | (1 << SMTMRParser.PS_False) | (1 << SMTMRParser.PS_Logic) | (1 << SMTMRParser.PS_Theory) | (1 << SMTMRParser.PS_True) | (1 << SMTMRParser.PS_Sat) | (1 << SMTMRParser.PS_Unsat) | (1 << SMTMRParser.PS_Unknown) | (1 << SMTMRParser.UndefinedSymbol))) != 0)):
                         break
 
-                self.state = 200
+                self.state = 199
                 self.match(SMTMRParser.ParClose)
                 pass
-
+            else:
+                raise NoViableAltException(self)
 
         except RecognitionException as re:
             localctx.exception = re
@@ -1907,9 +1896,9 @@ class SMTMRParser ( Parser ):
         self.enterRule(localctx, 40, self.RULE_formula_dec)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 204
+            self.state = 203
             self.symbol()
-            self.state = 205
+            self.state = 204
             self.status()
         except RecognitionException as re:
             localctx.exception = re
@@ -1966,13 +1955,13 @@ class SMTMRParser ( Parser ):
         self.enterRule(localctx, 42, self.RULE_subst_pair)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 207
+            self.state = 206
             self.match(SMTMRParser.ParOpen)
+            self.state = 207
+            self.term()
             self.state = 208
             self.term()
             self.state = 209
-            self.term()
-            self.state = 210
             self.match(SMTMRParser.ParClose)
         except RecognitionException as re:
             localctx.exception = re
@@ -2029,13 +2018,13 @@ class SMTMRParser ( Parser ):
         self.enterRule(localctx, 44, self.RULE_seed_dec)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 212
+            self.state = 211
             self.match(SMTMRParser.ParOpen)
-            self.state = 213
+            self.state = 212
             self.match(SMTMRParser.GRW_Seed)
-            self.state = 214
+            self.state = 213
             self.formula_dec()
-            self.state = 215
+            self.state = 214
             self.match(SMTMRParser.ParClose)
         except RecognitionException as re:
             localctx.exception = re
@@ -2092,13 +2081,13 @@ class SMTMRParser ( Parser ):
         self.enterRule(localctx, 46, self.RULE_mutant_dec)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 217
+            self.state = 216
             self.match(SMTMRParser.ParOpen)
-            self.state = 218
+            self.state = 217
             self.match(SMTMRParser.GRW_Mutant)
-            self.state = 219
+            self.state = 218
             self.formula_dec()
-            self.state = 220
+            self.state = 219
             self.match(SMTMRParser.ParClose)
         except RecognitionException as re:
             localctx.exception = re
@@ -2166,37 +2155,37 @@ class SMTMRParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 222
+            self.state = 221
             self.match(SMTMRParser.ParOpen)
-            self.state = 223
+            self.state = 222
             self.match(SMTMRParser.GRW_Notation)
-            self.state = 224
+            self.state = 223
             self.symbol()
-            self.state = 227
+            self.state = 226
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [SMTMRParser.QuotedSymbol, SMTMRParser.PS_Not, SMTMRParser.PS_Bool, SMTMRParser.PS_False, SMTMRParser.PS_Logic, SMTMRParser.PS_Theory, SMTMRParser.PS_True, SMTMRParser.PS_Sat, SMTMRParser.PS_Unsat, SMTMRParser.PS_Unknown, SMTMRParser.UndefinedSymbol]:
-                self.state = 225
+                self.state = 224
                 self.symbol()
                 pass
             elif token in [SMTMRParser.Colon, SMTMRParser.PK_Gen, SMTMRParser.PK_Var, SMTMRParser.PK_Cons, SMTMRParser.PK_Snippet, SMTMRParser.PK_Seed, SMTMRParser.PK_Free, SMTMRParser.PK_Bound]:
-                self.state = 226
+                self.state = 225
                 self.attribute()
                 pass
             else:
                 raise NoViableAltException(self)
 
-            self.state = 232
+            self.state = 231
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             while (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << SMTMRParser.Colon) | (1 << SMTMRParser.PK_Gen) | (1 << SMTMRParser.PK_Var) | (1 << SMTMRParser.PK_Cons) | (1 << SMTMRParser.PK_Snippet) | (1 << SMTMRParser.PK_Seed) | (1 << SMTMRParser.PK_Free) | (1 << SMTMRParser.PK_Bound))) != 0):
-                self.state = 229
+                self.state = 228
                 self.attribute()
-                self.state = 234
+                self.state = 233
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
 
-            self.state = 235
+            self.state = 234
             self.match(SMTMRParser.ParClose)
         except RecognitionException as re:
             localctx.exception = re
@@ -2277,53 +2266,53 @@ class SMTMRParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 237
+            self.state = 236
             self.match(SMTMRParser.ParOpen)
-            self.state = 238
+            self.state = 237
             self.match(SMTMRParser.GRW_SubstTemplate)
-            self.state = 242
+            self.state = 241
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             while (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << SMTMRParser.Colon) | (1 << SMTMRParser.PK_Gen) | (1 << SMTMRParser.PK_Var) | (1 << SMTMRParser.PK_Cons) | (1 << SMTMRParser.PK_Snippet) | (1 << SMTMRParser.PK_Seed) | (1 << SMTMRParser.PK_Free) | (1 << SMTMRParser.PK_Bound))) != 0):
-                self.state = 239
+                self.state = 238
                 self.attribute()
-                self.state = 244
+                self.state = 243
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
 
-            self.state = 245
+            self.state = 244
             self.match(SMTMRParser.ParOpen)
-            self.state = 247 
+            self.state = 246 
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             while True:
-                self.state = 246
+                self.state = 245
                 self.sorted_var()
-                self.state = 249 
+                self.state = 248 
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if not (_la==SMTMRParser.ParOpen):
                     break
 
-            self.state = 251
+            self.state = 250
             self.match(SMTMRParser.ParClose)
-            self.state = 252
+            self.state = 251
             self.match(SMTMRParser.ParOpen)
-            self.state = 254 
+            self.state = 253 
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             while True:
-                self.state = 253
+                self.state = 252
                 self.subst_pair()
-                self.state = 256 
+                self.state = 255 
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if not (_la==SMTMRParser.ParOpen):
                     break
 
-            self.state = 258
+            self.state = 257
             self.match(SMTMRParser.ParClose)
-            self.state = 259
+            self.state = 258
             self.match(SMTMRParser.ParClose)
         except RecognitionException as re:
             localctx.exception = re
@@ -2347,8 +2336,8 @@ class SMTMRParser ( Parser ):
         def GRW_Fuse(self):
             return self.getToken(SMTMRParser.GRW_Fuse, 0)
 
-        def term_template(self):
-            return self.getTypedRuleContext(SMTMRParser.Term_templateContext,0)
+        def boolean_term_template(self):
+            return self.getTypedRuleContext(SMTMRParser.Boolean_term_templateContext,0)
 
 
         def ParClose(self):
@@ -2380,13 +2369,13 @@ class SMTMRParser ( Parser ):
         self.enterRule(localctx, 52, self.RULE_fuse_dec)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 261
+            self.state = 260
             self.match(SMTMRParser.ParOpen)
-            self.state = 262
+            self.state = 261
             self.match(SMTMRParser.GRW_Fuse)
+            self.state = 262
+            self.boolean_term_template()
             self.state = 263
-            self.term_template()
-            self.state = 264
             self.match(SMTMRParser.ParClose)
         except RecognitionException as re:
             localctx.exception = re
@@ -2450,17 +2439,17 @@ class SMTMRParser ( Parser ):
         self.enterRule(localctx, 54, self.RULE_method_dec)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 266
+            self.state = 265
             self.match(SMTMRParser.ParOpen)
-            self.state = 267
+            self.state = 266
             self.match(SMTMRParser.GRW_Method)
-            self.state = 268
+            self.state = 267
             self.match(SMTMRParser.String)
-            self.state = 269
+            self.state = 268
             self.symbol()
-            self.state = 270
+            self.state = 269
             self.attribute()
-            self.state = 271
+            self.state = 270
             self.match(SMTMRParser.ParClose)
         except RecognitionException as re:
             localctx.exception = re

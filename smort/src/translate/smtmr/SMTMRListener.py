@@ -179,12 +179,12 @@ class SMTMRListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SMTMRParser#term_template.
-    def enterTerm_template(self, ctx:SMTMRParser.Term_templateContext):
+    # Enter a parse tree produced by SMTMRParser#boolean_term_template.
+    def enterBoolean_term_template(self, ctx:SMTMRParser.Boolean_term_templateContext):
         pass
 
-    # Exit a parse tree produced by SMTMRParser#term_template.
-    def exitTerm_template(self, ctx:SMTMRParser.Term_templateContext):
+    # Exit a parse tree produced by SMTMRParser#boolean_term_template.
+    def exitBoolean_term_template(self, ctx:SMTMRParser.Boolean_term_templateContext):
         pass
 
 

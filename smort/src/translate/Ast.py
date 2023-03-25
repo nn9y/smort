@@ -14,12 +14,13 @@ from smort.src.translate.utils import *
 ###
 
 class SpecConstType(StrEnum):
-    NUMERAL = 'NUMERAL'
-    DECIMAL = 'DECIMAL'
+    NUMERAL     = 'NUMERAL'
+    DECIMAL     = 'DECIMAL'
     HEXADECIMAL = 'HEXADECIMAL'
-    BINARY = 'BINARY'
-    STRING = 'STRING'
-    B_VALUE = 'B_VALUE'
+    BINARY      = 'BINARY'
+    STRING      = 'STRING'
+    B_VALUE     = 'B_VALUE'
+
 
 
 class SpecConstant:

@@ -8,6 +8,7 @@ from smort.src.translate.theory.available_sorts import *
 # get sorts and funs
 # add sorts and funs above 
 
+core_sorts, core_funs = core_theory()
 ints_sorts, ints_funs = ints_theory()
 reals_sorts, reals_funs = reals_theory()
 reals_ints_sorts, reals_ints_funs = reals_ints_theory()

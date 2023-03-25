@@ -5,7 +5,7 @@ import sys
 from smort.src.base.exitcodes import ERR_USAGE, ERR_INTERNAL
 from smort.src.translate.smtlibv2.Script import DeclareConst, Assert
 from smort.src.translate.Ast import Expr, Var
-from smort.src.translate.theory.available_sorts import get_constant_value 
+from smort.src.translate.theory.available_sorts import random_constant_value 
 from smort.src.translate.smtmr.MetamorphicRelation import SMTMRKeyword
 from smort.src.mutator.utils import merge, random_term_tuples, call_function_from_module
 
@@ -41,7 +41,7 @@ class Mutator:
                         self.other_terms[var] = term 
                     if attr.keyword == SMTMRKeyword.CONS:
                         # TODO
-                        cons_map[var] = get_constant_value(sort)
+                        cons_map[var] = random_constant_value(sort)
 
             for i, repl_pair in enumerate(template.repl_pairs):
                 term, repl = repl_pair 

@@ -63,7 +63,7 @@ class Translator(SMTMRVisitor):
         # TODO
         # convert symbol to Identifier object
         # for convenience of comparing
-        return Identifier(ctx.getChild(0).getText())
+        return ctx.getChild(0).getText()
     
     def visitKeyword(self, ctx: SMTMRParser.KeywordContext):
         if ctx.predefKeyword():
@@ -83,10 +83,7 @@ class Translator(SMTMRVisitor):
         elif ctx.String():
             return SpecConstant(SpecConstType.STRING, ctx.String().getText())
         else:
-            return SpecConstant(
-                SpecConstType.B_VALUE,
-                True if ctx.b_value().getText() == "true" else False
-            ) 
+            return SpecConstant(SpecConstType.B_VALUE, ctx.b_value().getText()) 
  
     def visitS_expr(self, ctx: SMTMRParser.S_exprContext):
         if ctx.spec_constant():
@@ -158,7 +155,9 @@ class Translator(SMTMRVisitor):
     def visitTerm(self, ctx: SMTMRParser.TermContext, local_vars):
         if ctx.spec_constant():
             spec_constant = self.visitSpec_constant(ctx.spec_constant())
-            ret_sort = self._well_sorted_term(spec_constant, [], None, local_vars)
+            ret_sort, flag = self._well_sorted_term(spec_constant, [], None, local_vars)
+            if flag == 0:
+                raise SMTMRException('warning: notation name overrides signature in theories')
             return Const(name=spec_constant, sort=ret_sort)
         elif ctx.qual_identifier():
             id_, sort = self.visitQual_identifier(ctx.qual_identifier())
@@ -171,27 +170,32 @@ class Translator(SMTMRVisitor):
                     subterm = self.visitTerm(term_ctx, local_vars)
                     subterms.appen(subterm)
                     input_list.append(subterm.sort)
-                ret_sort = self._well_sorted_term(id_, input_list, sort)
+                ret_sort, flag = self._well_sorted_term(id_, input_list, sort)
+                if flag == 0:
+                    raise SMTMRException('warning: notation name overrides signature in theories')
                 return Expr(name=id_, subterms=subterms, sort=ret_sort, qual_id=qual_id)
             else:
                 sort = self._well_sorted_term(id_, [], sort)
-                return Var(name=id_, sort=ret_sort, qual_id=qual_id)
+                match flag:
+                    case 0:
+                        return Var(name=id_, sort=ret_sort, qual_id=qual_id)
+                    case 1:
+                        return Expr(name=id_, subterms=[], sort=ret_sort, qual_id=qual_id)
     
-    def visitTerm_template(self, ctx: SMTMRParser.Term_templateContext):
-        if ctx.spec_constant():
-            spec_constant = self.visitSpec_constant(ctx.spec_constant())
-            return Const(name=spec_constant)
-        elif ctx.symbol():
-            sym = self.visitSymbol(ctx.symbol())
-            self._check_valid_formula_symbol(sym)
-            if ctx.ParOpen(): 
-                subterms = []
-                for tt_ctx in ctx.term_template():
-                    subtt = self.visitTerm_template(tt_ctx)
-                    subterms.appen(subtt)
-                return Expr(name=sym, subterms=subterms)
-            else:
-                return Var(name=sym)
+    def visitBoolean_term_template(self, ctx:SMTMRParser.Boolean_term_templateContext):
+        sym = self.visitSymbol(ctx.symbol())
+        if ctx.ParOpen(): 
+            subterms = []
+            input_list = []
+            for btt_ctx in ctx.boolean_term_template():
+                subbtt = self.visitBoolean_term_template(btt_ctx)
+                subterms.append(subbtt)
+                input_list.append(BOOL)
+            self._is_boolean_fun(sym, input_list)
+            return Expr(name=Identifier(sym), subterms=subterms, sort=BOOL)
+        else:
+            self._is_valid_formula_symbol(sym)
+            return Var(name=Identifier(sym), sort=BOOL)
     
     def visitFormula_dec(self, ctx: SMTMRParser.Formula_decContext):
         symbol = self.visitSymbol(ctx.symbol()) 
@@ -257,7 +261,7 @@ class Translator(SMTMRVisitor):
         formula_attribute = self.visitAttribute(ctx.attribute())
         return Method(name=method_name, formula=formula_symbol, attribute=formula_attribute)
     
-    def _check_valid_formula_symbol(self, symbol):
+    def _is_valid_formula_symbol(self, symbol):
         if str(symbol) in self.index_of_seed:
             return
         for method in self.methods:
@@ -268,9 +272,15 @@ class Translator(SMTMRVisitor):
                 for attr in info.attributes:
                     if attr == SMTMRKeyword.GEN:
                         return
-        raise SMTMRException(f"symbol '{symbol}' is not a valid seed symbol, \
+        raise SMTMRException(f"'{symbol}' is not a valid seed symbol, \
 symbol returned by extended method, or notation with :gen attributes")
     
+    def _is_boolean_fun(self, symbol, input_list):
+        fun = match_fun_in_signatures(Identifier(symbol), input_list, None, core_funs)
+        if fun:
+            return
+        raise SMTMRException(f"'({symbol} {list2str(input_list)})' is not a valid boolean signature")
+ 
     def _well_sorted_term(self, name, input_list=None, output=None, local_vars=None):
         if str(name) in local_vars:
             # sorted symbols declared in each subst template
@@ -278,12 +288,12 @@ symbol returned by extended method, or notation with :gen attributes")
                 (output and local_vars[str(name)] == output)
                 or not output
             ):
-                return local_vars[str(name)] 
+                return local_vars[str(name)], 0 
         # predefined signatures
         # constants, functions
         fun = match_fun_in_signatures(name, input_list, output, all_funs)
         if fun:
-            return fun.output
+            return fun.output, 1
         raise SMTMRException(f"signature ({name} {list2str(input_list)}) is not defined")
 
     def _check_conflicted_decl(self, symbol):

@@ -56,10 +56,7 @@ class ScriptVisitor(SMTLIBv2Visitor):
         elif ctx.String():
             return SpecConstant(SpecConstType.STRING, ctx.String().getText())
         else:
-            return SpecConstant(
-                SpecConstType.B_VALUE,
-                True if ctx.b_value().getText() == "true" else False
-            )
+            return SpecConstant(SpecConstType.B_VALUE, ctx.b_value().getText()) 
  
     def visitS_expr(self, ctx: SMTLIBv2Parser.S_exprContext):
         if ctx.spec_constant():
