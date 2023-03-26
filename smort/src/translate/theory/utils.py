@@ -20,14 +20,20 @@ def merge_disjoint_dict(dict_list):
 
 def merge_multi_dict(dict_list):
     """
-    merge dicts, values with the same key are combined into a list
-    no nested list
+    merge dicts, values with the same key are combined into a list, no nested list, no duplicated item 
     """
     merged_dict = defaultdict(list)
     for _dict in dict_list:
         for key, value in _dict.items():
             if isinstance(value, list):
-                merged_dict[key].extend(value)
+                for v in value:
+                    not_exists = True
+                    for f in merged_dict[key]:
+                        if f == v:
+                            not_exists = False
+                            break
+                    if not_exists:
+                        merged_dict[key].append(v)
             else:
                 merged_dict[key].append(value)
     return merged_dict

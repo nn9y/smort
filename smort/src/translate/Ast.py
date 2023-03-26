@@ -182,19 +182,36 @@ class Sort:
 
 
 class SExperssion:
+    """
+    s_expr
+        : spec_constant
+        | symbol
+        | keyword
+        | ParOpen s_expr* ParClose
+        ;
+    """
     def __init__(
         self,
         value=None,
-        subsexprs=None,
+        subsexprs: list = None
     ):
-        self.value = value
-        self.subsexprs = subsexprs
-    
+        """
+        (value == None) xor (subsexprs == None)
+        """
+        self.value = value          # spec_constant, symbol, or keyword
+        self.subsexprs = subsexprs  # ( s_expr* )
+ 
+    def __eq__(self, other):
+        if not isinstance(other, SExperssion):
+            return False
+        if self.value != other.value:
+            return False
+        if self.subsexprs != other.subsexprs:
+            return False
+        return True
+
     def __str__(self):
-        if self.subsexprs:
-            return f"({list2str(self.subsexprs)})"
-        else:
-            return f"{self.value}"
+        return str(self.value) if self.value else f"({list2str(self.subsexprs)})"
 
     def __repr__(self):
         return self.__str__()
@@ -202,15 +219,22 @@ class SExperssion:
 
 class AttributeValue:
     """
-    value == None xor sexprs == None
+    attribute_value
+        : spec_constant
+        | symbol
+        | ParOpen s_expr* ParClose
+        ;
     """
     def __init__(
         self,
         value=None,
-        sexprs=None
+        sexprs: list = None
     ):
-        self.value = value
-        self.sexprs = sexprs
+        """
+        (value == None) xor (sexprs == None)
+        """
+        self.value = value      # spec_constant or symbol
+        self.sexprs = sexprs    # ( s_expr* )
 
     def __eq__(self, other):
         if not isinstance(other, AttributeValue):
@@ -220,7 +244,7 @@ class AttributeValue:
         if self.sexprs != other.sexprs:
             return False
         return True
-    
+ 
     def __str__(self):
         return str(self.value) if self.value else f"({list2str(self.sexprs)})"
 
@@ -244,7 +268,7 @@ class Attribute:
  
     def __str__(self):
         return (
-            f"{self.keyword} {str(self.value)}"
+            f"{self.keyword} {self.value}"
             if self.value
             else self.keyword
         )
@@ -252,11 +276,6 @@ class Attribute:
     def __repr__(self):
         return self.__str__()
 
-
-
-class Quantifier(StrEnum):
-    FORALL = 'forall'
-    EXISTS = 'exists'
 
 
 class TermType(Enum):
@@ -269,6 +288,7 @@ class TermType(Enum):
     ANNOT   = 6
 
 
+
 def Const(name, sort=None):
     return Term(name=name, sort=sort, term_type=TermType.CONST)
 
@@ -277,7 +297,7 @@ def Var(name, sort=None, qual_id=False):
         name=name,
         sort=sort,
         term_type=TermType.VAR,
-        local_free_vars={name},
+        local_free_vars={str(name)},
         qual_id=qual_id,
     )
 
@@ -286,7 +306,7 @@ def Expr(name, subterms, sort=None, local_free_vars=None, qual_id=False):
         name=name,
         subterms=subterms,
         sort=sort,
-        term_type=TermType.EXP,
+        term_type=TermType.EXPR,
         local_free_vars=local_free_vars,
         qual_id=qual_id,
     )
@@ -338,17 +358,14 @@ class Term:
         name=None,
         sort=None,
         term_type=None,
-        var_bindings={},
         quantifier=None,
-        sorted_vars={},
-        match_cases={},
+        sorted_vars=[],
+        var_bindings=[],
+        match_cases=[],
         bound_vars={},
         subterms=[],
-        annotations=None,
-        local_free_vars=None,
-        global_free_vars=None,
-        parent=None,
-        is_free=False,
+        annotations=[],
+        local_free_vars={},
         qual_id=False,
     ):
         self._set(
@@ -363,13 +380,9 @@ class Term:
             subterms=subterms,
             annotations=annotations,
             local_free_vars=local_free_vars,
-            global_free_vars=global_free_vars,
-            parent=parent,
-            is_free=is_free,
             qual_id=qual_id,
         )
-        self._add_parent_pointer()
-    
+ 
     def _set(
         self,
         name=None,
@@ -383,9 +396,6 @@ class Term:
         subterms=None,
         annotations=None,
         local_free_vars=None,
-        global_free_vars=None,
-        parent=None,
-        is_free=False,
         qual_id=False,
     ):
         self.name = name
@@ -399,34 +409,11 @@ class Term:
         self.subterms = subterms
         self.annotations = annotations
         self.local_free_vars = local_free_vars,
-        self.global_free_vars = global_free_vars,
-        self.parent = parent
-        self.is_free = is_free 
         self.qual_id = qual_id
-    
-    def _add_parent_pointer(self):
-        if self.subterms:
-            for t in self.subterms:
-                if isinstance(t, Term):
-                    t.parent = self
-                    t._add_parent_pointer()
 
-    def update_global_free_vars(self):
-        if not self.parent:
-            self.global_free_vars = self.local_free_vars
-        if self.subterms:
-            for t in self.subterms:
-                if isinstance(t, Term):
-                    t.global_free_vars = self.global_free_vars
-                    t.update_global_free_vars()
-                    # TODO
-                    if t.term_type == TermType.VAR:
-                        if t in self.global_free_vars and t not in self.bound_vars:
-                            t.is_free = True
-    
-    def equals(self, other, is_free, var_name_map):
+    def equals(self, other, free=False):
         """
-        Check if this term match template term to be replaced
+        check if this term match other, the template term to be replaced
         """
         if not isinstance(other, Term):
             return False
@@ -434,46 +421,65 @@ class Term:
             return False
         if self.sort != other.sort:
             return False
-        # name can be different for vars, funs ...
-        # we only deal with cons, vars, funs in current implementation,
+        # name of cons, exprs should be the same
+        if ((self.term_type == TermType.CONST) or (self.term_type == TermType.EXPR)):
+            if self.name != other.name:
+                return False
+        # only deal with cons, vars, exprs in current implementation
+        # other.term_type won't be following types
+        # if (
+        #     (self.term_type == TermType.QUANT)
+        #     or (self.term_type == TermType.LET)
+        #     or (self.term_type == TermType.MATCH)
+        #     or (self.term_type == TermType.ANNOT)
+        # ):
+        #     return False
         if len(self.subterms) != len(other.subterms):
             return False
         for i, t in enumerate(self.subterms):
-            if not t.equals(other.subterms[i]):
+            if not t.equals(other.subterms[i], free):
                 return False
-            if t.term_type == TermType.VAR:
-                if is_free and not t.is_free:
+            if t.term_type == TermType.VAR and free:
+                if (
+                    not (str(t) in self.local_free_vars)
+                    or (str(t) in self.bound_vars)
+                ):
                     return False
-        # name (value) should be same for constant
-        if self.term_type == TermType.CONST:
-            if self.name != other.name:
-                return False
-        # match success
-        # get mapping
+        return True
+ 
+    def update_var_name_map(self, other, var_name_map):
+        if self.term_type == TermType.VAR:
+            var_name_map[str(other.name)] = self.name
         for i, t in enumerate(self.subterms):
-            if t.term_type == TermType.VAR:
-                var_name_map[other.subterms[i].name] = t.name
-        return True 
-    
-    def find_all_terms(self, t, occs, is_free, var_name_map):
+            t.update_var_name_map(other.subterms[i], var_name_map)
+            # if t.term_type == TermType.VAR:
+            #     var_name_map[str(other.subterms[i].name)] = t.name
+ 
+    def find_all_terms(self, t, occs, var_name_map, free=False):
         """
-        Find all terms t in self and add them to the list occs.
+        find all terms t (and mapping from var name in t to self)
+            in self and add them to the list occs.
         """
-        if self.equals(t, is_free, var_name_map):
+        if self.equals(t, free):
+            self.update_var_name_map(t, var_name_map)
             return occs.append(self)
         if self.subterms:
             for subterm in self.subterms:
-                subterm.find_all_terms(t, occs, var_name_map)
-    
-    def substitute(self, t, repl, var_name_map):
+                subterm.find_all_terms(t, occs, var_name_map, free)
+
+    def substitute(self, t, repl, var_name_map, free=False):
         """
-        Substitute all terms t in self by repl.
+        substitute all terms t in self by repl.
         """
         occs = []
-        self.find_all_terms(t, occs)
+        self.find_all_terms(t, occs, var_name_map, free)
         for occ in occs:
+            if occ.term_type == TermType.VAR:
+                repl_name = var_name_map[str(repl.name)]
+            else:
+                repl_name = repl.name
             occ._set(
-                name=copy.deepcopy(var_name_map[repl.name]),
+                name=copy.deepcopy(repl_name),
                 sort=copy.deepcopy(repl.sort),
                 term_type=copy.deepcopy(repl.term_type),
                 var_bindings=copy.deepcopy(repl.var_bindings),
@@ -484,12 +490,34 @@ class Term:
                 subterms=copy.deepcopy(repl.subterms),
                 annotations=copy.deepcopy(repl.annotations),
                 local_free_vars=occ.local_free_vars,
-                global_free_vars=occ.global_free_vars,
-                parent=occ.parent,
-                is_free=occ.is_free,
                 qual_id=occ.qual_id,
             )
-    
+
+    def replace_symbols_by_terms(self, repl_dict):
+        """
+        replace formula symbols by formula (merged assertion term) instances
+        """
+        if self.term_type == TermType.VAR:
+            # formula symbol
+            repl = repl_dict[str(self.name)]
+            self._set(
+                name=copy.deepcopy(repl.name),
+                sort=copy.deepcopy(repl.sort),
+                term_type=copy.deepcopy(repl.term_type),
+                var_bindings=copy.deepcopy(repl.var_bindings),
+                quantifier=copy.deepcopy(repl.quantifier),
+                sorted_vars=copy.deepcopy(repl.sorted_vars),
+                match_cases=copy.deepcopy(repl.match_cases),
+                bound_vars=copy.deepcopy(repl.bound_vars),
+                subterms=copy.deepcopy(repl.subterms),
+                annotations=copy.deepcopy(repl.annotations),
+                local_free_vars=copy.deepcopy(repl.local_free_vars),
+                qual_id=copy.deepcopy(repl.qual_id),
+            )
+            return
+        for t in self.subterms:
+            t.replace_symbols_by_terms(self, repl_dict)
+
     def __eq__(self, other):
         if not isinstance(other, Term):
             return False
@@ -507,36 +535,24 @@ class Term:
             return False
         if self.match_cases != other.match_cases:
             return False
-        # bound vars, free vars can be different, for example:
+        # bound vars can be different, for example:
         # ( forall (x Int) (y Int) ( exists (z Int) (> (+ x y) z) ) )
         # ( exist (m Bool) (=> ( forall (x Int) (y Int) ( exists (z Int) (> (+ x y) z) ) ) ( not m ) ) )
         if self.subterms != other.subterms:
             return False
+        # local free vars is decided by other members
         if self.annotations != other.annotations:
             return False
         # parent can be different
         return True
-    
-    def replace_symbols_by_terms(self, repl_dict):
-        """
-        replace formula symbols by fused formula instances
-        """
-        # TODO
-        if self.term_type == TermType.VAR:
-            # formula symbol
-            self.substitute(repl_dict[str(self.name)])
-            return
-        for subterm in self.subterms:
-            subterm.substitue(self, repl_dict)
-    
+
     def __str__(self):
         match self.term_type:
             case TermType.LET:
-                return f"(let ({list2str(self.var_bindings)}) ({self.subterms[0]}))"
+                return f"(let ({list2str(self.var_bindings)}) {self.subterms[0]})"
             case TermType.QUANT:
                 return f"({self.quantifier} ({list2str(self.sorted_vars)}) {self.subterms[0]})"
             case TermType.MATCH:
-                # TODO
                 return f"(match {self.subterms[0]} ({list2str(self.match_cases)}))"
             case TermType.ANNOT:
                 return f"(! {self.subterms[0]} {list2str(self.annotations)})"

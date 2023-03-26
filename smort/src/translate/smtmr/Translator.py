@@ -157,7 +157,7 @@ class Translator(SMTMRVisitor):
             spec_constant = self.visitSpec_constant(ctx.spec_constant())
             ret_sort, flag = self._well_sorted_term(spec_constant, [], None, local_vars)
             if flag == 0:
-                raise SMTMRException('warning: notation name overrides signature in theories')
+                raise SMTMRException('notation name overrides signature in theories')
             return Const(name=spec_constant, sort=ret_sort)
         elif ctx.qual_identifier():
             id_, sort = self.visitQual_identifier(ctx.qual_identifier())
@@ -172,10 +172,10 @@ class Translator(SMTMRVisitor):
                     input_list.append(subterm.sort)
                 ret_sort, flag = self._well_sorted_term(id_, input_list, sort)
                 if flag == 0:
-                    raise SMTMRException('warning: notation name overrides signature in theories')
+                    raise SMTMRException('notation name overrides signature in theories')
                 return Expr(name=id_, subterms=subterms, sort=ret_sort, qual_id=qual_id)
             else:
-                sort = self._well_sorted_term(id_, [], sort)
+                ret_sort, flag = self._well_sorted_term(id_, [], sort)
                 match flag:
                     case 0:
                         return Var(name=id_, sort=ret_sort, qual_id=qual_id)

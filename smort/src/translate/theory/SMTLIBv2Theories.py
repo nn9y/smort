@@ -22,12 +22,9 @@ def core_theory():
         "ite": Fun(Identifier("ite"), [BOOL, A, A], A, [A]),
     }
 
-    # prefixes = [ pascal_case_to_snake_case(sort.id_.symbol) for sort in sorts ]
     # repl_dicts = [{A: sort} for sort in sorts]
-    # funs.update(get_all_instances(funs, prefixes, repl_dicts))
-    repl_dicts = [{A: sort} for sort in sorts]
-    funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
-    
+    # funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
+ 
     return [sorts, funs]
 
 def ints_theory(): 
@@ -65,11 +62,8 @@ def ints_theory():
 
     funs = merge_multi_dict([funs, core_funs])
 
-    # prefixes = [ pascal_case_to_snake_case(sort.id_.symbol) for sort in sorts ]
     # repl_dicts = [{A: sort} for sort in sorts]
-    # funs.update(get_all_instances(funs, prefixes, repl_dicts))
-    repl_dicts = [{A: sort} for sort in sorts]
-    funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
+    # funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
 
     return [sorts, funs]
 
@@ -99,11 +93,8 @@ def reals_theory():
 
     funs = merge_multi_dict([funs, core_funs])
 
-    # prefixes = [ pascal_case_to_snake_case(sort.id_.symbol) for sort in sorts ]
     # repl_dicts = [{A: sort} for sort in sorts]
-    # funs.update(get_all_instances(funs, prefixes, repl_dicts))
-    repl_dicts = [{A: sort} for sort in sorts]
-    funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
+    # funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
 
     return sorts, funs
 
@@ -119,11 +110,8 @@ def reals_ints_theory():
     funs["to_int"] = Fun(Identifier("to_int"), [REAL], INT)
     funs["is_int"] = Fun(Identifier("is_int"), [REAL], BOOL)
 
-    # prefixes = [ pascal_case_to_snake_case(sort.id_.symbol) for sort in sorts ]
     # repl_dicts = [{A: sort} for sort in sorts]
-    # funs.update(get_all_instances(funs, prefixes, repl_dicts))
-    repl_dicts = [{A: sort} for sort in sorts]
-    funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
+    # funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
 
     return sorts, funs
 
@@ -254,11 +242,8 @@ def fixedSizeBitVectors_theory():
 
     funs = merge_multi_dict([funs, core_funs])
 
-    # prefixes = [ pascal_case_to_snake_case(sort.id_.symbol) for sort in sorts ]
     # repl_dicts = [{A: sort} for sort in sorts]
-    # funs.update(get_all_instances(funs, prefixes, repl_dicts))
-    repl_dicts = [{A: sort} for sort in sorts]
-    funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
+    # funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
 
     return sorts, funs
 
@@ -626,11 +611,8 @@ def floatingPoints_theory():
 
     funs = merge_multi_dict([funs, core_funs])
 
-    # prefixes = [ pascal_case_to_snake_case(sort.id_.symbol) for sort in sorts ]
     # repl_dicts = [{A: sort} for sort in sorts]
-    # funs.update(get_all_instances(funs, prefixes, repl_dicts))
-    repl_dicts = [{A: sort} for sort in sorts]
-    funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
+    # funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
 
     return sorts, funs
 
@@ -745,11 +727,8 @@ def strings_theory():
 
     funs = merge_multi_dict([funs, core_funs])
 
-    # prefixes = [ pascal_case_to_snake_case(sort.id_.symbol) for sort in sorts ]
     # repl_dicts = [{A: sort} for sort in sorts]
-    # funs.update(get_all_instances(funs, prefixes, repl_dicts))
-    repl_dicts = [{A: sort} for sort in sorts]
-    funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
+    # funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
 
     return sorts, funs
 
@@ -781,8 +760,5 @@ def arraysEX_theory():
     }
     funs = merge_multi_dict([funs, core_funs])
 
-    # Infinite funs be be generated
-    # TODO
-    # use 'generate_one_instance()' to check if is a valid instance
 
     return sorts, funs

@@ -180,7 +180,7 @@ class ScriptVisitor(SMTLIBv2Visitor):
     
     def visitVar_binding(self, ctx: SMTLIBv2Parser.Var_bindingContext, local_vars):
         var = self.visitSymbol(ctx.symbol())
-        term = self.visitTerm(ctx.term(), local_vars)
+        term = self.visitTerm(ctx.term(), copy.deepcopy(local_vars))
         return [var, term]
 
     def visitSorted_var(self, ctx: SMTLIBv2Parser.Sorted_varContext):
@@ -194,11 +194,15 @@ class ScriptVisitor(SMTLIBv2Visitor):
             var_list.append(var)
         return name, var_list
     
-    def visitMatch_case(self, ctx: SMTLIBv2Parser.Match_caseContext, local_vars):
+    def visitMatch_case(self, ctx: SMTLIBv2Parser.Match_caseContext, output, par_dict, local_vars):
         name, var_list = self.visitPattern(ctx.pattern())
+        input_list = self._valid_pattern(name, len(var_list), output, par_dict)
         _local_vars = copy.deepcopy(local_vars)
-        for var in var_list:
-            _local_vars[str(var)] = Fun(Identifier(str(var)), [], None)
+        for i, var in enumerate(var_list):
+            _local_vars[var] =  input_list[i]
+        if input_list == output:
+            # name is variable
+            _local_vars[name] = output
         bound_vars = copy.deepcopy(_local_vars)
         term = self.visitTerm(ctx.term(), _local_vars)
         term.bound_vars = bound_vars
@@ -338,12 +342,12 @@ class ScriptVisitor(SMTLIBv2Visitor):
                 return cmd
  
     def visitTerm(self, ctx: SMTLIBv2Parser.TermContext, local_vars):
-        # TODO
-        # bound vars
         if ctx.spec_constant():
             spec_constant = self.visitSpec_constant(ctx.spec_constant())
-            fun = self._well_sorted_term(spec_constant, [], None, local_vars)
-            return Const(name=spec_constant, sort=fun.output)
+            ret_sort, flag = self._well_sorted_term(spec_constant, [], None, local_vars)
+            if flag == 0:
+                raise ScriptException('variable name overrides signature in theories')
+            return Const(name=spec_constant, sort=ret_sort)
         elif ctx.qual_identifier():
             id_, sort = self.visitQual_identifier(ctx.qual_identifier())
             qual_id = True if sort else False
@@ -353,42 +357,53 @@ class ScriptVisitor(SMTLIBv2Visitor):
                 input_list = []
                 local_free_vars = {}
                 for term_ctx in ctx.term():
-                    subterm = self.visitTerm(term_ctx, local_vars)
+                    subterm = self.visitTerm(term_ctx, copy.deepcopy(local_vars))
                     subterms.appen(subterm)
                     input_list.append(subterm.sort)
+                    # x occurs free in some e_i
                     local_free_vars.update(subterms.local_free_vars)
-                fun = self._well_sorted_term(id_, input_list, sort, local_vars)
+                ret_sort, flag = self._well_sorted_term(id_, input_list, sort, local_vars)
+                if flag == 0:
+                    raise ScriptException('variable name overrides signature in theories')
                 return Expr(
                             name=id_,
                             subterms=subterms,
-                            sort=fun.output,
+                            sort=ret_sort,
                             local_free_vars=local_free_vars,
                             qual_id=qual_id,
                         )
             else:
-                fun = self._well_sorted_term(id_, [], sort, local_vars)
-                return Var(name=id_, sort=fun.output, qual_id=qual_id)
+                ret_sort, flag = self._well_sorted_term(id_, [], sort, local_vars)
+                match flag:
+                    case 0:
+                        return Var(name=id_, sort=ret_sort, qual_id=qual_id)
+                    case 1:
+                        return Expr(name=id_, subterms=[], sort=ret_sort, qual_id=qual_id)
         elif ctx.GRW_Let():
             var_bindings = []
             var_list = []
-            bound_vars = set()
-            term_local_free_vars = []
+            terms_local_free_vars_list = []
+            # _local_vars for let_term
             _local_vars = copy.deepcopy(local_vars)
             for vb_ctx in ctx.var_binding():
-                var, term = self.visitVar_binding(vb_ctx, local_vars)
-                term_local_free_vars.append(term.local_free_vars)
-                var_list.append(var)
-                bound_vars.add(var)
-                var_bindings.append([var, term])
-                _local_vars[str(var)] = Fun(Identifier(str(var)), [], None)
+                x, t = self.visitVar_binding(vb_ctx, local_vars)
+                var_bindings.append([x, t])
+                terms_local_free_vars_list.append(t.local_free_vars)
+                var_list.append(x)
+                # x is local var in let_term
+                _local_vars[x] = t.sort 
+            bound_vars = copy.deepcopy(_local_vars)
             let_term = self.visitTerm(ctx.term(), _local_vars)
             let_term.bound_vars = bound_vars
-            let_term_free_vars = let_term.local_free_vars
-            local_free_vars = let_term_free_vars 
+            local_free_vars = let_term.local_free_vars
+            # any local free var x in t, and not in x_1, ..., x_n
+            # x occurs free in the entire expression
             for var in var_list:
-                let_term_free_vars.remove(var)
-            for i, free_vars in enumerate(term_local_free_vars):
-                if var_list[i] in let_term_free_vars:
+                local_free_vars.remove(var)
+            # any local free var x in t_i, and corresponding x_i occurs free in let_term
+            # x occurs free in the entire expression
+            for i, free_vars in enumerate(terms_local_free_vars_list):
+                if var_list[i] in let_term.local_free_vars:
                     local_free_vars.update(free_vars)
             return LetBinding(
                     var_bindings=var_bindings,
@@ -399,39 +414,49 @@ class ScriptVisitor(SMTLIBv2Visitor):
         elif ctx.GRW_Forall():
             return self._handle_quantifier(
                             ctx,
-                            Quantifier(ctx.GRW_Forall().getText()),
+                            ctx.GRW_Forall().getText(),
                             local_vars
                         )
         elif ctx.GRW_Exists():
             return self._handle_quantifier(
                             ctx,
-                            Quantifier(ctx.GRW_Exists().getText()),
+                            ctx.GRW_Exists().getText(),
                             local_vars
                         )
         elif ctx.GRW_Match():
             term = self.visitTerm(ctx.term(), local_vars)
+            # local_free_vars for entire match term
             local_free_vars = term.local_free_vars
+            # get output sort and its parameters mapping
+            output = term.output
+            par_dict = self._get_par_dict_from_sort(output)
             match_cases = []
             for mc_ctx in ctx.match_case():
-                # TODO
-                pat, term = self.visitMatch_case(mc_ctx, local_vars)
-                match_cases.append([pat, term])
-                for var in term.local_free_vars:
-                    if not var in pat[1:]:
+                p, t = self.visitMatch_case(
+                    mc_ctx,
+                    output=output,
+                    par_dict=par_dict,
+                    local_vars=local_vars
+                )
+                match_cases.append([p, t])
+                # update local_free_vars for entire match term
+                for var in t.local_free_vars:
+                    if var not in p:
                         local_free_vars.add(var)
-            # TODO sort
             return Match(
                 term=term,
                 match_cases=match_cases,
-                sort=match_cases[0][1].sort,
+                sort=match_cases[0][1].sort, # t.sort
                 local_free_vars=local_free_vars,
             )
         elif ctx.GRW_Exclamation():
-            term = self.visitTerm(ctx.term())
+            term = self.visitTerm(ctx.term(), local_vars)
             annotations = []
             for attr_ctx in ctx.attribute():
                 annotations.append(self._get_object(attr_ctx))
-            return AnnotatedTerm(term=term, annotations=annotations, sort=term.sort)
+            return AnnotatedTerm(
+                term=term, annotations=annotations, sort=term.sort
+            )
     
     def _handle_quantifier(
             self,
@@ -439,24 +464,26 @@ class ScriptVisitor(SMTLIBv2Visitor):
             quant,
             local_vars
     ):
-        quant_vars = []
+        quanted_vars = []
+        # local_vars for quant_term
         _local_vars = copy.deepcopy(local_vars)
-        bound_vars = set()
         for sv_ctx in ctx.sorted_var():
             var, sort = self.visitSorted_var(sv_ctx)
-            quant_vars.append([var, sort])
+            quanted_vars.append([var, sort])
+            _local_vars[var] = sort 
 
-            _local_vars[str(var)] = Fun(Identifier(str(var)), [], sort)
-            bound_vars.add(var)
-
+        bound_vars = copy.deepcopy(_local_vars)
         quant_term = self.visitTerm(ctx.term(), _local_vars)
-        local_free_vars = quant_term.local_free_vars
-        for var, _ in quant_vars:
-            local_free_vars.remove(var)
         quant_term.bound_vars = bound_vars
+        # local free vars for the entier expression 
+        # if occurs free in t
+        local_free_vars = quant_term.local_free_vars
+        # and does not occur in x_1, ..., x_n
+        for var in quanted_vars:
+            local_free_vars.remove(var)
         return Quantifier(
                 Quantifier=quant,
-                quantified_vars=quant_vars,
+                quantified_vars=quanted_vars,
                 quantified_term=quant_term,
                 sort=quant_term.sort,
                 local_free_vars=local_free_vars,
@@ -464,7 +491,7 @@ class ScriptVisitor(SMTLIBv2Visitor):
     
     def _add_to_global_vars(self, name, sort):
         self.global_vars[str(name)] = sort 
-    
+ 
     def _add_to_signatures(self, name, input_list, output):
         self.signatures[str(name)] = Fun(name, input_list, output) 
 
@@ -481,6 +508,22 @@ class ScriptVisitor(SMTLIBv2Visitor):
             return Sort(all_synonyms[name].get_parametric_instance(par_dict))
         return None
     
+    def _get_par_dict_from_sort(self, sort):
+        parsorts = sort.parsorts
+        if isinstance(parsorts, list) and len(parsorts) > 0:
+            par_dict = {}
+            name = sort.name
+            if str(name) in self.datatypes:
+                sort_template = self.datatypes(str(name))
+                if len(sort_template.parsorts) == len(parsorts):
+                    for i, par in enumerate(sort_template.parsorts):
+                        par_dict[par] = parsorts[i]
+                    return par_dict
+            raise ScriptException("datatype not found")
+        else:
+            # not a parametric sort
+            return {}
+    
     # def _valid_sort(self, name, sort):
     #     if str(name) in self.datatypes:
     #         if sort.same_type(self.datatypes[str(name)]):
@@ -495,18 +538,39 @@ class ScriptVisitor(SMTLIBv2Visitor):
     #             return True
     #         return False
 
+    def _valid_pattern(self, name, input_list_len, output: Sort, par_dict):
+        """
+        A pttern p in turn is either:
+        - a variable x of sort (output)
+        - a nullary constructor c of sort (output)
+        - a term of the form (c x_1 ... x_k) where c is a constructor of sort (output)
+        assuming no signatures have same name
+        """
+        if str(name) in self.signatures:
+            # constructor
+            fun = self.signatures[str(name)]
+            fun = generate_one_instance(fun, par_dict)
+            if (len(fun.input_list) == input_list_len) and (fun.output == output):
+                return fun.input_list
+        if input_list_len == 0:
+            # variable
+            return output 
+        else:
+            raise ScriptException("pattern is neither a variable nor a valid constructor")
+
     def _well_sorted_term(self, name, input_list=None, output=None, local_vars=None):
         # scope
         # local vars
-        if str(name) in local_vars and input_list == []:
-            return Fun(Identifier(str(name)), [], local_vars[str(name)]) 
+        if (str(name) in local_vars) and (input_list == []):
+            return local_vars[str(name)], 0
+            # return Fun(Identifier(str(name)), [], local_vars[str(name)]) 
         # global signatures
         fun = match_fun_in_signatures(name, input_list, output, self.signatures)
         if fun:
-            return fun
+            return fun.output, 1
         # predefined signatures
         fun = match_fun_in_signatures(name, input_list, output, all_funs)
         if fun:
-            return fun
+            return fun.output, 1
         else:
             raise ScriptException(f"function ({name} {list2str(input_list)}) is not declared")

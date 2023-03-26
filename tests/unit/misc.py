@@ -10,13 +10,13 @@ from smort.src.translate.theory.signatures import match_fun_in_signatures
 
 def test_list2str():
     l = [1, (3, (5, 6), 4), (1,)] 
-    s = "1 (3 (5 6) 4) (1)"
+    s = "1 (3 (5 6) 4) 1"
     assert list2str(l) == s 
     l = [1]
     s = "1"
     assert list2str(l) == s 
     l = [1, (3, [5, 'a'], 4), (1,)] 
-    s = "1 (3 (5 a) 4) (1)"
+    s = "1 (3 (5 a) 4) 1"
     assert list2str(l) == s 
     a_sort = Sort('a')
     b_sort = Sort('b')

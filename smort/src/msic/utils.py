@@ -6,10 +6,13 @@ import string
 def nested_list_to_string(lst, separator=' '):
     result = ''
     if isinstance(lst, (list, tuple)):
-        result += '('
+        tmp = ''
         for i in lst:
-            result += nested_list_to_string(i) + separator 
-        result = result[:-1] + ')'
+            tmp += nested_list_to_string(i) + separator 
+        if len(lst) == 1:
+            result += tmp[:-1] 
+        else:
+            result += '(' + tmp[:-1] + ')'
     else:
         result += str(lst)
     return result
@@ -21,7 +24,11 @@ def list2str(lst, separator=' '):
     reserve the nested '(' ')' of tuples and lists (to tuples)
     but without outermost '(' ')'
     """
-    return nested_list_to_string(lst, separator)[1:-1]
+    result = nested_list_to_string(lst, separator)
+    if result[0] == '(' and result[-1] == ')':
+        return result[1:-1]
+    else:
+        return result
 
 
 def cartesian_product(*args):

@@ -8,7 +8,7 @@ from smort.src.translate.theory.utils import *
 
 
 class Fun:
-    def __init__(self, name, input_list, output, par_list=None, constraints=None, get_output_indices=None):
+    def __init__(self, name, input_list, output: Sort, par_list=None, constraints=None, get_output_indices=None):
         self.name = name    # Identifier or SpecConstantType
         self.input_list = input_list
         self.output = output
@@ -158,7 +158,7 @@ def indexed_fun(
         name_symbol,    # str or SpecConstType
         name_indices_len,
         input_list,
-        output,
+        output: Sort,
         constraints=None,
         get_output_indices=None,
         par_list=None):

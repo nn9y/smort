@@ -1,7 +1,8 @@
 import pytest
 
-from smort.src.translate.Ast import Identifier, Sort
+from smort.src.translate.Ast import * 
 from smort.src.translate.theory.Fun import sort_with_arity
+from smort.src.translate.theory.SMTLIBv2Sorts import * 
 from smort.src.translate.theory.utils import numeral_greater_than_x 
 
 
@@ -159,3 +160,126 @@ def test_sort():
     assert sx == None 
     sx = s1.get_parametric_instance({'A': s2, 'B': s2})
     assert str(sx) == "(s1 s2 s2)"
+
+
+
+def test_misc():
+    se1 = SExperssion(SpecConstant(SpecConstType.NUMERAL, 15))
+    assert str(se1) == '15'
+    _se1 = SExperssion(SpecConstant(SpecConstType.NUMERAL, 15))
+    assert se1 == _se1
+    se2 = SExperssion('test')
+    assert str(se2) == 'test'
+    se3 = SExperssion(':keyword')
+    assert str(se3) == ':keyword'
+    se4 = SExperssion(subsexprs=[se1, se2, se3])
+    assert str(se4) == '(15 test :keyword)'
+    _se4 = SExperssion(value=None, subsexprs=[se1, se2, se3])
+    assert se4 == _se4
+    av1 = AttributeValue(SpecConstant(SpecConstType.HEXADECIMAL, '#x4F6B'))
+    assert str(av1) == '#x4F6B'
+    av2 = AttributeValue('value')
+    assert str(av2) == 'value'
+    av3 = AttributeValue(sexprs=[av1, av2])
+    assert str(av3) == '(#x4F6B value)'
+    a1 = Attribute(':a1')
+    assert str(a1) == ':a1'
+    a2 = Attribute(':a2', value=av2)
+    assert str(a2) == ':a2 value'
+    a3 = Attribute(':a1', value=av2)
+    assert a3 != a1
+    a3 = Attribute(':a1', value=None)
+    assert a3 == a1
+
+def test_term():
+    c1 = Const(name=SpecConstant(SpecConstType.DECIMAL, 1.5), sort=REAL) 
+    assert str(c1) == '1.5'
+    v1 = Var(name=Identifier('v1'), sort=REAL)
+    assert str(v1) == 'v1'
+    assert v1.term_type == TermType.VAR
+    e1 = Expr(name=Identifier('e1'), subterms=[v1, c1], sort=BOOL, qual_id=True)
+    assert str(e1) == '((as e1 Bool) v1 1.5)'
+    e2 = Expr(name=Identifier('e2'), subterms=[v1, c1], sort=BOOL)
+    assert str(e2) == '(e2 v1 1.5)'
+    vbs = [['v1', c1], ['v2', v1], ['v3', e1], ['v4', e2]]
+    lb1 = LetBinding(var_bindings=vbs, let_term=e1, sort=INT)
+    res = f'(let ((v1 {c1}) (v2 {v1}) (v3 {e1}) (v4 {e2})) {e1})'
+    assert str(lb1) == res 
+    svs = [['v1', BOOL], ['v2', INT], ['v3', REAL], ['v4', STRING]]
+    q1 = Quantifier(quantifier='forall', sorted_vars=svs, quantified_term=e1)
+    res = f'(forall ((v1 Bool) (v2 Int) (v3 Real) (v4 String)) {e1})'
+    assert str(q1) == res 
+    svs = [['v1', BIT_VECTOR.get_indexed_instance([4])], ['v2', INT], ['v3', REAL], ['v4', STRING]]
+    q2 = Quantifier(quantifier='exists', sorted_vars=svs, quantified_term=e2)
+    res = f'(exists ((v1 (_ BitVec 4)) (v2 Int) (v3 Real) (v4 String)) {e2})'
+    assert str(q2) == res 
+    pt1 = ['f1']
+    pt2 = ['f2', 'k1', 'k2']
+    pt3 = ['f3', 'q1']
+    mcs = [[pt1, e1], [pt2, e2], [pt3, c1]]
+    m1 = Match(term=e1, match_cases=mcs)
+    res = f'(match {e1} (({list2str(pt1)} {e1}) (({list2str(pt2)}) {e2}) (({list2str(pt3)}) {c1})))'
+    assert str(m1) == res
+    av2 = AttributeValue('value')
+    a1 = Attribute(':a1')
+    a2 = Attribute(':a2', value=av2)
+    a = [a1, a2]
+    at1 = AnnotatedTerm(term=e1, annotations=a)
+    res = f'(! {e1} {list2str(a)})'
+    assert str(at1) == res
+    # test methods
+    c2 = Const(name=SpecConstant(SpecConstType.DECIMAL, 1.5), sort=REAL) 
+    v2 = Var(name=Identifier('v2'), sort=REAL)
+    _e2 = Expr(name=Identifier('e2'), subterms=[v2, c2], sort=BOOL)
+    assert e2.equals(_e2)
+    v2 = Var(name=Identifier('v3'), sort=REAL)
+    _e2 = Expr(name=Identifier('e2'), subterms=[v2, c2], sort=BOOL)
+    assert e2.equals(_e2)
+    c2 = Const(name=SpecConstant(SpecConstType.DECIMAL, 1.0), sort=REAL) 
+    v2 = Var(name=Identifier('v2'), sort=REAL)
+    _e2 = Expr(name=Identifier('e2'), subterms=[v2, c2], sort=BOOL)
+    assert not e2.equals(_e2)
+    c2 = Const(name=SpecConstant(SpecConstType.DECIMAL, 1.5), sort=REAL) 
+    v2 = Var(name=Identifier('v2'), sort=INT)
+    _e2 = Expr(name=Identifier('e2'), subterms=[v2, c2], sort=BOOL)
+    assert not e2.equals(_e2)
+    e3 = Expr(name=Identifier('e3'), subterms=[e2, e1], sort=BOOL)
+    c2 = Const(name=SpecConstant(SpecConstType.DECIMAL, 1.5), sort=REAL) 
+    v2 = Var(name=Identifier('x3'), sort=REAL)
+    _e2 = Expr(name=Identifier('e2'), subterms=[v2, c2], sort=BOOL)
+    _e3 = Expr(name=Identifier('e3'), subterms=[_e2, e1], sort=BOOL)
+    assert e3.equals(_e3)
+    e1.local_free_vars = {'v1': REAL}
+    e2.local_free_vars = {'v1': REAL}
+    assert e3.equals(_e3, free=True)
+    e1.bound_vars = {'v1': REAL}
+    assert not e3.equals(_e3, free=True)
+    e1.bound_vars = {}
+    vn_map = {}
+    v1 = Var(name=Identifier('v1'), sort=REAL)
+    v2 = Var(name=Identifier('v2'), sort=REAL)
+    e1 = Expr(name=Identifier('e1'), subterms=[v1, c1], sort=BOOL, qual_id=True)
+    e2 = Expr(name=Identifier('e2'), subterms=[v2, c1], sort=BOOL)
+    e1.local_free_vars = {'v1': REAL}
+    e2.local_free_vars = {'v2': REAL}
+    c2 = Const(name=SpecConstant(SpecConstType.DECIMAL, 1.5), sort=REAL) 
+    _v2 = Var(name=Identifier('x3'), sort=REAL)
+    _e2 = Expr(name=Identifier('e2'), subterms=[_v2, c2], sort=BOOL)
+    e3 = Expr(name=Identifier('e3'), subterms=[e2, e1], sort=BOOL)
+    _e3 = Expr(name=Identifier('e3'), subterms=[_e2, e1], sort=BOOL)
+    assert e3.equals(_e3, free=True)
+    e3.update_var_name_map(_e3, vn_map)
+    assert vn_map == {'x3': v2.name, 'v1': v1.name}
+    ex = Expr(name=Identifier('ex'), subterms=[e2, e1, e2, e2, e1, c2], sort=BOOL)
+    vn_map = {}
+    _e2_repl = Expr(name=Identifier('_e2_repl'), subterms=[v1, c2], sort=BOOL)
+    ex.substitute(_e2, _e2_repl, vn_map, True)
+    s = '(ex (_e2_repl v1 1.5) ((as e1 Bool) v1 1.5) (_e2_repl v1 1.5) (_e2_repl v1 1.5) ((as e1 Bool) v1 1.5) 1.5)'
+    assert str(ex) == s
+    vn_map = {}
+    _c2 = Const(name=SpecConstant(SpecConstType.DECIMAL, 1.5), sort=REAL)
+    _c2_repl = Const(name=SpecConstant(SpecConstType.BINARY, '#b1010'), sort=BIT_VECTOR.get_indexed_instance([4])) 
+    ex.substitute(_c2, _c2_repl, vn_map, True)
+    s = '(ex (_e2_repl v1 #b1010) ((as e1 Bool) v1 #b1010) (_e2_repl v1 #b1010) (_e2_repl v1 #b1010) ((as e1 Bool) v1 #b1010) #b1010)'
+    assert str(ex) == s
+
