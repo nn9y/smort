@@ -20,7 +20,7 @@ Semicolon
     ;
 
 String
-    : '"' (PrintableCharNoDquote | WhiteSpaceChar)+ '"'
+    : '"' (PrintableCharNoDquote | WhiteSpaceChar)* '"'
     ;
 
 QuotedSymbol:
@@ -416,7 +416,7 @@ mutant_dec
     ;
 
 notation_dec
-    : ParOpen GRW_Notation symbol ( symbol | attribute ) attribute* ParClose
+    : ParOpen GRW_Notation symbol ( symbol | attribute* ) ParClose
     ;
 
 substTemplate_dec

@@ -1,4 +1,5 @@
 from smort.src.translate.theory.Fun import Fun, indexed_fun, indexed_sort
+from smort.src.translate.theory.signatures import match_fun_in_signatures
 from smort.src.translate.theory.utils import (
     numeral_greater_than_x,
     get_number_of_binary_digits,
@@ -97,3 +98,11 @@ def test_fun():
     assert z.get_indexed_instance([2, 3], []) == f
     assert z.get_indexed_instance([0, 3], []) == None 
     assert z.get_indexed_instance([2, 1], []) == None 
+
+
+def test_match_fun_in_sigs():
+    STRING = Sort(Identifier('String'))
+    input_list = [STRING, STRING]
+    output = STRING
+    fun = Fun(Identifier("str.++"), [STRING, STRING], STRING)
+    assert match_fun_in_signatures(Identifier('str.++'), input_list, None) == fun

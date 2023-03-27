@@ -24,6 +24,8 @@ def list2str(lst, separator=' '):
     reserve the nested '(' ')' of tuples and lists (to tuples)
     but without outermost '(' ')'
     """
+    if len(lst) == 1:
+        return str(lst[0])
     result = nested_list_to_string(lst, separator)
     if result[0] == '(' and result[-1] == ')':
         return result[1:-1]

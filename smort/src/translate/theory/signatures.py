@@ -13,16 +13,16 @@ def match_fun_in_signatures(name, input_list=[], output=None, signatures=all_fun
         return None
 
     if str(symbol) in signatures:
-        fun_list = signatures[symbol]
+        fun_list = signatures[str(symbol)]
         for fun in fun_list:
             if isinstance(fun.name, name_type):
                 instance = None
-                if isinstance(fun.name.indices, dict) or (fun.name.indices == None):
-                    # Indexed Fun (name is an Identifier) or name is a SpecConstant
+                if (name_type == SpecConstant) or (isinstance(fun.name.indices, dict)):
+                    # SpecConstant or Indexed Fun (name is an Identifier) 
                     if fun.match_indexed_term(name, input_list):
                         instance = fun.get_indexed_instance(
                                     indices, 
-                                    [inp.indices for inp in input_list]
+                                    [inp.id_.indices for inp in input_list]
                                 )
                 elif fun.par_list:
                     # parametric Fun

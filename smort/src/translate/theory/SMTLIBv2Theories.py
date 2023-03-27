@@ -10,16 +10,16 @@ def core_theory():
         BOOL_NAME: BOOL
     }
     funs = {
-        str(SpecConstType.B_VALUE): Fun(SpecConstant(SpecConstType.B_VALUE, None), [], BOOL),
-        "not": Fun(Identifier("not"), [BOOL], BOOL),
-        "=>": Fun(Identifier("=>"), [BOOL, BOOL], BOOL),
-        "and": Fun(Identifier("and"), [BOOL, BOOL], BOOL),
-        "or": Fun(Identifier("or"), [BOOL, BOOL], BOOL),
-        "xor": Fun(Identifier("xor"), [BOOL, BOOL], BOOL),
+        str(SpecConstType.B_VALUE): [Fun(SpecConstant(SpecConstType.B_VALUE, None), [], BOOL)],
+        "not": [Fun(Identifier("not"), [BOOL], BOOL)],
+        "=>": [Fun(Identifier("=>"), [BOOL, BOOL], BOOL)],
+        "and": [Fun(Identifier("and"), [BOOL, BOOL], BOOL)],
+        "or": [Fun(Identifier("or"), [BOOL, BOOL], BOOL)],
+        "xor": [Fun(Identifier("xor"), [BOOL, BOOL], BOOL)],
         # parametric functions
-        "=": Fun(Identifier("="), [A, A], BOOL, [A]),
-        "distinct": Fun(Identifier("distinct"), [A, A], BOOL, [A]),
-        "ite": Fun(Identifier("ite"), [BOOL, A, A], A, [A]),
+        "=": [Fun(Identifier("="), [A, A], BOOL, [A])],
+        "distinct": [Fun(Identifier("distinct"), [A, A], BOOL, [A])],
+        "ite": [Fun(Identifier("ite"), [BOOL, A, A], A, [A])],
     }
 
     # repl_dicts = [{A: sort} for sort in sorts]
@@ -177,6 +177,14 @@ def fixedSizeBitVectors_theory():
                     ),
         "bvand":    indexed_fun(
                         "bvand", 
+                        0,
+                        [BIT_VECTOR, BIT_VECTOR],
+                        BIT_VECTOR,
+                        eq_input_indices(0, 2, 2),
+                        get_indices_of_first_indexed_input
+                    ), 
+        "bvor":    indexed_fun(
+                        "bvor", 
                         0,
                         [BIT_VECTOR, BIT_VECTOR],
                         BIT_VECTOR,

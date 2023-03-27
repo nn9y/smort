@@ -37,7 +37,7 @@ class Translator(SMTMRVisitor):
                 symbol, info = self.visitNotation_dec(child)
                 self.notations[symbol] = info
             elif isinstance(child, SMTMRParser.SubstTemplate_decContext):
-                self.subst_templates.append(self.visitSubstTermGroup_dec(child)) 
+                self.subst_templates.append(self.visitSubstTemplate_dec(child)) 
             elif isinstance(child, SMTMRParser.Method_decContext):
                 self.methods.append(self.visitMethod_dec(child))
             elif isinstance(child, SMTMRParser.Fuse_decContext):
@@ -157,7 +157,7 @@ class Translator(SMTMRVisitor):
             spec_constant = self.visitSpec_constant(ctx.spec_constant())
             ret_sort, flag = self._well_sorted_term(spec_constant, [], None, local_vars)
             if flag == 0:
-                raise SMTMRException('notation name overrides signature in theories')
+                raise SMTMRException(f"notation name '{spec_constant.const_type}' overrides signature in theories")
             return Const(name=spec_constant, sort=ret_sort)
         elif ctx.qual_identifier():
             id_, sort = self.visitQual_identifier(ctx.qual_identifier())
@@ -168,14 +168,14 @@ class Translator(SMTMRVisitor):
                 for term_ctx in ctx.term():
                     # in current grammar of SMTMR, visiting term does not modify local_vars
                     subterm = self.visitTerm(term_ctx, local_vars)
-                    subterms.appen(subterm)
+                    subterms.append(subterm)
                     input_list.append(subterm.sort)
-                ret_sort, flag = self._well_sorted_term(id_, input_list, sort)
+                ret_sort, flag = self._well_sorted_term(id_, input_list, sort, local_vars)
                 if flag == 0:
-                    raise SMTMRException('notation name overrides signature in theories')
+                    raise SMTMRException(f"notation name '{id_}' overrides signature in theories")
                 return Expr(name=id_, subterms=subterms, sort=ret_sort, qual_id=qual_id)
             else:
-                ret_sort, flag = self._well_sorted_term(id_, [], sort)
+                ret_sort, flag = self._well_sorted_term(id_, [], sort, local_vars)
                 match flag:
                     case 0:
                         return Var(name=id_, sort=ret_sort, qual_id=qual_id)
@@ -203,7 +203,7 @@ class Translator(SMTMRVisitor):
         status = Status(ctx.status().getText())
         return [symbol, status]
 
-    def visitSubst_pair(self, ctx: SMTMRParser.SubstTerm_pairContext, local_vars):
+    def visitSubst_pair(self, ctx: SMTMRParser.Subst_pairContext, local_vars):
         # in current grammar of SMTMR, visiting term does not modify local_vars
         # _local_vars = copy.deepcopy(local_vars)
         # term = self.visitTerm(ctx.term(0), _local_vars)
@@ -247,13 +247,13 @@ class Translator(SMTMRVisitor):
             local_vars[symbol] = sort
             sorted_vars.append([symbol, sort])
         subst_term_pairs = []
-        for stp_ctx in ctx.substTerm_pair():
+        for stp_ctx in ctx.subst_pair():
             term, repl = self.visitSubst_pair(stp_ctx, local_vars)        
             subst_term_pairs.append([term, repl])
         return SubstTemplate(attributes=attributes, sorted_vars=sorted_vars, repl_pairs=subst_term_pairs)
  
     def visitFuse_dec(self, ctx: SMTMRParser.Fuse_decContext):
-        return self.visitTerm_template(ctx.term_template())
+        return self.visitBoolean_term_template(ctx.boolean_term_template())
 
     def visitMethod_dec(self, ctx: SMTMRParser.Method_decContext):
         method_name = ctx.String().getText()
@@ -270,7 +270,7 @@ class Translator(SMTMRVisitor):
         for sym, info in self.notations.items():
             if str(symbol) == str(sym):
                 for attr in info.attributes:
-                    if attr == SMTMRKeyword.GEN:
+                    if attr.keyword == SMTMRKeyword.GEN:
                         return
         raise SMTMRException(f"'{symbol}' is not a valid seed symbol, \
 symbol returned by extended method, or notation with :gen attributes")
@@ -316,7 +316,7 @@ symbol returned by extended method, or notation with :gen attributes")
             raise  SMTMRException(f"'{symbol}' is not a notation")
     
     def _is_seed(self, symbol):
-        if symbol in self.seeds:
+        if symbol in self.index_of_seed:
             return True
     
     def _is_mutant(self, symbol):

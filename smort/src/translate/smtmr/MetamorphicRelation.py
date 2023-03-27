@@ -28,11 +28,10 @@ class NotationInfo:
         self.attributes = attributes
     
     def __str__(self):
-        info_str = ""
         if self.formula_in:
-            info_str += self.formula_in + " "
-        info_str += list2str(self.attributes)
-        return info_str
+            return f"{self.formula_in}"
+        else:
+            return f"{list2str(self.attributes)}"
 
     def __repr__(self):
         return self.__str__()

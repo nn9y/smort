@@ -270,7 +270,7 @@ class Attribute:
         return (
             f"{self.keyword} {self.value}"
             if self.value
-            else self.keyword
+            else f"{self.keyword}"
         )
 
     def __repr__(self):
