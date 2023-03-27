@@ -1,0 +1,12 @@
+(seed s1 sat)
+(seed s2 sat)
+(mutant m sat)
+
+(notation x s1)
+(notation y s2)
+(notation z :var)
+(notation c :cons)
+
+(subst-template :free ((x Int) (y Bool) (z Int)) ((x (div z y)) (y (div z x)) (z (* x y))) )
+
+(fuse (and s1 s2))
