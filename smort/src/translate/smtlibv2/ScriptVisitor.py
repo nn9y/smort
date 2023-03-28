@@ -6,10 +6,6 @@ from smort.src.translate.Ast import *
 from smort.src.translate.theory.signatures import *
 
 
-### !!! TODO !!!
-### bound vars
-###
-
 ### and def dec commands
 
 class ScriptException(Exception):
@@ -108,30 +104,68 @@ class ScriptVisitor(SMTLIBv2Visitor):
     def visitSort(self, ctx: SMTLIBv2Parser.SortContext):
         id_ = self.visitIdentifier(ctx.identifier())
         parsorts = []
+        with_par = False
         if ctx.ParOpen():
             for sort_ctx in ctx.sort():
-                parsorts.append(self.visitSort(sort_ctx))
+                parsort = self.visitSort(sort_ctx)
+                if isinstance(parsort, str):
+                    with_par = True
+                parsorts.append(parsort)
+        # TODO
+        # check if or sort
+        if len(parsorts) == 0:
+            pass
         return Sort(id_, parsorts)
 
     def visitFunction_dec(self, ctx: SMTLIBv2Parser.Function_decContext):
         symbol = self.visitSymbol(ctx.symbol())
         sorted_vars = []
-        for var_ctx in ctx.sorted_var():
-            sorted_vars.append(self.visitSorted_var(var_ctx))
+        local_vars = {}
+        for sv_ctx in ctx.sorted_var():
+            v, s = self.visitSorted_var(sv_ctx)
+            sorted_vars.append([v, s])
+            local_vars[v] = s
         sort = self.visitSort(ctx.sort())
         input_sort_list = [input_sort for _, input_sort in sorted_vars]
-        self._add_to_globals(symbol, input_sort_list, sort)
-        return FunDecl(symbol, sorted_vars, sort)
+ 
+        # function_dec used in cmd_defineFunsRec,
+        # function symbols are declared first,
+        # terms can use them after
+        if len(input_sort_list) == 0:
+            self.global_vars[symbol] = sort
+        else:
+            self.signatures[symbol] = Fun(Identifier(symbol), input_sort_list, sort) 
+
+        return FunDecl(symbol, sorted_vars, sort), local_vars
     
-    def visitFunction_def(self, ctx:SMTLIBv2Parser.Function_defContext):
+    def visitFunction_def(self, ctx:SMTLIBv2Parser.Function_defContext, rec=False):
         symbol = self.visitSymbol(ctx.symbol())
         sorted_vars = []
-        for sorted_var_ctx in ctx.sorted_var():
-            sorted_vars.append(self.visitSorted_var(sorted_var_ctx))
+        local_vars = {}
+        for sv_ctx in ctx.sorted_var():
+            v, s = self.visitSorted_var(sv_ctx)
+            sorted_vars.append([v, s])
+            local_vars[v] = s
         sort = self.visitSort(ctx.sort())
-        term = self.visitTerm(ctx.term())
         input_sort_list = [input_sort for _, input_sort in sorted_vars]
-        self._add_to_globals(symbol, input_sort_list, sort)
+
+        if rec:
+            # declare function first
+            if len(input_sort_list) == 0:
+                self.global_vars[symbol] = sort
+            else:
+                self.signatures[symbol] = Fun(Identifier(symbol), input_sort_list, sort) 
+            # TODO: local vars
+            term = self.visitTerm(ctx.term(), local_vars)
+        else:
+            # visit term first
+            # TODO: local vars
+            term = self.visitTerm(ctx.term(), local_vars)
+            if len(input_sort_list) == 0:
+                self.global_vars[symbol] = sort
+            else:
+                self.signatures[symbol] = Fun(Identifier(symbol), input_sort_list, sort) 
+
         return [symbol, sorted_vars, sort, term]
 
     def visitScript(self, ctx: SMTLIBv2Parser.ScriptContext):
@@ -253,11 +287,15 @@ class ScriptVisitor(SMTLIBv2Visitor):
         adt_name = self.visitSymbol(ctx.symbol())
         pars, constructor_decs = self.visitDatatype_dec(ctx.datatype_dec())
         adt = create_adt(adt_name, len(pars))
-        self._add_to_datatypes(adt_name, adt)
+
+        self.datatypes[str(adt_name)] = adt 
+
         for dec in constructor_decs:
             funs_list = deal_constructor_dec(dec, adt, pars)
+
             for fun in funs_list:
-                self._add_to_signatures(fun)
+                self.signatures[str(fun.name)] = fun
+
         return DeclareDataType(adt_name, DataTypeDec(pars, constructor_decs)) 
 
     def visitCmd_declareDatatypes(self, ctx:SMTLIBv2Parser.Cmd_declareDatatypesContext):
@@ -267,16 +305,21 @@ class ScriptVisitor(SMTLIBv2Visitor):
             adt_name, arity = self.visitSort_dec(sd_ctx)
             sort_decs.append([adt_name, arity])
             adt = create_adt(adt_name, arity)
-            self._add_to_datatypes(adt_name, adt)
+ 
+            self.datatypes[str(adt_name)] = adt 
+
             adts.append(adt)
+
         datatype_decs = []
         for i, dtd_ctx in enumerate(ctx.datatype_dec()):
             pars, decs = self.visitDatatype_dec(dtd_ctx)
             datatype_decs.append(DataTypeDec(pars, decs))
             for dec in decs:
                 funs_list = deal_constructor_dec(dec, adts[i], pars)
+
                 for fun in funs_list:
-                    self._add_to_signatures(fun)
+                    self.signatures[str(fun.name)] = fun
+
         return DeclareDataTypes(sort_decs, datatype_decs) 
 
     def visitCmd_declareFun(self, ctx:SMTLIBv2Parser.Cmd_declareFunContext):
@@ -286,30 +329,31 @@ class ScriptVisitor(SMTLIBv2Visitor):
             input_sort_list.append(self.visitSort(sort_ctx))
         output_sort = self.visitSort(ctx.sort()[-1])
 
-        self._add_to_globals(symbol, input_sort_list, output_sort)
+        if len(input_sort_list) == 0:
+            self.global_vars[symbol] = output_sort 
+        else:
+            self.signatures[symbol] = Fun(Identifier(symbol), input_sort_list, output_sort) 
 
         return DeclareFun(symbol, input_sort_list, output_sort)
     
     def visitCmd_defineFun(self, ctx:SMTLIBv2Parser.Cmd_defineFunContext):
         symbol, sorted_vars, sort, term = self.visitFunction_def(ctx.function_def)
-        # '_add_to_globals()' called in 'visitFunction_def()'
         return DefineFun(symbol, sorted_vars, sort, term)
 
     def visitCmd_defineFunRec(self, ctx:SMTLIBv2Parser.Cmd_defineFunRecContext):
-        symbol, sorted_vars, sort, term = self.visitFunction_def(ctx.function_def)
-        # '_add_to_globals()' called in 'visitFunction_def()'
+        symbol, sorted_vars, sort, term = self.visitFunction_def(ctx.function_def, rec=True)
         return DefineFunRec(symbol, sorted_vars, sort, term)
     
     def visitCmd_defineFunsRec(self, ctx:SMTLIBv2Parser.Cmd_defineFunsRecContext):
         fun_decls = []
+        local_vars_list = []
         for fun_dec_ctx in ctx.function_dec():
-            fun_decls.append(self.visitFunction_dec(fun_dec_ctx))
+            decl, local_vars = self.visitFunction_dec(fun_dec_ctx)
+            fun_decls.append(decl)
+            local_vars_list.append(local_vars)
         terms = []
-        for term_ctx in ctx.term():
-            # TODO
-            # deal terms here?
-            terms.append(self.visitTerm(term_ctx))
-        # '_add_to_globals()' called in 'visitFunction_dec()'
+        for i, term_ctx in enumerate(ctx.term()):
+            terms.append(self.visitTerm(term_ctx, local_vars_list[i]))
         return DefineFunsRec(fun_decls, terms)
 
     def visitCmd_defineSort(self, ctx:SMTLIBv2Parser.Cmd_defineSortContext):
