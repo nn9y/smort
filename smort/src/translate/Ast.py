@@ -109,7 +109,7 @@ class Sort:
         parsorts_instance = []
         for par in self.parsorts:
             if isinstance(par, Sort):
-                # assuming parsort cannot be nested parametric sort template
+                # ⚠️ assuming parsort cannot be nested parametric sort template
                 parsorts_instance.append(par)
             elif isinstance(par, str) and (par in parsort_dict):
                 parsorts_instance.append(parsort_dict[par])
@@ -290,32 +290,37 @@ class TermType(Enum):
 
 
 def Const(name, sort=None):
-    return Term(name=name, sort=sort, term_type=TermType.CONST)
+    return Term(name=name, sort=sort, local_free_vars={}, term_type=TermType.CONST)
 
 def Var(name, sort=None, qual_id=False):
     return Term(
         name=name,
         sort=sort,
         term_type=TermType.VAR,
-        local_free_vars={str(name)},
+        local_free_vars={str(name): sort},
         qual_id=qual_id,
     )
 
 def Expr(name, subterms, sort=None, local_free_vars=None, qual_id=False):
+    if not local_free_vars:
+        local_free_vars = {} 
     return Term(
         name=name,
         subterms=subterms,
         sort=sort,
-        term_type=TermType.EXPR,
         local_free_vars=local_free_vars,
         qual_id=qual_id,
+        term_type=TermType.EXPR,
     )
 
-def LetBinding(var_bindings, let_term, sort=None):
+def LetBinding(var_bindings, let_term, sort=None, local_free_vars=None):
+    if not local_free_vars:
+        local_free_vars = {} 
     return Term(
         var_bindings=var_bindings,
         subterms=[let_term],
         sort=sort,
+        local_free_vars=local_free_vars,
         term_type=TermType.LET,
     )
 
@@ -324,22 +329,26 @@ def Quantifier(quantifier,
                quantified_term,
                sort=None,
                local_free_vars=None):
+    if not local_free_vars:
+        local_free_vars = {}
     return Term(
         quantifier=quantifier,
         sorted_vars=sorted_vars,
         subterms=[quantified_term],
         sort=sort,
-        term_type=TermType.QUANT,
         local_free_vars=local_free_vars,
+        term_type=TermType.QUANT,
     )
 
 def Match(term, match_cases, sort=None, local_free_vars=None):
+    if not local_free_vars:
+        local_free_vars = {}
     return Term(
         subterms=[term],
         match_cases=match_cases,
         sort=sort,
-        term_type=TermType.MATCH,
         local_free_vars=local_free_vars,
+        term_type=TermType.MATCH,
     )
 
 def AnnotatedTerm(term, annotations, sort=None):
@@ -347,8 +356,8 @@ def AnnotatedTerm(term, annotations, sort=None):
         subterms=[term],
         annotations=annotations,
         sort=sort,
+        local_free_vars=term.local_free_vars,
         term_type=TermType.ANNOT,
-        local_free_vars=term.local_free_vars
     )
 
 
@@ -408,7 +417,7 @@ class Term:
         self.bound_vars = bound_vars
         self.subterms = subterms
         self.annotations = annotations
-        self.local_free_vars = local_free_vars,
+        self.local_free_vars = local_free_vars
         self.qual_id = qual_id
 
     def equals(self, other, free=False):

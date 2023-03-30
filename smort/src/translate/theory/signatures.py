@@ -1,7 +1,22 @@
 from smort.src.translate.theory.available_theories import *
 
 
-def match_fun_in_signatures(name, input_list=[], output=None, signatures=all_funs):
+def get_sort_in_synonym(symbol: str, pars: list, synonyms: dict):
+    """
+    convert symbol to "basic" sort synonym
+    par_list is replaced by pars
+    """
+    if symbol in synonyms:
+        sort, par_list = synonyms[symbol]
+        par_dict = {}
+        for i, par in enumerate(par_list):
+            # assuming elements of par_list are all string
+            par_dict[par] = pars[i]
+        return sort.get_parametric_instance(par_dict)
+    return None
+
+
+def match_fun_in_signatures(name, input_list, output, signatures: dict):
     name_type = type(name)
     if name_type == SpecConstant:
         symbol = name.const_type

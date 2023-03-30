@@ -154,7 +154,7 @@ class Assert:
         self.term = term
 
     def __str__(self):
-        return f"(assert {self.term} )"
+        return f"(assert {self.term})"
 
     def __repr__(self):
         return self.__str__()
@@ -310,13 +310,13 @@ class DefineFunsRec:
 
 
 class DefineSort:
-    def __init__(self, symbol, pars, sort):
+    def __init__(self, symbol, par_list, sort):
         self.symbol = symbol 
-        self.pars = pars
+        self.par_list = par_list
         self.sort = sort 
 
     def __str__(self):
-        return f"(define-sort {self.symbol} ({list2str(self.pars)}) {self.sort})"
+        return f"(define-sort {self.symbol} ({list2str(self.par_list)}) {self.sort})"
     
     def __repr__(self):
         return self.__str__()

@@ -101,7 +101,7 @@ def reals_theory():
 def reals_ints_theory():
     ints_sorts, ints_funs = ints_theory()
     reals_sorts, reals_funs = reals_theory()
-    del reals_funs[SpecConstType.NUMERAL.value]
+    del reals_funs[str(SpecConstType.NUMERAL)]
     # :sorts
     sorts = merge_disjoint_dict([ints_sorts, reals_sorts])
     # :funs

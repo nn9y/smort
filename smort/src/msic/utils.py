@@ -25,7 +25,7 @@ def list2str(lst, separator=' '):
     but without outermost '(' ')'
     """
     if len(lst) == 1:
-        return str(lst[0])
+        return nested_list_to_string(lst[0])
     result = nested_list_to_string(lst, separator)
     if result[0] == '(' and result[-1] == ')':
         return result[1:-1]

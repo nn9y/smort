@@ -5,7 +5,7 @@ from smort.src.translate.Ast import Sort
 from smort.src.translate.theory.utils import *
 from smort.src.translate.theory.Fun import *
 from smort.src.translate.theory.Fun import _get_repl_sort 
-from smort.src.translate.theory.signatures import match_fun_in_signatures 
+from smort.src.translate.theory.signatures import *
 
 
 def test_list2str():
@@ -24,6 +24,10 @@ def test_list2str():
     sorted_var_list = [['a', a_sort], ['b_d', b_sort], ['ckk', c_sort]]
     svl_str = "(a a) (b_d b) (ckk (c a b))"
     assert list2str(sorted_var_list) == svl_str 
+    var_bindings = [[1, 2], [3, 'a']]
+    assert list2str(var_bindings) == '(1 2) (3 a)'
+    var_bindings = [[1, 2]]
+    assert list2str(var_bindings) == '(1 2)'
 
 
 def test_constraints_and_get_output_indices():
@@ -359,8 +363,11 @@ def test_match_fun_in_signatures():
     BOOL = Sort(Identifier('Bool'))
     INT = Sort(Identifier('Int'))
     ite = Fun(Identifier("ite"), [BOOL, INT, INT], INT)
-    assert match_fun_in_signatures(Identifier('ite'), [BOOL, INT, INT]) == ite
+    assert match_fun_in_signatures(Identifier('ite'), [BOOL, INT, INT], None, all_funs) == ite
     band = Fun(Identifier("and"), [BOOL, BOOL], BOOL)
-    assert match_fun_in_signatures(Identifier('and'), [BOOL, BOOL]) == band 
-    assert match_fun_in_signatures(Identifier('and'), [BOOL, BOOL], BOOL) == band 
-    assert match_fun_in_signatures(Identifier('and'), [BOOL, BOOL], INT) == None 
+    assert match_fun_in_signatures(Identifier('and'), [BOOL, BOOL], None, all_funs) == band 
+    assert match_fun_in_signatures(Identifier('and'), [BOOL, BOOL], BOOL, all_funs) == band 
+    assert match_fun_in_signatures(Identifier('and'), [BOOL, BOOL], INT, all_funs) == None 
+    bv32 = BIT_VECTOR.get_indexed_instance([32])
+    ite = Fun(Identifier("ite"), [BOOL, bv32, bv32], bv32)
+    assert match_fun_in_signatures(Identifier('ite'), [BOOL, bv32, bv32], bv32, all_funs) == ite

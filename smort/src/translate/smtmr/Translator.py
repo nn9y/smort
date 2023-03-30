@@ -141,9 +141,19 @@ class Translator(SMTMRVisitor):
         parsorts = []
         if ctx.ParOpen():
             for sort_ctx in ctx.sort():
-                parsorts.append(self.visitSort(sort_ctx))
-        return Sort(id_, parsorts)
-    
+                parsort = self.visitSort(sort_ctx)
+                parsorts.append(parsort)
+        symbol = str(id_)
+        # map to synonym sort
+        synonym_sort = get_sort_in_synonym(symbol, parsorts, all_synonyms)
+        if synonym_sort:
+            return synonym_sort
+        # valid sort
+        sort = Sort(id_, parsorts)
+        if self._is_valid_sort(symbol, sort):
+            return sort
+        raise SMTMRException("not a valid sort, or a synonym of a valid sort")
+ 
     def visitQual_identifier(self, ctx: SMTMRParser.Qual_identifierContext):
         id_ = self.visitIdentifier(ctx.identifier())
         sort = self.visitSort(ctx.sort()) if ctx.GRW_As() else None
@@ -191,10 +201,10 @@ class Translator(SMTMRVisitor):
                 subbtt = self.visitBoolean_term_template(btt_ctx)
                 subterms.append(subbtt)
                 input_list.append(BOOL)
-            self._is_boolean_fun(sym, input_list)
+            self._check_boolean_fun(sym, input_list)
             return Expr(name=Identifier(sym), subterms=subterms, sort=BOOL)
         else:
-            self._is_valid_formula_symbol(sym)
+            self._check_valid_formula_symbol(sym)
             return Var(name=Identifier(sym), sort=BOOL)
     
     def visitFormula_dec(self, ctx: SMTMRParser.Formula_decContext):
@@ -260,27 +270,7 @@ class Translator(SMTMRVisitor):
         formula_symbol = self.visitSymbol(ctx.symbol())
         formula_attribute = self.visitAttribute(ctx.attribute())
         return Method(name=method_name, formula=formula_symbol, attribute=formula_attribute)
-    
-    def _is_valid_formula_symbol(self, symbol):
-        if str(symbol) in self.index_of_seed:
-            return
-        for method in self.methods:
-            if str(symbol) == str(method.formula):
-                return
-        for sym, info in self.notations.items():
-            if str(symbol) == str(sym):
-                for attr in info.attributes:
-                    if attr.keyword == SMTMRKeyword.GEN:
-                        return
-        raise SMTMRException(f"'{symbol}' is not a valid seed symbol, \
-symbol returned by extended method, or notation with :gen attributes")
-    
-    def _is_boolean_fun(self, symbol, input_list):
-        fun = match_fun_in_signatures(Identifier(symbol), input_list, None, core_funs)
-        if fun:
-            return
-        raise SMTMRException(f"'({symbol} {list2str(input_list)})' is not a valid boolean signature")
- 
+
     def _well_sorted_term(self, name, input_list=None, output=None, local_vars=None):
         if str(name) in local_vars:
             # sorted symbols declared in each subst template
@@ -296,7 +286,27 @@ symbol returned by extended method, or notation with :gen attributes")
             return fun.output, 1
         raise SMTMRException(f"signature ({name} {list2str(input_list)}) is not defined")
 
-    def _check_conflicted_decl(self, symbol):
+    def _check_valid_formula_symbol(self, symbol: str):
+        if str(symbol) in self.index_of_seed:
+            return
+        for method in self.methods:
+            if str(symbol) == str(method.formula):
+                return
+        for sym, info in self.notations.items():
+            if str(symbol) == str(sym):
+                for attr in info.attributes:
+                    if attr.keyword == SMTMRKeyword.GEN:
+                        return
+        raise SMTMRException(f"'{symbol}' is not a valid seed symbol, \
+symbol returned by extended method, or notation with :gen attributes")
+    
+    def _check_boolean_fun(self, symbol: str, input_list):
+        fun = match_fun_in_signatures(Identifier(symbol), input_list, None, core_funs)
+        if fun:
+            return
+        raise SMTMRException(f"'({symbol} {list2str(input_list)})' is not a valid boolean signature")
+
+    def _check_conflicted_decl(self, symbol: str):
         conflict = False
         if self._is_seed(symbol):
             conflict = True
@@ -307,23 +317,29 @@ symbol returned by extended method, or notation with :gen attributes")
         if conflict:
             raise  SMTMRException(f"'{symbol}' has already defined")
     
-    def _check_valid_seed(self, symbol):
+    def _check_valid_seed(self, symbol: str):
         if not self._is_seed(symbol):
             raise  SMTMRException(f"'{symbol}' is not a seed")
     
-    def _check_valid_notation(self, symbol):
+    def _check_valid_notation(self, symbol: str):
         if not self._is_notation(symbol):
             raise  SMTMRException(f"'{symbol}' is not a notation")
     
-    def _is_seed(self, symbol):
+    def _is_valid_sort(self, symbol: str, sort):
+        if symbol in all_sorts:
+            if sort.same_type(all_sorts[symbol]):
+                return True
+        return False
+    
+    def _is_seed(self, symbol: str):
         if symbol in self.index_of_seed:
             return True
     
-    def _is_mutant(self, symbol):
+    def _is_mutant(self, symbol: str):
         if self.mutant and (symbol == self.mutant[0]):
             return True
     
-    def _is_notation(self, symbol):
+    def _is_notation(self, symbol: str):
         if symbol in self.notations:
             return True
             

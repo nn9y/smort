@@ -129,13 +129,13 @@ def sort_with_arity(symbol: str, arity: int):
         raise TheoryException("'arity' should be non-negative integer")
     if arity == 0:
         return Sort(Identifier(symbol))
-    def _parametric_sort(pars: list):
+    def _parametric_sort(par_list: list):
         """
         called in construction of parametric functions to fill parameter placeholder (string)
         """
-        if len(pars) != arity:
-            raise TheoryException(f"length of 'pars' should be {arity}")
-        return Sort(Identifier(symbol), pars)
+        if len(par_list) != arity:
+            raise TheoryException(f"length of 'par_list' should be {arity}")
+        return Sort(Identifier(symbol), par_list)
     return _parametric_sort
 
 
