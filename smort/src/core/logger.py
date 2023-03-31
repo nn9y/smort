@@ -3,7 +3,7 @@ import datetime
 
 from logging.handlers import RotatingFileHandler
 
-from smort.src.base.utils import list2str
+from smort.src.misc.utils import list2str
 
 RED = "\033[91m"
 BOLD = "\033[1m"
@@ -57,10 +57,9 @@ def log_generation_attempt(iterations):
     )
 
 
-def log_finished_generations(successful_gens, unsuccessful_gens):
+def log_finished_generations(generations):
     logging.debug(
-        f"Finished generations: {successful_gens} successful, \
-{unsuccessful_gens} unsuccessful"
+        f"Finished generations: {generations}"
     )
 
 
@@ -103,21 +102,13 @@ def log_invalid_mutant(iterations, i):
     )
 
 
-def log_skip_seed_mutator(iterations, i):
+def log_skip_seed(iterations, i):
     logging.debug(
-        f"{i}/{iterations} Mutator indicated to skip the seed."
+        f"{i}/{iterations} skip the seed."
     )
 
 
-def log_skip_seed_test(iterations, i):
+def log_skip_template(k):
     logging.debug(
-        f"{i}/{iterations} Fuzzer::test indicated to skip the seed."
+        f"Skip template {k}."
     )
-
-
-def log_debug(msg):
-    logging.debug(msg)
-
-
-def log_error(msg):
-    logging.error(msg)

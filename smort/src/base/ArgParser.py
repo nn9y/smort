@@ -2,7 +2,7 @@ import sys
 import argparse
 from pathlib import Path
 
-from smort.config.configs import file_size_limit
+from smort.config.configs import file_size_limit, iterations
 from smort.src.base.exitcodes import *
 
 
@@ -49,21 +49,21 @@ def add_args(parser, current_dir):
         "--bugfolder",
         metavar="path_to_folder",
         default=current_dir+"/bugs",
-        help="bugs found"
+        help="bug reports (default: <current_dir>/bugs)"
     )
     parser.add_argument(
         "-l",
         "--logfolder",
         metavar="path_to_folder",
         default=current_dir+"/logs",
-        help="tool logs"
+        help="fuzzer log files (default: <current_dir>/logs)"
     )
     parser.add_argument(
         "-s",
         "--scratchfolder",
         metavar="path_to_folder",
         default=current_dir+"/scratchs",
-        help="generated SMT-LIB mutant scratch files"
+        help="generated SMT-LIB mutant scratch files (default: <current_dir>/scratchs)"
     )
     # parser.add_argument(
     #     "-h",
@@ -77,7 +77,6 @@ def add_args(parser, current_dir):
         default=8,
         metavar="seconds",
         type=int,
-        help="TODO"
     )
     parser.add_argument(
         "-k",
@@ -108,10 +107,10 @@ def add_args(parser, current_dir):
     parser.add_argument(
         "-i",
         "--iterations",
-        default=30,
+        default=iterations,
         metavar="<N>",
         type=int,
-        help="num of iterations in each mutant generation"
+        help=f"num of iterations in each mutant generation (default: {iterations})"
     )
     parser.add_argument(
         "-r",
@@ -125,6 +124,7 @@ def build_parser(current_dir):
     parser = ArgParser(
         description="",
         formatter_class=argparse.RawDescriptionHelpFormatter,
+        #add_help=False,
     )
     add_args(parser, current_dir)
 

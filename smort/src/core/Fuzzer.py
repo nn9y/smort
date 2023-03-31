@@ -3,15 +3,15 @@ import re
 import copy
 import time
 import shutil
+import logging
 import random
 import signal
 import pathlib
 
-from smort.src.base.utils import list2str, random_string, plain, escape
-from smort.src.base.exitcodes import OK_BUGS, OK_NOBUGS, ERR_EXHAUSTED_DISK
-from smort.src.core.BugType import BugType
+from smort.src.misc.utils import list2str, random_string, plain, escape
+from smort.src.base.exitcodes import OK_BUGS, OK_NOBUGS, ERR_EXHAUSTED_DISK, ERR_USAGE
 from smort.src.core.Statistic import *
-from smort.src.core.Solver import Solver, SolverResult
+from smort.src.core.Solver import Solver
 from smort.src.core.returncodes import * 
 from smort.src.core.utils import (
     get_seeds_tuples,
@@ -23,7 +23,7 @@ from smort.src.core.utils import (
 )
 from smort.src.core.logger import (
     init_logging,
-    log_strategy_num_seeds,
+    log_num_targets_seeds,
     log_generation_attempt,
     log_finished_generations,
     log_crash_trigger,
@@ -33,11 +33,9 @@ from smort.src.core.logger import (
     log_solver_timeout,
     log_soundness_trigger,
     log_invalid_mutant,
-    log_skip_seed_mutator,
-    log_skip_seed_test,
+    log_skip_seed,
     log_processing_seeds,
-    log_debug,
-    log_error,
+    log_skip_template
 )
 
 from smort.src.translate.smtmr.MetamorphicRelation import Status
@@ -54,6 +52,9 @@ class Fuzzer:
         self.args = args
 
         self.mr = translate_mr_file(self.args.METAMORPHIC_REL, MAX_TIMEOUTS, False)
+        if len(self.mr.methods) > 0 and (not self.methods_path):
+            print("method declared in mr file, but no path to methods provided in command args")
+            exit(ERR_USAGE)
 
         self.oracle = self.mr.get_oracle()
 
@@ -70,15 +71,17 @@ class Fuzzer:
     def process_seed(self, seed):
         if not admissible_seed_size(seed, self.args.file_size_limit):
             self.statistic.invalid_seeds += 1
-            log_debug(f"Skip invalid seed: exceeds max file size: {self.args.file_size_limit}")
+            logging.debug(f"Skip invalid seed: exceeds max file size: {self.args.file_size_limit}")
             return None
 
         self.currentseeds.append(pathlib.Path(seed).stem)
         script = translate_script_file(seed, silent=False)
+        # TODO
+        script.merge_asserts()
 
         if not script:
             self.statistic.invalid_seeds += 1
-            log_debug(f"Skipping invalid seed: error in translating script: {seed}")
+            logging.debug(f"Skipping invalid seed: error in translating script: {seed}")
             return None
 
         return script
@@ -106,13 +109,13 @@ class Fuzzer:
         2. instantiates a mutator according to metamorphic relations
         3. generates `self.args.iterations` many iterations per seeds group.
         """
-        seeds_tuples, index_in_tuple = get_seeds_tuples(self.args.SAT_SEEDS, self.args.UNSAT_SEEDS, self.mr, self.args.randomize)
+        seeds_tuples = get_seeds_tuples(self.args.SAT_SEEDS, self.args.UNSAT_SEEDS, self.mr, self.args.randomize)
 
-        log_strategy_num_seeds(self.args.SOLVER_CLIS, seeds_tuples)
+        log_num_targets_seeds(self.args.SOLVER_CLIS, seeds_tuples)
 
         while len(seeds_tuples) != 0:
-            # TODO?
-            # translate all script first 
+            # TODO
+            # translate all script first? 
             # store in a map
             # test memory usage
             scripts = self.get_script_group()
@@ -120,49 +123,43 @@ class Fuzzer:
             for script in scripts:
                 if not script:
                     continue
-            # script1, _, script2, _ = self.get_script_pair(seeds)
-            # if not script1 or not script2:
-            #     continue
+
             self.mutator = Mutator(scripts, self.mr, self.args.method_path)
+            valid_num = len(self.mutator.valid_index_list)
 
-            # else:
-            #     assert False
+            log_generation_attempt(self.args.iterations * valid_num)
 
-            log_generation_attempt(self.args.iterations)
-
-            unsuccessful_gens = 0
-            successful_gens = 0
             self.timeout_of_current_seed = 0
-            for i in range(self.args.iterations):
-                self.print_stats()
-                mutant, success, skip_seed = self.mutator.mutate()
+            generations = 0
+            for k in range(valid_num):
+                mutate_further = True
+                for i in range(self.args.iterations):
+                    self.printbar()
+                    # TODO
+                    mutant, skip_template = self.mutator.mutate(k)
 
-                # Reason for unsuccessful generation: randomness in the
-                # mutator to more efficiently generate mutants.
-                if not success:
-                    self.statistic.unsuccessful_generations += 1
-                    unsuccessful_gens += 1
-                    continue  # Go to next iteration.
+                    generations += 1
 
-                successful_gens += 1
+                    # TODO
+                    # parallel testing for each solver
+                    mutate_further, scratchfile = self.test(mutant, i + 1)
+                    # find bug
+                    if not mutate_further:
+                        log_skip_seed(self.args.iterations, k * valid_num + i)
+                        break  # Continue to next seed.
+                        
+                    if skip_template:
+                        log_skip_template(k)
+                        break  # Continue to next template.
 
-                # Reason for mutator to skip a seed: no random components, i.e.
-                # mutant would be the same for all iterations and hence just
-                # waste time.
-                if skip_seed:
-                    log_skip_seed_mutator(self.args.iterations, i)
-                    break  # Continue to next seed.
+                    self.statistic.mutants += 1
+                    if not self.args.keep_mutants:
+                        os.remove(scratchfile)
 
-                (mutate_further, scratchfile) = self.test(mutant, i + 1)
-                if not mutate_further:  # Continue to next seed.
-                    log_skip_seed_test(self.args.iterations, i)
-                    break  # Continue to next seed.
+                if not mutate_further:
+                    break
 
-                self.statistic.mutants += 1
-                if not self.args.keep_mutants:
-                    os.remove(scratchfile)
-
-            log_finished_generations(successful_gens, unsuccessful_gens)
+            log_finished_generations(generations)
 
         self.terminate()
 
@@ -227,7 +224,7 @@ class Fuzzer:
                     self.statistic.effective_calls += 1
                     self.statistic.crashes += 1
                     bug_script_path = self.report(
-                        script, BugType.CRASH, solver_cli, stdout, stderr
+                        script, 'crash', solver_cli, stdout, stderr
                     )
                     log_crash_trigger(bug_script_path)
                 else:
@@ -249,7 +246,7 @@ class Fuzzer:
                         self.statistic.effective_calls += 1
                         self.statistic.crashes += 1
                         path = self.report(
-                            script, BugType.SEGFAULT, solver_cli, stdout, stderr
+                            script, 'segfault', solver_cli, stdout, stderr
                         )
                         log_segfault_trigger(self.args, path, iteration)
                         return False  # Stop testing.
@@ -283,7 +280,7 @@ class Fuzzer:
                         self.statistic.soundness += 1
                         # Produce a bug report if the query result differs from the pre-set oracle of mutant
                         path = self.report(
-                            script, BugType.INCORRECT, solver_cli,
+                            script, 'incorrect', solver_cli,
                             stdout, stderr
                         )
                         log_soundness_trigger(self.args.iterations, iteration, path)
@@ -314,7 +311,7 @@ class Fuzzer:
             with open(report, "w") as report_writer:
                 report_writer.write(script.__str__())
         except Exception:
-            log_error("error: couldn't copy scratchfile to bugfolder.") 
+            logging.error("error: couldn't copy scratchfile to bugfolder.") 
             exit(ERR_EXHAUSTED_DISK)
 
         record = fn_format + ".record"
@@ -322,7 +319,7 @@ class Fuzzer:
             with open(record, "w") as record_writer:
                 record_writer.write(f"command: {cli}\nstderr:\n{stderr}stdout:\n{stdout}")
         except Exception:
-            log_error("error: couldn't save recordfile to bugfolder.") 
+            logging.error("error: couldn't save recordfile to bugfolder.") 
             exit(ERR_EXHAUSTED_DISK)
 
         return report

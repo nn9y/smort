@@ -173,7 +173,7 @@ class ScriptVisitor(SMTLIBv2Visitor):
         cmds = []
         for cmd_ctx in ctx.command():
             cmds.append(self.visitCommand(cmd_ctx))
-        return Script(cmds, self.global_vars)
+        return Script(cmds)
 
     def handleCommand(self, ctx: SMTLIBv2Parser.CommandContext):
         if ctx.cmd_assert():

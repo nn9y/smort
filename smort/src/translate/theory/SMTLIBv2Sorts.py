@@ -1,6 +1,6 @@
 import random
 
-from smort.src.msic.utils import random_string
+from smort.src.misc.utils import random_string
 from smort.src.translate.Ast import Const, Expr, SpecConstant
 from smort.src.translate.theory.Fun import *
 

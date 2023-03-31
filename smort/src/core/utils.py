@@ -3,9 +3,10 @@ import re
 import pathlib
 
 from smort.config.configs import crash_list, duplicate_list, ignore_list
-from smort.src.base.utils import in_list, cartesian_product
+from smort.src.base.exitcodes import ERR_USAGE
+from smort.src.misc.utils import in_list, cartesian_product
 from smort.src.core.Solver import SolverResult
-from src.translate.smtmr.MetamorphicRelation import Status
+from smort.src.translate.smtmr.MetamorphicRelation import Status
 
 
 def in_crash_list(stdout, stderr):
@@ -46,53 +47,35 @@ def grep_result(stdout):
     return None 
 
 
-def get_seeds_tuples(sat_seeds_path, unsat_seeds_path, mr, randomize=False):
+def get_seeds_tuples(sat_seed_paths, unsat_seed_paths, mr, randomize=False):
     """
     Get cartesian product of seeds' alternative list according to seeds' statisfiability 
     :returns: list of seeds tuples, index of seed symbol in each tuple
     """
     seeds_alter_list = []
-    idx = 0
-    index_in_tuple = {}
-    sat_count = 0
-    unsat_count = 0
-    for symbol, status in mr.seeds.items():
+    sat_seeds = 0
+    unsat_seeds = 0
+    for status in mr.seed_status_list:
         if status == Status.SAT:
-            seeds_alter_list.append(sat_seeds_path)
-            sat_count += 1
+            seeds_alter_list.append(sat_seed_paths)
+            sat_seeds += 1
         elif status == Status.UNSAT:
-            seeds_alter_list.append(unsat_seeds_path)
-            unsat_count += 1
+            seeds_alter_list.append(unsat_seed_paths)
+            unsat_seeds += 1
         else:
-            print("TODO")
-            assert False
-        index_in_tuple[symbol] = idx
-        idx += 1
-    
-    if sat_count > len(sat_seeds_path):
-        print("TODO")
-        assert False
-    if unsat_count > len(unsat_seeds_path):
-        print("TODO")
-        assert False
+            print(f"unsupported status '{status}'")
+            exit(ERR_USAGE)
 
     seeds_tuples = cartesian_product(*seeds_alter_list) 
+
+    if sat_seeds > len(sat_seed_paths):
+        print(f"number of sat files provided is less than minimum requirements")
+        exit(ERR_USAGE)
+    if unsat_seeds > len(unsat_seed_paths):
+        print(f"number of unsat files provided is less than minimum requirements")
+        exit(ERR_USAGE)
 
     if randomize:
         random.shuffle(seeds_tuples)
 
-    return seeds_tuples, index_in_tuple
-
-
-# def init_oracle(args):
-#     """
-#     Initialize the oracle. For SemanticFusion the oracle is either sat or
-#     unsat. For TypeAwareOpMutation the oracle is unknown
-#     """
-#     if args.oracle == "unknown":
-#         return SolverResult(SolverQueryResult.UNKNOWN)
-#     elif args.oracle == "sat":
-#         return SolverResult(SolverQueryResult.SAT)
-#     elif args.oracle == "unsat":
-#         return SolverResult(SolverQueryResult.UNSAT)
-#     assert False
+    return seeds_tuples

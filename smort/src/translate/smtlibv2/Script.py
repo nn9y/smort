@@ -5,52 +5,46 @@ from smort.src.translate.Ast import *
 
 
 class Script:
-    def __init__(self, commands, global_vars):
+    def __init__(self, commands):
         self.commands = commands
-        #self.vars, self.sorts = self._decl_commands()
-        self.global_vars = global_vars
-        self.free_var_occs = []
         self.assert_cmds = []
-
-    # def _decl_commands(self):
-    #     var_list, sort_dict = [], {}
-    #     for cmd in self.commands:
-    #         if isinstance(cmd, DeclareConst):
-    #             vars.append(Var(cmd.symbol, cmd.sort))
-    #             sort_dict[cmd.symbol] = cmd.sort
-    #         if isinstance(cmd, DeclareFun):
-    #             if cmd.input_sort != "":
-    #                 vars.append(Var(cmd.symbol, cmd.input_sort))
-    #                 sort_dict[cmd.symbol] = cmd.input_sort
-    #     return var_list, sort_dict 
 
     def _prefix_vars_in_assert(self, prefix, t):
         match t.term_type:
             case TermType.CONST:
                 return
             case TermType.VAR:
-                ## TODO
-                # string?
-                t.name = prefix + t.name
+                t.name = Identifier(prefix + str(t.name.symbol), t.name.indices)
                 return
             case TermType.LET:
-                for var, term in t.var_bindings:
-                    # TODO
-                    var = prefix + var
-                    self._prefix_vars_in_assert(prefix, term)
+                for i, vb in enumerate(t.var_bindings):
+                    var, _ = vb
+                    # set
+                    t.var_bindings[i][0] = prefix + var
+                    self._prefix_vars_in_assert(prefix, t.var_bindings[i][1])
                 self._prefix_vars_in_assert(prefix, t.subterms[0])
                 return
             case TermType.QUANT:
-                for var, _ in t.sorted_vars:
-                    # TODO
-                    var = prefix + var
+                for i, sv in enumerate(t.sorted_vars):
+                    var, _ = sv
+                    # set
+                    t.sorted_vars[i][0] = prefix + var
                 self._prefix_vars_in_assert(prefix, t.subterms[0])
                 return
             case TermType.MATCH:
                 self._prefix_vars_in_assert(prefix, t.subterms[0])
-                for pat, term in self.match_cases:
-                    # TODO pat
-                    self._prefix_vars_in_assert(prefix, term)
+                for i, mc in enumerate(t.match_cases):
+                    pat, term = mc
+                    if len(pat) > 1:
+                        for j in range(1, len(pat)):
+                            # set
+                            t.match_cases[i][0][j] = prefix + pat[j]
+                    else:
+                        if pat[0] in term.bound_vars:
+                            # set
+                            # not nullary constructor
+                            t.match_cases[i][0][0] = prefix + pat[0]
+                    self._prefix_vars_in_assert(prefix, t.match_cases[i][1])
                 return
             case TermType.ANNOT:
                 self._prefix_vars_in_assert(prefix, t.subterms[0])
@@ -64,16 +58,20 @@ class Script:
             if isinstance(cmd, DeclareConst):
                 cmd.symbol = prefix + cmd.symbol
             if isinstance(cmd, DeclareFun):
-                if cmd.input_sort == "":
+                if cmd.input_sort_list == []:
                     cmd.symbol = prefix + cmd.symbol
-            # TODO
-            # defines
+            if isinstance(cmd, DefineFun):
+                if cmd.sorted_vars == []:
+                    cmd.symbol = prefix + cmd.symbol
+            if isinstance(cmd, DefineFunRec):
+                if cmd.sorted_vars == []:
+                    cmd.symbol = prefix + cmd.symbol
+            if isinstance(cmd, DefineFunsRec):
+                for fun_decl in cmd.fun_decls: 
+                    if fun_decl.sorted_vars == []:
+                        fun_decl.symbol = prefix + fun_decl.symbol
             if isinstance(cmd, Assert):
-                self._prefix_vars_in_assert(prefix, cmd.term)
-        new_global_vars = {}
-        for global_var in self.global_vars:
-            new_global_vars[prefix + global_var] = self.global_vars[global_var]
-        self.global_vars = new_global_vars
+                self._prefix_vars_in_assert(prefix, cmd.term) 
 
     def merge_asserts(self):
         """
@@ -81,12 +79,12 @@ class Script:
         reset-assertions statement) into a single assert by conjunction.
         """
         terms = []
-        # TODO
-        global_free_vars = set() 
+        local_free_vars = {}
         for cmd in self.commands:
             if isinstance(cmd, Assert):
-                global_free_vars.update(cmd.term.global_free_vars)
-                terms.append(cmd.term)
+                term = cmd.term
+                local_free_vars.update(term.local_free_vars)
+                terms.append(term)
             if isinstance(cmd, SMTLIBCommand):
                 if cmd.cmd_str == "(exit)":
                     break
@@ -94,8 +92,7 @@ class Script:
                     terms = []
                 if cmd.cmd_str == "(reset-assertions)":
                     terms = []
-        conjunction = Assert(Expr(name=Identifier("and"), subterms=terms, local_free_vars=global_free_vars))
-        # TODO: can remove update global free vars in Term()?
+        conjunction = Assert(Expr(name=Identifier("and"), subterms=terms, local_free_vars=local_free_vars))
         new_cmds, first_found = [], False
         for cmd in self.commands:
             if not first_found and isinstance(cmd, Assert):
@@ -230,15 +227,10 @@ class DefineConst:
         self.term = term
 
     def __str__(self):
-        return (
-            "(define-const "
-            + self.symbol
-            + " "
-            + str(self.sort)
-            + " "
-            + self.term.__str__()
-            + ")"
-        )
+        return f"(define-const {self.symbol} {self.sort} {self.term})"
+
+    def __repr__(self):
+        return self.__str__()
 
 
 class DefineFun:
@@ -249,12 +241,8 @@ class DefineFun:
         self.term = term
 
     def __str__(self):
-        sorted_var_str_list = []
-        for sorted_var in self.sorted_vars:
-            sorted_var_str_list.append("(" + list2str(sorted_var) + ")")
-        sorted_vars_str = " ".join(sorted_var_str_list)
         return f"(define-fun {self.symbol} \
-({sorted_vars_str}) {str(self.sort)} {str(self.term)})"
+({list2str(self.sorted_vars)}) {str(self.sort)} {str(self.term)})"
 
     def __repr__(self):
         return self.__str__()
@@ -282,7 +270,7 @@ class FunDecl:
         self.sort = sort
 
     def __str__(self):
-        return f"{self.symbol} ({list2str(self.sorted_vars)}) {str(self.sort)}"
+        return f"({self.symbol} ({list2str(self.sorted_vars)}) {str(self.sort)})"
 
     def __repr__(self):
         return self.__str__()
@@ -294,17 +282,8 @@ class DefineFunsRec:
         self.terms = terms
 
     def __str__(self):
-        s = "(define-funs-rec (" + self.fun_decls[0].__str__()
-        if len(self.fun_decls) > 1:
-            for decl in self.fun_decls[1:]:
-                s += " " + decl.__str__()
-            s += ") (" + self.terms[0].__str__()
-        if len(self.terms) > 1:
-            for term in self.terms[1:]:
-                s += " " + term.__str__()
-            s += ")"
-        return s + ")"
-    
+        return f"(define-funs-rec ({list2str(self.fun_decls)}) ({list2str(self.terms)}))"
+ 
     def __repr__(self):
         return self.__str__()
 
@@ -382,7 +361,6 @@ class SMTLIBCommand:
     commands we don't care about:
         checkSat
         checkSatAssuming
-        declareSort
         echo
         exit
         getAssertions

@@ -18,13 +18,9 @@ def main():
     current_dir = os.getcwd()
     parser = build_parser(current_dir)
 
-
     if len(sys.argv) == 1:
-        print(f"{header}\n\n{usage}\n{short_description}", flush=True)
+        print(f"{header}\n\n{usage}\nFor usage information: {sys.argv[0]} -h or --help", flush=True)
         exit(ERR_USAGE)
-    elif "-h" in sys.argv or "--help" in sys.argv:
-        print(f"{header}\n\n{usage}\n{long_description}\n{options}\n", flush=True)
-        exit(OK_NOBUGS)
     else:
         args = run_checks(parser)
         try:

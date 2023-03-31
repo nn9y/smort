@@ -1,6 +1,6 @@
 import pytest
 
-from smort.src.msic.utils import *
+from smort.src.misc.utils import *
 from smort.src.translate.Ast import Sort
 from smort.src.translate.theory.utils import *
 from smort.src.translate.theory.Fun import *

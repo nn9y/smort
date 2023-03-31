@@ -2,12 +2,13 @@ import subprocess
 
 from smort.src.base.exitcodes import ERR_USAGE
 from smort.src.core.returncodes import *
-from src.translate.smtmr.MetamorphicRelation import Status
+from smort.src.translate.smtmr.MetamorphicRelation import Status
 
 
 class SolverResult:
     """
     Class to store the result of multiple solver check-sat queries.
+    **Reserved for incremental benchmarks**
     :res_list a list of multiple "Status" items
     """
 

@@ -143,7 +143,7 @@ class Translator(SMTMRVisitor):
             for sort_ctx in ctx.sort():
                 parsort = self.visitSort(sort_ctx)
                 parsorts.append(parsort)
-        symbol = str(id_)
+        symbol = id_.symbol
         # map to synonym sort
         synonym_sort = get_sort_in_synonym(symbol, parsorts, all_synonyms)
         if synonym_sort:
@@ -158,7 +158,7 @@ class Translator(SMTMRVisitor):
         id_ = self.visitIdentifier(ctx.identifier())
         sort = self.visitSort(ctx.sort()) if ctx.GRW_As() else None
         return [id_, sort]
-  
+ 
     def visitSorted_var(self, ctx: SMTMRParser.Sorted_varContext):
         return [self.visitSymbol(ctx.symbol()), self.visitSort(ctx.sort())]
 
@@ -166,7 +166,7 @@ class Translator(SMTMRVisitor):
         if ctx.spec_constant():
             spec_constant = self.visitSpec_constant(ctx.spec_constant())
             ret_sort, flag = self._well_sorted_term(spec_constant, [], None, local_vars)
-            if flag == 0:
+            if flag != 1:
                 raise SMTMRException(f"notation name '{spec_constant.const_type}' overrides signature in theories")
             return Const(name=spec_constant, sort=ret_sort)
         elif ctx.qual_identifier():
@@ -181,16 +181,15 @@ class Translator(SMTMRVisitor):
                     subterms.append(subterm)
                     input_list.append(subterm.sort)
                 ret_sort, flag = self._well_sorted_term(id_, input_list, sort, local_vars)
-                if flag == 0:
+                if flag != 1:
                     raise SMTMRException(f"notation name '{id_}' overrides signature in theories")
                 return Expr(name=id_, subterms=subterms, sort=ret_sort, qual_id=qual_id)
             else:
                 ret_sort, flag = self._well_sorted_term(id_, [], sort, local_vars)
-                match flag:
-                    case 0:
-                        return Var(name=id_, sort=ret_sort, qual_id=qual_id)
-                    case 1:
-                        return Expr(name=id_, subterms=[], sort=ret_sort, qual_id=qual_id)
+                if flag == 1:
+                    return Expr(name=id_, subterms=[], sort=ret_sort, qual_id=qual_id)
+                else:
+                    return Var(name=id_, sort=ret_sort, qual_id=qual_id)
     
     def visitBoolean_term_template(self, ctx:SMTMRParser.Boolean_term_templateContext):
         sym = self.visitSymbol(ctx.symbol())
@@ -259,6 +258,8 @@ class Translator(SMTMRVisitor):
         subst_term_pairs = []
         for stp_ctx in ctx.subst_pair():
             term, repl = self.visitSubst_pair(stp_ctx, local_vars)        
+            if (term.sort and repl.sort) and (term.sort != repl.sort):
+                raise SMTMRException("sort of terms before and after substitution should be the same")
             subst_term_pairs.append([term, repl])
         return SubstTemplate(attributes=attributes, sorted_vars=sorted_vars, repl_pairs=subst_term_pairs)
  
@@ -274,17 +275,21 @@ class Translator(SMTMRVisitor):
     def _well_sorted_term(self, name, input_list=None, output=None, local_vars=None):
         if str(name) in local_vars:
             # sorted symbols declared in each subst template
+            sort = local_vars[str(name)]
             if (
-                (output and local_vars[str(name)] == output)
+                (output and sort == output)
                 or not output
             ):
-                return local_vars[str(name)], 0 
+                return sort, 0 
         # predefined signatures
         # constants, functions
         fun = match_fun_in_signatures(name, input_list, output, all_funs)
         if fun:
-            return fun.output, 1
-        raise SMTMRException(f"signature ({name} {list2str(input_list)}) is not defined")
+            return fun.output, 1 
+        # accept more functions 
+        # only need function name and input list sort
+        return None, 1 
+        # raise SMTMRException(f"signature ({name} {list2str(input_list)}) is not defined")
 
     def _check_valid_formula_symbol(self, symbol: str):
         if str(symbol) in self.index_of_seed:
@@ -323,8 +328,8 @@ symbol returned by extended method, or notation with :gen attributes")
     
     def _check_valid_notation(self, symbol: str):
         if not self._is_notation(symbol):
-            raise  SMTMRException(f"'{symbol}' is not a notation")
-    
+            raise SMTMRException(f"'{symbol}' is not a notation")
+ 
     def _is_valid_sort(self, symbol: str, sort):
         if symbol in all_sorts:
             if sort.same_type(all_sorts[symbol]):

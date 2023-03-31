@@ -1,8 +1,8 @@
 import copy
 from inspect import isfunction
 
-from smort.src.msic.StrEnum import StrEnum
-from smort.src.msic.utils import list2str
+from smort.src.misc.StrEnum import StrEnum
+from smort.src.misc.utils import list2str
 from smort.src.translate.utils import *
 
 ### !!! TODO !!!
@@ -428,8 +428,12 @@ class Term:
             return False
         if self.term_type != other.term_type:
             return False
-        if self.sort != other.sort:
-            return False
+        # sort of function could be None (Unknown)
+        if ((self.term_type == TermType.CONST) or (self.term_type == TermType.VAR)):
+            if self.sort != other.sort:
+                return False
+        # if self.sort != other.sort:
+        #     return False
         # name of cons, exprs should be the same
         if ((self.term_type == TermType.CONST) or (self.term_type == TermType.EXPR)):
             if self.name != other.name:
@@ -456,7 +460,7 @@ class Term:
                     return False
         return True
  
-    def update_var_name_map(self, other, var_name_map):
+    def _update_var_name_map(self, other, var_name_map):
         if self.term_type == TermType.VAR:
             var_name_map[str(other.name)] = self.name
         for i, t in enumerate(self.subterms):
@@ -470,34 +474,43 @@ class Term:
             in self and add them to the list occs.
         """
         if self.equals(t, free):
-            self.update_var_name_map(t, var_name_map)
+            self._update_var_name_map(t, var_name_map)
             return occs.append(self)
         if self.subterms:
             for subterm in self.subterms:
                 subterm.find_all_terms(t, occs, var_name_map, free)
+    
+    def _replace_var_name(self, t, var_name_map):
+        if t.term_type == TermType.VAR:
+            # exists in seed 
+            symbol = str(t.name)
+            if symbol in var_name_map:
+                t.name = var_name_map[symbol]
+        else:
+            for s in t.subterms:
+                self._replace_var_name(s, var_name_map)
 
-    def substitute(self, t, repl, var_name_map, free=False):
+    # def substitute(self, t, repl, var_name_map, free=False):
+    def substitute(self, occs, repl, var_name_map):
         """
-        substitute all terms t in self by repl.
+        substitute all terms in occs by repl.
         """
-        occs = []
-        self.find_all_terms(t, occs, var_name_map, free)
+        # occs = []
+        # self.find_all_terms(t, occs, var_name_map, free)
         for occ in occs:
-            if occ.term_type == TermType.VAR:
-                repl_name = var_name_map[str(repl.name)]
-            else:
-                repl_name = repl.name
+            r = copy.deepcopy(repl)
+            self._replace_var_name(r, var_name_map)
             occ._set(
-                name=copy.deepcopy(repl_name),
-                sort=copy.deepcopy(repl.sort),
-                term_type=copy.deepcopy(repl.term_type),
-                var_bindings=copy.deepcopy(repl.var_bindings),
-                quantifier=copy.deepcopy(repl.quantifier),
-                sorted_vars=copy.deepcopy(repl.sorted_vars),
-                match_cases=copy.deepcopy(repl.match_cases),
-                bound_vars=copy.deepcopy(repl.bound_vars),
-                subterms=copy.deepcopy(repl.subterms),
-                annotations=copy.deepcopy(repl.annotations),
+                name=copy.deepcopy(r.name),
+                sort=copy.deepcopy(r.sort),
+                term_type=copy.deepcopy(r.term_type),
+                var_bindings=copy.deepcopy(r.var_bindings),
+                quantifier=copy.deepcopy(r.quantifier),
+                sorted_vars=copy.deepcopy(r.sorted_vars),
+                match_cases=copy.deepcopy(r.match_cases),
+                bound_vars=copy.deepcopy(r.bound_vars),
+                subterms=copy.deepcopy(r.subterms),
+                annotations=copy.deepcopy(r.annotations),
                 local_free_vars=occ.local_free_vars,
                 qual_id=occ.qual_id,
             )
