@@ -21,8 +21,8 @@ def generate_script(stream):
     return vis.visitStart(tree)
 
 
-def translate_script_file(fn, timeout_limit, slient=True):
-    return translate_file(generate_script, fn, timeout_limit, slient) 
+def translate_script_file(fn, timeout_limit, silent=True):
+    return translate_file(generate_script, fn, timeout_limit, silent) 
 
 
 def main(argv):

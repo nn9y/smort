@@ -18,22 +18,21 @@ def add_args(parser, current_dir):
     parser.add_argument(
         "SOLVER_CLIS",
         metavar="solver_clis",
-        help="SMT solver clis"
+        help="SMT solver CLIs"
     )
     parser.add_argument(
         "METAMORPHIC_REL",
-        nargs=1,
         metavar="path_to_file",
         help="SMTMR config file"
     )
     parser.add_argument(
-        "--sat",
+        "--sat-seeds",
         nargs="*",
         metavar="path_to_file/folder",
         help="sat SMT-LIB files or folders"
     )
     parser.add_argument(
-        "--unsat",
+        "--unsat-seeds",
         nargs="*",
         metavar="path_to_file/folder",
         help="unsat SMT-LIB files or folders"

@@ -90,11 +90,11 @@ def valid_template_index_list(formulas, templates):
     valid_index_list = []
     for k, template in enumerate(templates):
         matched = True
-        for i, repl_pair in enumerate(template.repl_pairs):
+        for i, formula in enumerate(formulas):
+            term, _ = template.repl_pairs[i]
             term_occs = []
-            term, _ = repl_pair
             # assuming assertions have been merged into single one in each formula
-            formulas[i].assert_cmds[0].term.find_all_terms(term, term_occs, {}, template.free)
+            formula.assert_cmds[0].term.find_all_terms(term, term_occs, {}, template.free)
             # invalid template
             if len(term_occs) == 0:
                 matched = False

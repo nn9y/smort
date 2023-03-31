@@ -10,7 +10,6 @@ srcdir = str(path.parent.absolute().parent)
 #sys.path.insert(1, os.getcwd() + "/.smtmr")
 
 def check_solver_clis(solver_clis):
-    solver_clis = [] 
     if solver_clis == "":
         if len(solvers) == 0:
             print("error: no solver specified", flush=True)
@@ -37,7 +36,7 @@ def check_iterations(iterations):
 
 def run_checks(parser):
     args = parser.parse_args()
-    if not (args.SAT_SEEDS or args.UNSAT_SEEDS):
+    if not (args.sat_seeds or args.unsat_seeds):
         parser.error("no seed file/folder specified")
 
     args.SOLVER_CLIS = check_solver_clis(args.SOLVER_CLIS)
@@ -46,7 +45,7 @@ def run_checks(parser):
     folder_path_list = [args.bugfolder, args.logfolder, args.scratchfolder]
     for folder_path in folder_path_list:
         create_folder(folder_path)
-    args.SAT_SEEDS = get_seeds(args.SAT_SEEDS)
-    args.UNSAT_SEEDS = get_seeds(args.UNSAT_SEEDS)
+    args.sat_seeds = get_seeds(args.sat_seeds)
+    args.unsat_seeds = get_seeds(args.unsat_seeds)
 
     return args

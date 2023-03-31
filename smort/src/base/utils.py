@@ -15,6 +15,8 @@ def create_folder(folder_path):
             exit(ERR_EXHAUSTED_DISK)
 
 def get_seeds(seed_path_list):
+    if not seed_path_list:
+        return None
     seeds_list = []
     for path in seed_path_list:
         if not os.path.exists(path):

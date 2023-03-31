@@ -93,6 +93,7 @@ class Script:
                 if cmd.cmd_str == "(reset-assertions)":
                     terms = []
         conjunction = Assert(Expr(name=Identifier("and"), subterms=terms, local_free_vars=local_free_vars))
+        self.assert_cmds = [conjunction]
         new_cmds, first_found = [], False
         for cmd in self.commands:
             if not first_found and isinstance(cmd, Assert):

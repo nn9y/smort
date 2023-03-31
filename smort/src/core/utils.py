@@ -68,10 +68,13 @@ def get_seeds_tuples(sat_seed_paths, unsat_seed_paths, mr, randomize=False):
 
     seeds_tuples = cartesian_product(*seeds_alter_list) 
 
-    if sat_seeds > len(sat_seed_paths):
+    sat_seeds_len = len(sat_seed_paths) if sat_seed_paths else 0
+    unsat_seeds_len = len(unsat_seed_paths) if unsat_seed_paths else 0
+
+    if sat_seeds > sat_seeds_len:
         print(f"number of sat files provided is less than minimum requirements")
         exit(ERR_USAGE)
-    if unsat_seeds > len(unsat_seed_paths):
+    if unsat_seeds > unsat_seeds_len:
         print(f"number of unsat files provided is less than minimum requirements")
         exit(ERR_USAGE)
 

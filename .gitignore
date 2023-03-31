@@ -2,3 +2,4 @@ examples
 .antlr
 *.pyc
 .vscode
+.smort

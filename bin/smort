@@ -23,6 +23,7 @@ def main():
         exit(ERR_USAGE)
     else:
         args = run_checks(parser)
+        #print(args)
         try:
             fuzzer = Fuzzer(args)
 

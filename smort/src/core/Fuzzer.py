@@ -75,7 +75,7 @@ class Fuzzer:
             return None
 
         self.currentseeds.append(pathlib.Path(seed).stem)
-        script = translate_script_file(seed, silent=False)
+        script = translate_script_file(seed, MAX_TIMEOUTS, silent=False)
         # TODO
         script.merge_asserts()
 
@@ -109,7 +109,7 @@ class Fuzzer:
         2. instantiates a mutator according to metamorphic relations
         3. generates `self.args.iterations` many iterations per seeds group.
         """
-        seeds_tuples = get_seeds_tuples(self.args.SAT_SEEDS, self.args.UNSAT_SEEDS, self.mr, self.args.randomize)
+        seeds_tuples = get_seeds_tuples(self.args.sat_seeds, self.args.unsat_seeds, self.mr, self.args.randomize)
 
         log_num_targets_seeds(self.args.SOLVER_CLIS, seeds_tuples)
 
@@ -118,7 +118,7 @@ class Fuzzer:
             # translate all script first? 
             # store in a map
             # test memory usage
-            scripts = self.get_script_group()
+            scripts = self.get_script_group(seeds_tuples)
             # invalid script exisits
             for script in scripts:
                 if not script:

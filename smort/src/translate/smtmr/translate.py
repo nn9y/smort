@@ -21,8 +21,8 @@ def generate_mr(stream):
     return translator.visitStart(tree)
 
 
-def translate_mr_file(fn, timeout_limit, slient=True):
-    return translate_file(generate_mr, fn, timeout_limit, slient) 
+def translate_mr_file(fn, timeout_limit, silent=True):
+    return translate_file(generate_mr, fn, timeout_limit, silent) 
 
 
 def main(argv):
