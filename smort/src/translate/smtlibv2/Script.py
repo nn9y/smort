@@ -10,18 +10,23 @@ class Script:
         self.assert_cmds = []
 
     def _prefix_vars_in_assert(self, prefix, t):
+        t.bound_vars = {prefix + key: value for key, value in t.bound_vars.items()}
+        t.local_free_vars = {prefix + key: value for key, value in t.local_free_vars.items()}
         match t.term_type:
             case TermType.CONST:
                 return
             case TermType.VAR:
-                t.name = Identifier(prefix + str(t.name.symbol), t.name.indices)
+                t.name = Identifier(prefix + t.name.symbol, t.name.indices)
                 return
+            case TermType.EXPR:
+                for subterm in t.subterms:
+                    self._prefix_vars_in_assert(prefix, subterm)
             case TermType.LET:
                 for i, vb in enumerate(t.var_bindings):
-                    var, _ = vb
+                    var, term = vb
                     # set
                     t.var_bindings[i][0] = prefix + var
-                    self._prefix_vars_in_assert(prefix, t.var_bindings[i][1])
+                    self._prefix_vars_in_assert(prefix, term)
                 self._prefix_vars_in_assert(prefix, t.subterms[0])
                 return
             case TermType.QUANT:
@@ -44,16 +49,12 @@ class Script:
                             # set
                             # not nullary constructor
                             t.match_cases[i][0][0] = prefix + pat[0]
-                    self._prefix_vars_in_assert(prefix, t.match_cases[i][1])
+                    self._prefix_vars_in_assert(prefix, term)
                 return
             case TermType.ANNOT:
                 self._prefix_vars_in_assert(prefix, t.subterms[0])
-            
-    def prefix_vars(self, prefix):
-        """
-        Add a shared prefix to all variables
-        :prefix: str
-        """
+ 
+    def prefix_vars(self, prefix: str):
         for cmd in self.commands:
             if isinstance(cmd, DeclareConst):
                 cmd.symbol = prefix + cmd.symbol
@@ -93,13 +94,13 @@ class Script:
                 if cmd.cmd_str == "(reset-assertions)":
                     terms = []
         conjunction = Assert(Expr(name=Identifier("and"), subterms=terms, local_free_vars=local_free_vars))
-        self.assert_cmds = [conjunction]
         new_cmds, first_found = [], False
         for cmd in self.commands:
-            if not first_found and isinstance(cmd, Assert):
-                new_cmds.append(conjunction)
-                first_found = True
             if isinstance(cmd, Assert):
+                if not first_found:
+                    new_cmds.append(conjunction)
+                    self.assert_cmds.append(conjunction)
+                    first_found = True
                 continue
             if isinstance(cmd, SMTLIBCommand):
                 if cmd.cmd_str == "(exit)":
@@ -107,7 +108,7 @@ class Script:
                 if cmd.cmd_str == "(reset-assertions)":
                     continue
                 if cmd.cmd_str == "(reset)":
-                    new_cmds, first_found = [], False
+                    new_cmds, self.assert_cmds, first_found = [], [], False
                     continue
             new_cmds.append(cmd)
         self.commands = new_cmds

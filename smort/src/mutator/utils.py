@@ -1,13 +1,16 @@
 import random
 import importlib
 
-from smort.src.misc.utils import cartesian_product
+from smort.src.misc.utils import cartesian_product, random_string
 from smort.src.translate.smtlibv2.Script import * 
 
 
-def merge(scripts, add_cmds, fused):
+def merge(scripts, fused, decls, defs, asserts):
+    merged_cmds = []
+    # set-logic ALL 
+    merged_cmds.append(SMTLIBCommand('(set-logic ALL)'))
     # add new decls and defs
-    merged_cmds = add_cmds 
+    merged_cmds += decls + defs 
     # merge decls and defs
     for script in scripts:
         for cmd in script.commands:
@@ -29,8 +32,12 @@ def merge(scripts, add_cmds, fused):
                 merged_cmds.append(cmd)
             if isinstance(cmd, DefineSort):
                 merged_cmds.append(cmd)
-    
+    # add asserts
     merged_cmds.append(Assert(fused))
+    merged_cmds += asserts 
+
+    # check-sat
+    merged_cmds.append(SMTLIBCommand('(check-sat)'))
  
     return Script(merged_cmds)
 
@@ -40,7 +47,7 @@ def random_tuple_list(lsts, lower_bound=1):
     Generate a random list of tuples (t_1, t_2, ..., t_n)
         where t_i is in lst_i
     """
-    product = cartesian_product(lsts) 
+    product = cartesian_product(*lsts) 
 
     skip_template = False 
 
@@ -58,7 +65,7 @@ def random_tuple_list(lsts, lower_bound=1):
     new_tups = []
     dups = [[] for _ in range(n)]
     for tup in tups:
-        for i in n:
+        for i in range(n):
             if tup[i] in dups[i]:
                 continue
             else:
@@ -70,20 +77,32 @@ def random_tuple_list(lsts, lower_bound=1):
 def random_term_tuples(formulas, template):
     """
     :return:
-    [a list of random term tuples (to be replaced)] and
+    a list of [random term tuple (to be replaced)] and
     [a dict mapping from var name in template to:
         var name in actual formula]
     """
-    var_name_map = {}
     term_occs_list = []
-    for i, repl_pair in enumerate(template.repl_pairs):
+    for i, formula in enumerate(formulas):
         term_occs = []
-        term, _ = repl_pair
+        term, _ = template.repl_pairs[i]
         # assuming assertions have been merged into single one in each formula
-        formulas[i].assert_cmds[0].term.find_all_terms(term, term_occs, var_name_map, template.free)
+        formula.assert_cmds[0].term.find_all_terms(term, term_occs, template.free)
         term_occs_list.append(term_occs)
     rnd_tuples, skip_teamplate = random_tuple_list(term_occs_list)
-    return [rnd_tuples, var_name_map, skip_teamplate]
+    var_name_maps = []
+    for k, tup in enumerate(rnd_tuples):
+        var_name_map = {}
+        for i, t in enumerate(tup):
+            term, _ = template.repl_pairs[i]
+            t.update_var_name_mapping(term, var_name_map)
+        # new vars and cons
+        for var, _ in template.sorted_vars:
+            if not var in var_name_map:
+                # TODO
+                # when add multiple templates
+                var_name_map[var] = f"{var}_random{str(k)}"
+        var_name_maps.append(var_name_map)
+    return [rnd_tuples, var_name_maps, skip_teamplate]
 
 
 def valid_template_index_list(formulas, templates):
@@ -94,7 +113,7 @@ def valid_template_index_list(formulas, templates):
             term, _ = template.repl_pairs[i]
             term_occs = []
             # assuming assertions have been merged into single one in each formula
-            formula.assert_cmds[0].term.find_all_terms(term, term_occs, {}, template.free)
+            formula.assert_cmds[0].term.find_all_terms(term, term_occs, template.free)
             # invalid template
             if len(term_occs) == 0:
                 matched = False

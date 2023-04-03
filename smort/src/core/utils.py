@@ -44,7 +44,7 @@ def grep_result(stdout):
             result.append(Status.SAT)
         elif re.search("^unknown$", line, flags=re.MULTILINE):
             result.append(Status.UNKNOWN)
-    return None 
+    return result 
 
 
 def get_seeds_tuples(sat_seed_paths, unsat_seed_paths, mr, randomize=False):

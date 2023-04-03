@@ -28,6 +28,8 @@ def test_list2str():
     assert list2str(var_bindings) == '(1 2) (3 a)'
     var_bindings = [[1, 2]]
     assert list2str(var_bindings) == '(1 2)'
+    attrs = [':aa', ':bbc']
+    assert list2str(attrs) == ':aa :bbc'
 
 
 def test_constraints_and_get_output_indices():

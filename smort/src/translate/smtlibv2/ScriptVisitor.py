@@ -239,7 +239,7 @@ class ScriptVisitor(SMTLIBv2Visitor):
             _local_vars[name] = output
         bound_vars = copy.deepcopy(_local_vars)
         term = self.visitTerm(ctx.term(), _local_vars)
-        term.bound_vars = bound_vars
+        term.update_bound_vars(bound_vars)
         return [[name] + var_list, term]
 
     def getString(self, ctx):
@@ -448,12 +448,11 @@ class ScriptVisitor(SMTLIBv2Visitor):
                 _local_vars[x] = t.sort 
             bound_vars = copy.deepcopy(_local_vars)
             let_term = self.visitTerm(ctx.term(0), _local_vars)
-            let_term.bound_vars = bound_vars
+            let_term.update_bound_vars(bound_vars)
             local_free_vars = copy.deepcopy(let_term.local_free_vars)
             # any local free var x in t, and not in x_1, ..., x_n
             # x occurs free in the entire expression
             for var in var_list:
-                # TODO
                 if var in local_free_vars:
                     del local_free_vars[var]
             # any local free var x in t_i, and corresponding x_i occurs free in let_term
@@ -530,13 +529,12 @@ class ScriptVisitor(SMTLIBv2Visitor):
 
         bound_vars = copy.deepcopy(_local_vars)
         quant_term = self.visitTerm(ctx.term(0), _local_vars)
-        quant_term.bound_vars = bound_vars
+        quant_term.update_bound_vars(bound_vars)
         # local free vars for the entier expression 
         # if occurs free in t
         local_free_vars = copy.deepcopy(quant_term.local_free_vars)
         # and does not occur in x_1, ..., x_n
         for var, _ in quanted_vars:
-            # TODO
             if var in local_free_vars:
                 del local_free_vars[var]
         return Quantifier(

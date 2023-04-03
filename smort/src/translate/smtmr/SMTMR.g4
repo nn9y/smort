@@ -430,7 +430,7 @@ fuse_dec
 // Extended Methods Declarations
 
 method_dec
-    : ParOpen GRW_Method String symbol attribute ParClose
+    : ParOpen GRW_Method String symbol attribute* ParClose
     ;
 
 // Parser Rules End

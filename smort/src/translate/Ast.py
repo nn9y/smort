@@ -432,6 +432,9 @@ class Term:
         if ((self.term_type == TermType.CONST) or (self.term_type == TermType.VAR)):
             if self.sort != other.sort:
                 return False
+            if free:
+                if str(self.name) in self.bound_vars:
+                    return False
         # if self.sort != other.sort:
         #     return False
         # name of cons, exprs should be the same
@@ -452,43 +455,52 @@ class Term:
         for i, t in enumerate(self.subterms):
             if not t.equals(other.subterms[i], free):
                 return False
-            if t.term_type == TermType.VAR and free:
-                if (
-                    not (str(t) in self.local_free_vars)
-                    or (str(t) in self.bound_vars)
-                ):
-                    return False
         return True
+    
+    def update_bound_vars(self, bound_vars):
+        """
+        update bound vars of this term and its subterms recursively
+        """
+        self.bound_vars = bound_vars
+        match self.term_type:
+            # ScriptVisitor spread local vars and bound vars top down
+            # but call this method bottom up
+            # We want to update bound vars for each term just once
+            case TermType.LET | TermType.QUANT | TermType.MATCH:
+                return
+        for t in self.subterms:
+            t.update_bound_vars(bound_vars)
  
-    def _update_var_name_map(self, other, var_name_map):
+    def update_var_name_mapping(self, other, var_name_map):
+        """
+        update var_name_map of a tuple of terms (to be replaced)
+            except for new variables and constants
+        """
         if self.term_type == TermType.VAR:
             var_name_map[str(other.name)] = self.name
         for i, t in enumerate(self.subterms):
-            t.update_var_name_map(other.subterms[i], var_name_map)
-            # if t.term_type == TermType.VAR:
-            #     var_name_map[str(other.subterms[i].name)] = t.name
+            t.update_var_name_mapping(other.subterms[i], var_name_map)
  
-    def find_all_terms(self, t, occs, var_name_map, free=False):
+    def find_all_terms(self, t, occs, free=False):
         """
-        find all terms t (and mapping from var name in t to self)
-            in self and add them to the list occs.
+        find all terms t in self and add them to the list occs.
         """
         if self.equals(t, free):
-            self._update_var_name_map(t, var_name_map)
+            # self.update_var_name_mapping(t, var_name_map)
             return occs.append(self)
         if self.subterms:
             for subterm in self.subterms:
-                subterm.find_all_terms(t, occs, var_name_map, free)
+                subterm.find_all_terms(t, occs, free)
     
-    def _replace_var_name(self, t, var_name_map):
-        if t.term_type == TermType.VAR:
+    def replace_var_name(self, var_name_map):
+        if self.term_type == TermType.VAR:
             # exists in seed 
-            symbol = str(t.name)
+            symbol = str(self.name)
             if symbol in var_name_map:
-                t.name = var_name_map[symbol]
+                self.name = var_name_map[symbol]
         else:
-            for s in t.subterms:
-                self._replace_var_name(s, var_name_map)
+            for s in self.subterms:
+                s.replace_var_name(var_name_map)
 
     # def substitute(self, t, repl, var_name_map, free=False):
     def substitute(self, occs, repl, var_name_map):
@@ -499,7 +511,7 @@ class Term:
         # self.find_all_terms(t, occs, var_name_map, free)
         for occ in occs:
             r = copy.deepcopy(repl)
-            self._replace_var_name(r, var_name_map)
+            r.replace_var_name(var_name_map)
             occ._set(
                 name=copy.deepcopy(r.name),
                 sort=copy.deepcopy(r.sort),
@@ -538,7 +550,7 @@ class Term:
             )
             return
         for t in self.subterms:
-            t.replace_symbols_by_terms(self, repl_dict)
+            t.replace_symbols_by_terms(repl_dict)
 
     def __eq__(self, other):
         if not isinstance(other, Term):

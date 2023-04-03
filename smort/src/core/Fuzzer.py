@@ -41,6 +41,7 @@ from smort.src.core.logger import (
 from smort.src.translate.smtmr.MetamorphicRelation import Status
 from smort.src.translate.smtmr.translate import translate_mr_file
 from smort.src.translate.smtlibv2.translate import translate_script_file
+from smort.src.translate.smtlibv2.Script import Script 
 from smort.src.mutator.Mutator import Mutator
 
 
@@ -66,7 +67,7 @@ class Fuzzer:
         self.name = random_string()
         self.timeout_of_current_seed = 0
 
-        init_logging("SMTMR", self.args.quiet, self.name, self.args)
+        init_logging("smort", self.args.quiet, self.name, self.args)
 
     def process_seed(self, seed):
         if not admissible_seed_size(seed, self.args.file_size_limit):
@@ -197,7 +198,6 @@ class Fuzzer:
                     and True otherwise), scratchfile (generated script file)
         """
         testbook = self.create_testbook(script)
-        scratchfile = None
 
         for testitem in testbook:
             # TODO
@@ -299,7 +299,7 @@ class Fuzzer:
         # bug filename format:
         # <{crash, wrong, invalid_model}><solver_cli><seeds>.<random-str>.<{smt2, record}>
         fn_format = "%s/%s-%s-%s-%s" % (
-            self.args.bugsfolder,
+            self.args.bugfolder,
             bugtype, 
             plain_cli,
             escape(list2str(self.currentseeds, separator='-')),
@@ -337,12 +337,12 @@ class Fuzzer:
     def printbar(self):
         if not self.first_status_bar_printed\
            and time.time() - self.last_time >= 1:
-            self.statistic.printbar(self.start_time)
+            self.statistic.printbar()
             self.last_time = time.time()
             self.first_status_bar_printed = True
 
         if time.time() - self.last_time >= 2.0:
-            self.statistic.printbar(self.start_time)
+            self.statistic.printbar()
             self.last_time = time.time()
 
     def terminate(self):

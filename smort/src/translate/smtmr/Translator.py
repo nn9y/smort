@@ -269,8 +269,11 @@ class Translator(SMTMRVisitor):
     def visitMethod_dec(self, ctx: SMTMRParser.Method_decContext):
         method_name = ctx.String().getText()
         formula_symbol = self.visitSymbol(ctx.symbol())
-        formula_attribute = self.visitAttribute(ctx.attribute())
-        return Method(name=method_name, formula=formula_symbol, attribute=formula_attribute)
+        attrs = []
+        if ctx.attribute():
+            for attr_ctx in ctx.attribute():
+                attrs.append(self.visitAttribute(attr_ctx))
+        return Method(name=method_name, formula=formula_symbol, attributes=attrs)
 
     def _well_sorted_term(self, name, input_list=None, output=None, local_vars=None):
         if str(name) in local_vars:
@@ -297,13 +300,8 @@ class Translator(SMTMRVisitor):
         for method in self.methods:
             if str(symbol) == str(method.formula):
                 return
-        for sym, info in self.notations.items():
-            if str(symbol) == str(sym):
-                for attr in info.attributes:
-                    if attr.keyword == SMTMRKeyword.GEN:
-                        return
-        raise SMTMRException(f"'{symbol}' is not a valid seed symbol, \
-symbol returned by extended method, or notation with :gen attributes")
+        raise SMTMRException(f"'{symbol}' is not a valid seed symbol or\
+symbol returned by extended method")
     
     def _check_boolean_fun(self, symbol: str, input_list):
         fun = match_fun_in_signatures(Identifier(symbol), input_list, None, core_funs)

@@ -57,13 +57,13 @@ class SubstTemplate:
 
 
 class Method:
-    def __init__(self, name, formula, attribute):
+    def __init__(self, name, formula, attributes=[]):
         self.name = name
         self.formula = formula
-        self.attribute = attribute
+        self.attributes = attributes
     
     def __str__(self):
-        return f"(method {self.name} {self.formula} {self.attribute})"
+        return f"(method {self.name} {self.formula} {list2str(self.attribute)})"
     
     def __repr__(self):
         return self.__str__()
@@ -82,7 +82,7 @@ class MetamorphicRelation:
  
     def get_oracle(self):
         """
-        Oracle: status of mutant
+        Test Oracle: status of mutant
         """
         return self.mutant[1]
  
