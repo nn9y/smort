@@ -25,37 +25,38 @@ class Mutator:
         """
         self.valid_index_list = valid_template_index_list(self.formulas, self.mr.subst_templates)
 
-    def metamorphose(self, formulas, template, term_tuples, var_name_maps):
-        decls = []
-        defs = []
-        asserts = []
-        # TODO
-        # use multiple templates
-        for i, tup in enumerate(term_tuples):
-            # generate new variables and constants
-            for var, sort in template.sorted_vars:
-                attrs = self.mr.notations[var].attributes
-                if attrs:
-                    mapped_name = var_name_maps[i][var]
-                    for attr in attrs:
-                        if attr.keyword == SMTMRKeyword.VAR:
-                            decls.append(DeclareConst(mapped_name, sort))
-                        if attr.keyword == SMTMRKeyword.GEN:
-                            # op = Identifier(attr.value)
-                            repl = None
-                            for t, r in template.repl_pairs:
-                                if t.term_type == TermType.VAR and t.name == var:
-                                    repl = r.replace_var_name(var_name_maps[i]) 
-                                    break
-                            asserts.append(Assert(term=Expr(name="=", subterms=[Var(var), repl])))
-                        if attr.keyword == SMTMRKeyword.CONS:
-                            value = random_constant_value(sort)
-                            term = Const(name=value, sort=sort)
-                            defs.append(DefineFun(mapped_name, [], sort, term))
-            # replace terms
-            for j, formula in enumerate(formulas):
-                _, repl = template.repl_pairs[j]
-                formula.assert_cmds[0].term.substitute([tup[j]], repl, var_name_maps[i])
+    def metamorphose(self, formulas, mapping):
+        for k, lst in mapping.items():
+            template = self.mr.subst_templates[k]
+            term_tuples, var_name_maps = lst
+            decls = []
+            defs = []
+            asserts = []
+            for i, tup in enumerate(term_tuples):
+                # generate new variables and constants
+                for var, sort in template.sorted_vars:
+                    attrs = self.mr.notations[var].attributes
+                    if attrs:
+                        mapped_name = var_name_maps[i][var]
+                        for attr in attrs:
+                            if attr.keyword == SMTMRKeyword.VAR:
+                                decls.append(DeclareConst(mapped_name, sort))
+                            if attr.keyword == SMTMRKeyword.GEN:
+                                # op = Identifier(attr.value)
+                                repl = None
+                                for t, r in template.repl_pairs:
+                                    if t.term_type == TermType.VAR and t.name == var:
+                                        repl = r.replace_var_name(var_name_maps[i]) 
+                                        break
+                                asserts.append(Assert(term=Expr(name="=", subterms=[Var(var), repl])))
+                            if attr.keyword == SMTMRKeyword.CONS:
+                                value = random_constant_value(sort)
+                                term = Const(name=value, sort=sort)
+                                defs.append(DefineFun(mapped_name, [], sort, term))
+                # replace terms
+                for j, formula in enumerate(formulas):
+                    _, repl = template.repl_pairs[j]
+                    formula.assert_cmds[0].term.substitute([tup[j]], repl, var_name_maps[i])
 
         return [formulas, decls, defs, asserts]
 
@@ -80,25 +81,23 @@ class Mutator:
         fused.replace_symbols_by_terms(repl_dict)
         return fused 
  
-    def mutate(self, k):
+    def mutate(self):
         """
-        generate mutant using k-th valid template (templates[self.valid_index_list[k]])
+        generate mutant using valid templates
         """
 
         formulas = [copy.deepcopy(formula) for formula in self.formulas]
 
         for i, formula in enumerate(formulas):
             formula.prefix_vars(f"seed{i}_")
- 
-        template = self.mr.subst_templates[self.valid_index_list[k]]
 
-        term_tuples, var_name_maps, skip_template = random_term_tuples(
-            formulas, template 
+        mapping = random_term_tuples(
+            formulas, self.mr.subst_templates, self.valid_index_list
         )
-        formulas, decls, defs, asserts = self.metamorphose(formulas, template, term_tuples, var_name_maps)
+        formulas, decls, defs, asserts = self.metamorphose(formulas, mapping)
         snpts = self.call_extended_methods(formulas)
         # get fused assert term in mutant
         fused = self.fuse(formulas, snpts)
         # generate whole mutant
         mutant = merge(formulas, fused, decls, defs, asserts)
-        return mutant, skip_template
+        return mutant

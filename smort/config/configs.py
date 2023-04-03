@@ -41,4 +41,4 @@ ignore_list = [
 ]
 
 file_size_limit = 100000
-iterations = 30
+iterations = 50

@@ -126,36 +126,31 @@ class Fuzzer:
                     continue
 
             self.mutator = Mutator(scripts, self.mr, self.args.method_path)
-            valid_num = len(self.mutator.valid_index_list)
 
-            log_generation_attempt(self.args.iterations * valid_num)
+            log_generation_attempt(self.args.iterations)
 
             self.timeout_of_current_seed = 0
             generations = 0
-            for k in range(valid_num):
+
+            for i in range(self.args.iterations):
                 mutate_further = True
-                for i in range(self.args.iterations):
-                    self.printbar()
-                    # TODO
-                    mutant, skip_template = self.mutator.mutate(k)
+                self.printbar()
 
-                    generations += 1
+                mutant = self.mutator.mutate()
 
-                    # TODO
-                    # parallel testing for each solver
-                    mutate_further, scratchfile = self.test(mutant, i + 1)
-                    # find bug
-                    if not mutate_further:
-                        log_skip_seed(self.args.iterations, k * valid_num + i)
-                        break  # Continue to next seed.
-                        
-                    if skip_template:
-                        log_skip_template(k)
-                        break  # Continue to next template.
+                generations += 1
 
-                    self.statistic.mutants += 1
-                    if not self.args.keep_mutants:
-                        os.remove(scratchfile)
+                # TODO
+                # parallel testing for each solver
+                mutate_further, scratchfile = self.test(mutant, i + 1)
+                # find bug
+                if not mutate_further:
+                    log_skip_seed(self.args.iterations, i)
+                    break  # Continue to next seed.
+
+                self.statistic.mutants += 1
+                if not self.args.keep_mutants:
+                    os.remove(scratchfile)
 
                 if not mutate_further:
                     break
