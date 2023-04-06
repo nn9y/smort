@@ -4,7 +4,7 @@ import pathlib
 
 from smort.config.configs import crash_list, duplicate_list, ignore_list
 from smort.src.base.exitcodes import ERR_USAGE
-from smort.src.misc.utils import in_list, cartesian_product
+from smort.src.tools.utils import in_list, cartesian_product
 from smort.src.core.Solver import SolverResult
 from smort.src.translate.smtmr.MetamorphicRelation import Status
 

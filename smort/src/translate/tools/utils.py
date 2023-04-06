@@ -5,7 +5,7 @@ from antlr4.error.ErrorListener import ErrorListener
 from antlr4.FileStream import FileStream
 from antlr4.InputStream import InputStream
 
-from smort.src.translate.decorators import exit_after, print_when_catch_exception
+from smort.src.translate.tools.decorators import exit_after, print_when_catch_exception
 
 
 # class StreamType(Enum):

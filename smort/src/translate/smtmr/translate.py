@@ -2,7 +2,7 @@ import sys
 
 from antlr4.CommonTokenStream import CommonTokenStream
 
-from smort.src.translate.utils import translate_file, ErrorListener
+from smort.src.translate.tools.utils import translate_file, ErrorListener
 from smort.src.translate.smtmr.SMTMRLexer import SMTMRLexer
 from smort.src.translate.smtmr.SMTMRParser import SMTMRParser 
 from smort.src.translate.smtmr.Translator import Translator 

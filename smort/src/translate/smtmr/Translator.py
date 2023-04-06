@@ -2,7 +2,7 @@ from smort.src.translate.smtmr.SMTMRParser import SMTMRParser
 from smort.src.translate.smtmr.SMTMRVisitor import SMTMRVisitor
 from smort.src.translate.smtmr.MetamorphicRelation import *
 from smort.src.translate.theory.signatures import *
-from smort.src.translate.Ast import *
+from smort.src.translate.tools.Ast import *
 
 
 class SMTMRException(Exception):
@@ -291,7 +291,7 @@ class Translator(SMTMRVisitor):
             return fun.output, 1 
         # accept more functions 
         # only need function name and input list sort
-        return None, 1 
+        return output, 1 
         # raise SMTMRException(f"signature ({name} {list2str(input_list)}) is not defined")
 
     def _check_valid_formula_symbol(self, symbol: str):

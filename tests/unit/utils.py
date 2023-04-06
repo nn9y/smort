@@ -1,4 +1,4 @@
-from smort.src.misc.utils import *
+from smort.src.tools.utils import *
 
 
 print(random_string(2))

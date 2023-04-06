@@ -1,7 +1,7 @@
 import pytest
 
-from smort.src.misc.utils import *
-from smort.src.translate.Ast import Sort
+from smort.src.tools.utils import *
+from smort.src.translate.tools.Ast import Sort
 from smort.src.translate.theory.utils import *
 from smort.src.translate.theory.Fun import *
 from smort.src.translate.theory.Fun import _get_repl_sort 

@@ -1,7 +1,7 @@
 import random
 import importlib
 
-from smort.src.misc.utils import cartesian_product, random_string
+from smort.src.tools.utils import cartesian_product, random_string
 from smort.src.translate.smtlibv2.Script import * 
 
 
@@ -42,7 +42,7 @@ def merge(scripts, fused, decls, defs, asserts):
     return Script(merged_cmds)
 
 
-def random_tuple_list(lsts, lower_bound=1):
+def random_tuple_list(lsts, dups, lower_bound=1):
     """
     Generate a random list of tuples (t_1, t_2, ..., t_n)
         where t_i is in lst_i
@@ -58,7 +58,6 @@ def random_tuple_list(lsts, lower_bound=1):
 
     n = len(lsts)
     new_tups = []
-    dups = [[] for _ in range(n)]
     for tup in tups:
         for i in range(n):
             if tup[i] in dups[i]:
@@ -76,6 +75,9 @@ def random_term_tuples(formulas, templates, valid_index_list):
                     [a dict mapping from var name in template to var name in actual formula]
     """
     mapping = {}
+    # make sure no term will be replaced twice, which raises errors (invalid formula)
+    dups = [[] for _ in range(len(formulas))]
+    total = 0
     for k in valid_index_list: 
         template = templates[k]
         term_occs_list = []
@@ -85,7 +87,13 @@ def random_term_tuples(formulas, templates, valid_index_list):
             # assuming assertions have been merged into single one in each formula
             formula.assert_cmds[0].term.find_all_terms(term, term_occs, template.free)
             term_occs_list.append(term_occs)
-        rnd_tuples = random_tuple_list(term_occs_list)
+        rnd_tuples = random_tuple_list(term_occs_list, dups)
+        new_total = 0
+        for d in dups:
+            new_total += len(d)
+        if total > new_total:
+            assert False
+        total = new_total
         var_name_maps = []
         for i, tup in enumerate(rnd_tuples):
             var_name_map = {}

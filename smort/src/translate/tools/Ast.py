@@ -1,9 +1,9 @@
 import copy
 from inspect import isfunction
 
-from smort.src.misc.StrEnum import StrEnum
-from smort.src.misc.utils import list2str
-from smort.src.translate.utils import *
+from smort.src.tools.StrEnum import StrEnum
+from smort.src.tools.utils import list2str
+from smort.src.translate.tools.utils import *
 
 ### !!! TODO !!!
 ### check synonyms in sort

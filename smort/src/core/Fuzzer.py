@@ -8,7 +8,7 @@ import random
 import signal
 import pathlib
 
-from smort.src.misc.utils import list2str, random_string, plain, escape
+from smort.src.tools.utils import list2str, random_string, plain, escape
 from smort.src.base.exitcodes import OK_BUGS, OK_NOBUGS, ERR_EXHAUSTED_DISK, ERR_USAGE
 from smort.src.core.Statistic import *
 from smort.src.core.Solver import Solver
@@ -207,7 +207,7 @@ class Fuzzer:
 
             if self.max_timeouts_reached():
                 return (False, scratchfile)
-
+            
             # Match stdout and stderr against the crash list
             # which contains various crash messages
             # such as assertion errors, check failure, invalid models, etc.
@@ -217,6 +217,7 @@ class Fuzzer:
                 # to prevent catching duplicate bug triggers.
                 if not in_duplicate_list(stdout, stderr):
                     self.statistic.effective_calls += 1
+                    crash_not_dup += 1
                     self.statistic.crashes += 1
                     bug_script_path = self.report(
                         script, 'crash', solver_cli, stdout, stderr

@@ -3,7 +3,7 @@ import datetime
 
 from logging.handlers import RotatingFileHandler
 
-from smort.src.misc.utils import list2str
+from smort.src.tools.utils import list2str
 
 RED = "\033[91m"
 BOLD = "\033[1m"

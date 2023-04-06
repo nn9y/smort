@@ -4,7 +4,7 @@ import sys
 
 from smort.src.base.exitcodes import ERR_USAGE, ERR_INTERNAL
 from smort.src.translate.smtlibv2.Script import DeclareConst, DefineFun, Assert
-from smort.src.translate.Ast import Expr, Var, Const, Identifier, TermType
+from smort.src.translate.tools.Ast import Expr, Var, Const, Identifier, TermType
 from smort.src.translate.theory.available_sorts import random_constant_value 
 from smort.src.translate.smtmr.MetamorphicRelation import SMTMRKeyword
 from smort.src.mutator.utils import merge, random_term_tuples, valid_template_index_list, call_function_from_module
@@ -26,22 +26,32 @@ class Mutator:
         self.valid_index_list = valid_template_index_list(self.formulas, self.mr.subst_templates)
 
     def metamorphose(self, formulas, mapping):
+        decls = []
+        defs = []
+        asserts = []
         for k, lst in mapping.items():
             template = self.mr.subst_templates[k]
             term_tuples, var_name_maps = lst
-            decls = []
-            defs = []
-            asserts = []
-            for i, tup in enumerate(term_tuples):
-                # generate new variables and constants
-                for var, sort in template.sorted_vars:
-                    attrs = self.mr.notations[var].attributes
-                    if attrs:
-                        mapped_name = var_name_maps[i][var]
-                        for attr in attrs:
-                            if attr.keyword == SMTMRKeyword.VAR:
+            # generate new variables and constants
+            for var, sort in template.sorted_vars:
+                attrs = self.mr.notations[var].attributes
+                if attrs:
+                    is_var = False 
+                    is_cons = False 
+                    is_gen = False 
+                    for attr in attrs:
+                        if attr.keyword == SMTMRKeyword.VAR:
+                            is_var = True
+                        if attr.keyword == SMTMRKeyword.CONS:
+                            is_cons = True
+                        if attr.keyword == SMTMRKeyword.GEN:
+                            is_gen = True
+                    for i in range(len(term_tuples)):
+                        if var in var_name_maps[i]:
+                            mapped_name = var_name_maps[i][var]
+                            if is_var:
                                 decls.append(DeclareConst(mapped_name, sort))
-                            if attr.keyword == SMTMRKeyword.GEN:
+                            if is_gen:
                                 # op = Identifier(attr.value)
                                 repl = None
                                 for t, r in template.repl_pairs:
@@ -49,10 +59,11 @@ class Mutator:
                                         repl = r.replace_var_name(var_name_maps[i]) 
                                         break
                                 asserts.append(Assert(term=Expr(name="=", subterms=[Var(var), repl])))
-                            if attr.keyword == SMTMRKeyword.CONS:
+                            if is_cons:
                                 value = random_constant_value(sort)
                                 term = Const(name=value, sort=sort)
                                 defs.append(DefineFun(mapped_name, [], sort, term))
+            for i, tup in enumerate(term_tuples):
                 # replace terms
                 for j, formula in enumerate(formulas):
                     _, repl = template.repl_pairs[j]

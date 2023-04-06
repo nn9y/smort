@@ -1,6 +1,6 @@
 import pytest
 
-from smort.src.translate.Ast import * 
+from smort.src.translate.tools.Ast import * 
 from smort.src.translate.theory.Fun import sort_with_arity
 from smort.src.translate.theory.SMTLIBv2Sorts import * 
 from smort.src.translate.theory.utils import numeral_greater_than_x 
