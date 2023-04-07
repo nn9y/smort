@@ -5,34 +5,33 @@ import sys
 import signal
 import inspect
 
-from smort.src.base.checkargs import run_checks
-from smort.src.base.errors import raise_runtime_error
-from smort.src.base.ArgParser import build_parser
-from smort.src.base.exitcodes import OK_BUGS, OK_NOBUGS, ERR_USAGE, ERR_INTERNAL
-from smort.src.base.helptext import *
-from smort.src.base.utils import stats_control_c, silent_control_c 
-from smort.src.core.Fuzzer import Fuzzer
+from smort.src.interface.process_args import process
+from smort.src.sys.errors import raise_runtime_error
+from smort.src.interface.ArgParser import build_argparser
+from smort.src.sys.exitcodes import OK_BUGS, OK_NOBUGS, ERR_USAGE, ERR_INTERNAL
+from smort.src.interface.info import *
+from smort.src.sys.utils import stats_control_c, silent_control_c 
+from smort.src.core.Tester import Tester
 
 
 def main():
     current_dir = os.getcwd()
-    parser = build_parser(current_dir)
+    arg_parser = build_argparser(current_dir)
 
     if len(sys.argv) == 1:
-        print(f"{header}\n\n{usage}\nFor usage information: {sys.argv[0]} -h or --help", flush=True)
+        print(f"{header}\n\n{usage}\n\n{introduction}\nFor detailed usage information: {sys.argv[0]} -h or --help", flush=True)
         exit(ERR_USAGE)
     else:
-        args = run_checks(parser)
-        #print(args)
+        args = process(arg_parser)
         try:
-            fuzzer = Fuzzer(args)
+            tester = Tester(args)
 
             if not args.quiet:
                 signal.signal(signal.SIGINT, stats_control_c)
             else:
                 signal.signal(signal.SIGINT, silent_control_c)
 
-            fuzzer.run()
+            tester.run()
             # TODO
             # exit
 

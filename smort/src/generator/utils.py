@@ -2,10 +2,12 @@ import random
 import importlib
 
 from smort.src.tools.utils import cartesian_product, random_string
+from smort.src.translate.theory.available_sorts import random_constant_value 
+from smort.src.translate.smtmr.MetamorphicRelation import SMTMRKeyword
 from smort.src.translate.smtlibv2.Script import * 
 
 
-def merge(scripts, fused, decls, defs, asserts):
+def merge(scripts, fused, decls, defs, asserts, snpts):
     merged_cmds = []
     # set-logic ALL 
     merged_cmds.append(SMTLIBCommand('(set-logic ALL)'))
@@ -34,7 +36,9 @@ def merge(scripts, fused, decls, defs, asserts):
                 merged_cmds.append(cmd)
     # add asserts
     merged_cmds.append(Assert(fused))
-    merged_cmds += asserts 
+    merged_cmds += asserts
+    for snpt in snpts:
+        merged_cmds.append(Assert(snpt)) 
 
     # check-sat
     merged_cmds.append(SMTLIBCommand('(check-sat)'))
@@ -42,7 +46,7 @@ def merge(scripts, fused, decls, defs, asserts):
     return Script(merged_cmds)
 
 
-def random_tuple_list(lsts, dups, lower_bound=1):
+def random_tuple_list(lsts, dups, multiple_substs=False):
     """
     Generate a random list of tuples (t_1, t_2, ..., t_n)
         where t_i is in lst_i
@@ -51,8 +55,11 @@ def random_tuple_list(lsts, dups, lower_bound=1):
 
     if len(product) == 0:
         k = 0
+    elif multiple_substs:
+        k = random.randint(1, len(product))
     else:
-        k = random.randint(lower_bound, len(product))
+        # single substitution for each template
+        k = 1
     tups = random.sample(product, k)
     random.shuffle(tups)
 
@@ -68,18 +75,16 @@ def random_tuple_list(lsts, dups, lower_bound=1):
     return new_tups
 
 
-def random_term_tuples(formulas, templates, valid_index_list):
+def random_term_tuples(formulas, templates, multiple_substs=False):
     """
-    :return: a dict, mapping index of template to
-                a list of [a list of random term tuple (to be replaced)] and
-                    [a dict mapping from var name in template to var name in actual formula]
+    :return: a list, index is mapping to index of templates:
+        [0]: a list of random term (to be replaced) tuples
+        [1]: a dict mapping from var name in the template to var name in actual formulas
     """
-    mapping = {}
-    # make sure no term will be replaced twice, which raises errors (invalid formula)
+    lst = []
+    # make sure no term will be replaced more than once in each generation, which may cause invalid formula
     dups = [[] for _ in range(len(formulas))]
-    total = 0
-    for k in valid_index_list: 
-        template = templates[k]
+    for k, template in enumerate(templates): 
         term_occs_list = []
         for i, formula in enumerate(formulas):
             term_occs = []
@@ -87,13 +92,7 @@ def random_term_tuples(formulas, templates, valid_index_list):
             # assuming assertions have been merged into single one in each formula
             formula.assert_cmds[0].term.find_all_terms(term, term_occs, template.free)
             term_occs_list.append(term_occs)
-        rnd_tuples = random_tuple_list(term_occs_list, dups)
-        new_total = 0
-        for d in dups:
-            new_total += len(d)
-        if total > new_total:
-            assert False
-        total = new_total
+        rnd_tuples = random_tuple_list(term_occs_list, dups, multiple_substs)
         var_name_maps = []
         for i, tup in enumerate(rnd_tuples):
             var_name_map = {}
@@ -105,11 +104,11 @@ def random_term_tuples(formulas, templates, valid_index_list):
                 if not var in var_name_map:
                     var_name_map[var] = f"{var}_random{k}_{i}"
             var_name_maps.append(var_name_map)
-        mapping[k] = [rnd_tuples, var_name_maps]
-    return mapping
+        lst.append([rnd_tuples, var_name_maps])
+    return lst 
 
 
-def valid_template_index_list(formulas, templates):
+def find_valid_templates(formulas, templates):
     valid_index_list = []
     for k, template in enumerate(templates):
         matched = True
@@ -131,3 +130,32 @@ def call_function_from_module(path, function_name, *args):
     module = importlib.import_module(path)
     function = getattr(module, function_name)
     return function(*args)
+
+def generate_additions(template, notations, var_name_map, decls, defs, asserts):
+    # generate new variables and constants
+    for var, sort in template.sorted_vars:
+        attrs = notations[var].attributes 
+        if attrs and (var in var_name_map):
+            mapped_name = var_name_map[var]
+            for attr in attrs:
+                if attr.keyword == SMTMRKeyword.VAR:
+                    decls.append(DeclareConst(mapped_name, sort))
+                if attr.keyword == SMTMRKeyword.CONS:
+                    value = random_constant_value(sort)
+                    term = Const(name=value, sort=sort)
+                    defs.append(DefineFun(mapped_name, [], sort, term))
+                if attr.keyword == SMTMRKeyword.GEN:
+                    # operator = Identifier(attr.value)
+                    for t, r in template.repl_pairs:
+                        if t.term_type == TermType.VAR and t.name == var:
+                            repl = r.replace_var_name(var_name_map) 
+                            break
+                    # asserts.append(Assert(term=Expr(name=Identifier("="), subterms=[Var(var), repl])))
+                    asserts.append(Assert(term=Expr(name="=", subterms=[Var(var), repl])))
+
+def replace(template, term_tup, var_name_map, formulas):
+    # replace terms in seed formulas
+    for i, formula in enumerate(formulas):
+        _, repl = template.repl_pairs[i]
+        formula.assert_cmds[0].term.substitute([term_tup[i]], repl, var_name_map)
+

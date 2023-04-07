@@ -1,7 +1,6 @@
-import copy
-
 from smort.src.translate.tools.utils import *
-from smort.src.translate.tools.Ast import *
+from smort.src.translate.tools.Term import *
+from smort.src.translate.tools.Sort import *
 
 
 class Script:

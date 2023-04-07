@@ -1,13 +1,7 @@
-from pathlib import Path
-
 from smort.config.configs import *
-from smort.src.base.exitcodes import ERR_USAGE
-from smort.src.base.utils import create_folder, get_seeds
+from smort.src.sys.exitcodes import ERR_USAGE
+from smort.src.sys.utils import create_folder, get_all_seed_files 
 
-path = Path(__file__)
-srcdir = str(path.parent.absolute().parent)
-
-#sys.path.insert(1, os.getcwd() + "/.smtmr")
 
 def check_solver_clis(solver_clis):
     if solver_clis == "":
@@ -34,18 +28,25 @@ def check_iterations(iterations):
         exit(ERR_USAGE)
 
 
-def run_checks(parser):
-    args = parser.parse_args()
+def check_incremental(args):
+    if args.incremental:
+        args.multiple_templates = True 
+        args.multiple_substs = True 
+
+
+def process(arg_parser):
+    args = arg_parser.parse_args()
     if not (args.sat_seeds or args.unsat_seeds):
-        parser.error("no seed file/folder specified")
+        arg_parser.error("no seed file/folder specified")
 
     args.SOLVER_CLIS = check_solver_clis(args.SOLVER_CLIS)
     check_timeout(args.timeout)
     check_iterations(args.iterations)
+    check_incremental(args)
     folder_path_list = [args.bugfolder, args.logfolder, args.scratchfolder]
     for folder_path in folder_path_list:
         create_folder(folder_path)
-    args.sat_seeds = get_seeds(args.sat_seeds)
-    args.unsat_seeds = get_seeds(args.unsat_seeds)
+    args.sat_seeds = get_all_seed_files(args.sat_seeds)
+    args.unsat_seeds = get_all_seed_files(args.unsat_seeds)
 
     return args

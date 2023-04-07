@@ -9,30 +9,30 @@ import signal
 import pathlib
 
 from smort.src.tools.utils import list2str, random_string, plain, escape
-from smort.src.base.exitcodes import OK_BUGS, OK_NOBUGS, ERR_EXHAUSTED_DISK, ERR_USAGE
-from smort.src.core.Statistic import *
-from smort.src.core.Solver import Solver
-from smort.src.core.returncodes import * 
+from smort.src.sys.exitcodes import OK_BUGS, OK_NOBUGS, ERR_EXHAUSTED_DISK, ERR_USAGE
+from smort.src.report.Statistic import *
+from smort.src.execute.Solver import Solver
+from smort.src.execute.returncodes import * 
+from smort.src.execute.utils import grep_checksat_result
 from smort.src.core.utils import (
     get_seeds_tuples,
-    grep_result,
     admissible_seed_size,
     in_crash_list,
     in_duplicate_list,
     in_ignore_list,
 )
-from smort.src.core.logger import (
+from smort.src.report.log import (
     init_logging,
     log_num_targets_seeds,
     log_generation_attempt,
     log_finished_generations,
     log_crash_trigger,
-    log_ignore_list_mutant,
+    log_ignore_list_morph,
     log_duplicate_trigger,
     log_segfault_trigger,
     log_solver_timeout,
     log_soundness_trigger,
-    log_invalid_mutant,
+    log_invalid_morph,
     log_skip_seed,
     log_processing_seeds,
     log_skip_template
@@ -42,17 +42,17 @@ from smort.src.translate.smtmr.MetamorphicRelation import Status
 from smort.src.translate.smtmr.translate import translate_mr_file
 from smort.src.translate.smtlibv2.translate import translate_script_file
 from smort.src.translate.smtlibv2.Script import Script 
-from smort.src.mutator.Mutator import Mutator
+from smort.src.generator.Generator import Generator
 
 
 MAX_TIMEOUTS = 32
 
 
-class Fuzzer:
+class Tester:
     def __init__(self, args):
         self.args = args
-
-        self.mr = translate_mr_file(self.args.METAMORPHIC_REL, MAX_TIMEOUTS, False)
+        
+        self.mr = translate_mr_file(self.args.MR_PATH, MAX_TIMEOUTS, False)
         if len(self.mr.methods) > 0 and (not self.methods_path):
             print("method declared in mr file, but no path to methods provided in command args")
             exit(ERR_USAGE)
@@ -70,9 +70,9 @@ class Fuzzer:
         init_logging("smort", self.args.quiet, self.name, self.args)
 
     def process_seed(self, seed):
-        if not admissible_seed_size(seed, self.args.file_size_limit):
+        if not admissible_seed_size(seed, self.args.file_size):
             self.statistic.invalid_seeds += 1
-            logging.debug(f"Skip invalid seed: exceeds max file size: {self.args.file_size_limit}")
+            logging.debug(f"Skip invalid seed: exceeds max file size: {self.args.file_size}")
             return None
 
         self.currentseeds.append(pathlib.Path(seed).stem)
@@ -105,9 +105,9 @@ class Fuzzer:
 
     def run(self):
         """
-        Core fuzzing loop. The procedure: 
-        1. fetches seeds at random from the seed corpus
-        2. instantiates a mutator according to metamorphic relations
+        Core testing loop: 
+        1. fetches seeds group at random from the seed corpus
+        2. instantiates a generator according to metamorphic relations
         3. generates `self.args.iterations` many iterations per seeds group.
         """
         seeds_tuples = get_seeds_tuples(self.args.sat_seeds, self.args.unsat_seeds, self.mr, self.args.randomize)
@@ -125,37 +125,37 @@ class Fuzzer:
                 if not script:
                     continue
 
-            self.mutator = Mutator(scripts, self.mr, self.args.method_path)
+            self.generator = Generator(scripts, self.mr, self.args)
 
             log_generation_attempt(self.args.iterations)
 
             self.timeout_of_current_seed = 0
-            generations = 0
-
+            total_iterations = 0
+            total_generations = 0
             for i in range(self.args.iterations):
-                mutate_further = True
+                generate_further = True
                 self.printbar()
-
-                mutant = self.mutator.mutate()
-
-                generations += 1
-
+                end_iteration = False
+                gens = 0
+                while not end_iteration:
+                    morph, end_iteration = self.generator.generate()
+                    gens += 1
+                    total_generations += 1
                 # TODO
                 # parallel testing for each solver
-                mutate_further, scratchfile = self.test(mutant, i + 1)
                 # find bug
-                if not mutate_further:
-                    log_skip_seed(self.args.iterations, i)
-                    break  # Continue to next seed.
-
-                self.statistic.mutants += 1
-                if not self.args.keep_mutants:
-                    os.remove(scratchfile)
-
-                if not mutate_further:
+                    generate_further, scratchfile = self.test(morph, i+1, gens)
+                    if not generate_further:
+                        log_skip_seed(self.args.iterations, i, gens)
+                        break  # continue to next seeds group
+                    self.statistic.morphs += 1
+                    if not self.args.keep_morphs:
+                        os.remove(scratchfile)
+                total_iterations += 1
+                if not generate_further:
                     break
 
-            log_finished_generations(generations)
+            log_finished_generations(total_iterations, total_generations)
 
         self.terminate()
 
@@ -180,7 +180,7 @@ class Fuzzer:
             testbook.append((cli, testcase))
         return testbook
 
-    def test(self, script, iteration):
+    def test(self, script, iteration, generation):
         """
         Tests the solvers on the provided script.
         Checks for crashes, segfaults, invalid models and soundness issues,
@@ -232,8 +232,8 @@ class Fuzzer:
                 # Check whether the solver call produced errors
                 # by matching stdout and stderr against the ignore list
                 if in_ignore_list(stdout, stderr):
-                    log_ignore_list_mutant(solver_cli)
-                    self.statistic.invalid_mutants += 1
+                    log_ignore_list_morph(solver_cli)
+                    self.statistic.invalid_morphs += 1
                     continue  # Continue to the next solver.
 
                 if exitcode != SUCCESS:
@@ -258,11 +258,11 @@ class Fuzzer:
                     elif exitcode == COMMAND_NOT_FOUND:
                         continue  # Continue to the next solver.
 
-                result = grep_result(stdout)
+                result = grep_checksat_result(stdout)
                 # Check if the stdout contains a valid solver query result,
-                if result.is_empty():
-                    self.statistic.invalid_mutants += 1
-                    log_invalid_mutant(self.args, iteration)
+                if result == None:
+                    self.statistic.invalid_morphs += 1
+                    log_invalid_morph(self.args, iteration, generation)
                     continue  # Continue to the next solver.
                 else:
                     # Grep for '^sat$', '^unsat$', and '^unknown$' to produce
@@ -272,9 +272,9 @@ class Fuzzer:
                     self.statistic.effective_calls += 1
                     # Comparing with the oracle (yinyang) or with other
                     # non-erroneous solver runs (opfuzz) for soundness bugs.
-                    if not result.equals(self.oracle):
+                    if result != self.oracle:
                         self.statistic.soundness += 1
-                        # Produce a bug report if the query result differs from the pre-set oracle of mutant
+                        # Produce a bug report if the query result differs from the pre-set oracle of morph
                         path = self.report(
                             script, 'incorrect', solver_cli,
                             stdout, stderr

@@ -106,8 +106,8 @@ GRW_String
 GRW_Seed
     : 'seed'
     ;
-GRW_Mutant
-    : 'mutant'
+GRW_Morph
+    : 'morph'
     ;
 GRW_Notation
     : 'notation'
@@ -247,7 +247,7 @@ UndefinedSymbol:
 // Starting rule(s)
 
 start
-    : seed_dec+ mutant_dec ( notation_dec | substTemplate_dec | method_dec )* fuse_dec EOF;
+    : seed_dec+ morph_dec ( notation_dec | substTemplate_dec | method_dec )* fuse_dec EOF;
 
 simpleSymbol
     : predefSymbol
@@ -411,8 +411,8 @@ seed_dec
     : ParOpen GRW_Seed formula_dec ParClose
     ;
 
-mutant_dec
-    : ParOpen GRW_Mutant formula_dec ParClose
+morph_dec
+    : ParOpen GRW_Morph formula_dec ParClose
     ;
 
 notation_dec

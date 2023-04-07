@@ -3,9 +3,8 @@ import re
 import pathlib
 
 from smort.config.configs import crash_list, duplicate_list, ignore_list
-from smort.src.base.exitcodes import ERR_USAGE
+from smort.src.sys.exitcodes import ERR_USAGE
 from smort.src.tools.utils import in_list, cartesian_product
-from smort.src.core.Solver import SolverResult
 from smort.src.translate.smtmr.MetamorphicRelation import Status
 
 
@@ -21,30 +20,15 @@ def in_ignore_list(stdout, stderr):
     return in_list(stdout, stderr, ignore_list)
 
 
-def admissible_seed_size(seed, file_size_limit):
+def admissible_seed_size(seed, file_size):
     """
-    Checks if seed size is below file_size_limit.
+    Checks if seed size is below file_size.
     :returns: True if that is the case and False otherwise.
     """
     seed_size_in_bytes = pathlib.Path(seed).stat().st_size
-    if seed_size_in_bytes >= file_size_limit:
+    if seed_size_in_bytes >= file_size:
         return False
     return True
-
-
-def grep_result(stdout):
-    """
-    Grep the query result from the stdout of a solver.
-    """
-    result = SolverResult()
-    for line in stdout.splitlines():
-        if re.search("^unsat$", line, flags=re.MULTILINE):
-            result.append(Status.UNSAT)
-        elif re.search("^sat$", line, flags=re.MULTILINE):
-            result.append(Status.SAT)
-        elif re.search("^unknown$", line, flags=re.MULTILINE):
-            result.append(Status.UNKNOWN)
-    return result 
 
 
 def get_seeds_tuples(sat_seed_paths, unsat_seed_paths, mr, randomize=False):

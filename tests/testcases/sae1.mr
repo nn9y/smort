@@ -1,5 +1,5 @@
 (seed s sat)
-(mutant m sat)
+(morph m sat)
 
 (notation x s)
 (notation y s)

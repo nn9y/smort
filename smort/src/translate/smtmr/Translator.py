@@ -2,7 +2,8 @@ from smort.src.translate.smtmr.SMTMRParser import SMTMRParser
 from smort.src.translate.smtmr.SMTMRVisitor import SMTMRVisitor
 from smort.src.translate.smtmr.MetamorphicRelation import *
 from smort.src.translate.theory.signatures import *
-from smort.src.translate.tools.Ast import *
+from smort.src.translate.tools.Term import *
+from smort.src.translate.tools.Sort import *
 
 
 class SMTMRException(Exception):
@@ -15,7 +16,7 @@ class Translator(SMTMRVisitor):
         self.seed_status_list = []
         self.index_of_seed = {}
         self.seed_on_index = {} 
-        self.mutant = None
+        self.morph = None
         self.notations = {}
         self.subst_templates = []
         self.methods = []
@@ -31,8 +32,8 @@ class Translator(SMTMRVisitor):
                 self.index_of_seed[symbol] = seed_idx
                 self.seed_on_index[seed_idx] = symbol 
                 seed_idx += 1
-            elif isinstance(child, SMTMRParser.Mutant_decContext):
-                self.mutant = self.visitMutant_dec(child)
+            elif isinstance(child, SMTMRParser.Morph_decContext):
+                self.morph = self.visitMorph_dec(child)
             elif isinstance(child, SMTMRParser.Notation_decContext):
                 symbol, info = self.visitNotation_dec(child)
                 self.notations[symbol] = info
@@ -49,7 +50,7 @@ class Translator(SMTMRVisitor):
             self.seed_status_list,
             self.index_of_seed,
             self.seed_on_index,
-            self.mutant,
+            self.morph,
             self.notations,
             self.subst_templates,
             self.methods,
@@ -225,7 +226,7 @@ class Translator(SMTMRVisitor):
     def visitSeed_dec(self, ctx: SMTMRParser.Seed_decContext):
         return self.visitFormula_dec(ctx.formula_dec())
     
-    def visitMutant_dec(self, ctx: SMTMRParser.Mutant_decContext):
+    def visitMorph_dec(self, ctx: SMTMRParser.Morph_decContext):
         return self.visitFormula_dec(ctx.formula_dec())
     
     def visitNotation_dec(self, ctx: SMTMRParser.Notation_decContext):
@@ -298,10 +299,10 @@ class Translator(SMTMRVisitor):
         if str(symbol) in self.index_of_seed:
             return
         for method in self.methods:
-            if str(symbol) == str(method.formula):
+            if (str(symbol) == str(method.formula)) and method.is_seed:
                 return
         raise SMTMRException(f"'{symbol}' is not a valid seed symbol or\
-symbol returned by extended method")
+symbol returned by extended method with ':seed' attribute")
     
     def _check_boolean_fun(self, symbol: str, input_list):
         fun = match_fun_in_signatures(Identifier(symbol), input_list, None, core_funs)
@@ -313,7 +314,7 @@ symbol returned by extended method")
         conflict = False
         if self._is_seed(symbol):
             conflict = True
-        elif self._is_mutant(symbol):
+        elif self._is_morph(symbol):
             conflict = True
         elif self._is_notation(symbol):
             conflict = True
@@ -338,8 +339,8 @@ symbol returned by extended method")
         if symbol in self.index_of_seed:
             return True
     
-    def _is_mutant(self, symbol: str):
-        if self.mutant and (symbol == self.mutant[0]):
+    def _is_morph(self, symbol: str):
+        if self.morph and (symbol == self.morph[0]):
             return True
     
     def _is_notation(self, symbol: str):

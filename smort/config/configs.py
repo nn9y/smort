@@ -40,5 +40,6 @@ ignore_list = [
     "Unimplemented code encountered",
 ]
 
-file_size_limit = 100000
+filesize = 100000
 iterations = 50
+timeout = 8 

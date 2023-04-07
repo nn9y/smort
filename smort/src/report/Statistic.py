@@ -9,8 +9,8 @@ class Statistic:
         self.invalid_seeds = 0
         self.total_generations = 0
         self.unsuccessful_generations = 0
-        self.mutants = 0
-        self.invalid_mutants = 0
+        self.morphs = 0
+        self.invalid_morphs = 0
         self.crashes = 0
         self.soundness = 0
         self.duplicates = 0
@@ -32,10 +32,10 @@ class Statistic:
         solver_calls_per_sec = round(
             float(self.solver_calls) / float(total_time), 1)
 
-        mutants_per_sec = round(float(self.mutants) / float(total_time), 1)
+        morphs_per_sec = round(float(self.morphs) / float(total_time), 1)
 
         bar = f"Performed {self.solver_calls} solver calls \
-({solver_calls_per_sec} calls/s, eff: {eff_str}, {mutants_per_sec} mutants/s)"
+({solver_calls_per_sec} calls/s, eff: {eff_str}, {morphs_per_sec} morphs/s)"
         logging.info(bar)
 
     def printsum(self):

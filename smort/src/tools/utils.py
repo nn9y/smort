@@ -1,6 +1,16 @@
 import itertools
 import random
 import string
+from enum import Enum
+
+
+class StrEnum(Enum):
+    def __str__(self):
+        return str(self.value)
+    
+    def __repr__(self):
+        return self.__str__()
+
 
 
 def nested_list_to_string(lst, separator=' '):

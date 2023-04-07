@@ -2,7 +2,8 @@ from smort.src.translate.smtlibv2.SMTLIBv2Parser import SMTLIBv2Parser
 from smort.src.translate.smtlibv2.SMTLIBv2Visitor import SMTLIBv2Visitor
 from smort.src.translate.smtlibv2.ADT import create_adt, deal_constructor_dec
 from smort.src.translate.smtlibv2.Script import *
-from smort.src.translate.tools.Ast import *
+from smort.src.translate.tools.Term import *
+from smort.src.translate.tools.Sort import *
 from smort.src.translate.theory.signatures import *
 
 

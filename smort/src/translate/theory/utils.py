@@ -1,7 +1,7 @@
 from math import sqrt
 from collections import defaultdict
 
-from smort.src.translate.tools.Ast import *
+from smort.src.translate.tools.Sort import Sort 
 
 
 class TheoryException(Exception):

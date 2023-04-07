@@ -124,8 +124,8 @@ class SMTMRVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SMTMRParser#mutant_dec.
-    def visitMutant_dec(self, ctx:SMTMRParser.Mutant_decContext):
+    # Visit a parse tree produced by SMTMRParser#morph_dec.
+    def visitMorph_dec(self, ctx:SMTMRParser.Morph_decContext):
         return self.visitChildren(ctx)
 
 

@@ -1,6 +1,6 @@
 import os
 
-from smort.src.base.exitcodes import ERR_USAGE, ERR_EXHAUSTED_DISK
+from smort.src.sys.exitcodes import ERR_USAGE, ERR_EXHAUSTED_DISK
 
 
 def create_folder(folder_path):
@@ -14,7 +14,8 @@ def create_folder(folder_path):
             print(f'error: folder "{folder_path}" cannot be created', flush=True)
             exit(ERR_EXHAUSTED_DISK)
 
-def get_seeds(seed_path_list):
+
+def get_all_seed_files(seed_path_list):
     if not seed_path_list:
         return None
     seeds_list = []
@@ -37,11 +38,12 @@ def get_seeds(seed_path_list):
 
     return seeds_list
 
-def stats_control_c(sig, frame, fuzzer):
+
+def stats_control_c(sig, frame, Tester):
     print("\b\b\rUser interrupt", flush=True)
-    fuzzer.printsum_exit(False)
+    Tester.printsum_exit(False)
 
 
-def silent_control_c(sig, frame, fuzzer):
-    fuzzer.printsum_exit(True)
+def silent_control_c(sig, frame, Tester):
+    Tester.printsum_exit(True)
 

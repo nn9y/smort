@@ -7,7 +7,7 @@ from smort.src.translate.theory.utils import (
     get_indices_of_first_indexed_input,
     get_indices_from_op
 )
-from smort.src.translate.tools.Ast import Identifier, SpecConstant, SpecConstType, Sort
+from smort.src.translate.tools.Sort import Identifier, SpecConstant, SpecConstType, Sort
 
 
 def test_fun():

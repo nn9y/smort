@@ -3,7 +3,8 @@ import re
 from inspect import isfunction
 from collections import defaultdict
 
-from smort.src.translate.tools.Ast import *
+from smort.src.translate.tools.Term import *
+from smort.src.translate.tools.Sort import *
 from smort.src.translate.theory.utils import *
 
 

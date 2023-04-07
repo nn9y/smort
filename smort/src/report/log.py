@@ -4,11 +4,7 @@ import datetime
 from logging.handlers import RotatingFileHandler
 
 from smort.src.tools.utils import list2str
-
-RED = "\033[91m"
-BOLD = "\033[1m"
-WARNING = "\033[91m"
-ENDC = "\033[0m"
+from smort.src.tools.escapes import BOLD, WARNING, NC 
 
 
 def init_logging(prefix, quiet_mode, name, args, max_bytes=1024*1024, backup_count=5):
@@ -53,13 +49,13 @@ def log_processing_seeds(seeds_tuple):
 
 def log_generation_attempt(iterations):
     logging.debug(
-        f"Attempting to generate {iterations} mutants"
+        f"Attempting to generate {iterations} morphs"
     )
 
 
-def log_finished_generations(generations):
+def log_finished_generations(iterations, generations):
     logging.debug(
-        f"Finished generations: {generations}"
+        f"Finished iterations: {iterations}. Finished generations: {generations}."
     )
 
 
@@ -67,12 +63,12 @@ def log_soundness_trigger(iterations, i, path):
     logging.debug(
         f"{i}/{iterations} Soundness bug! Stop testing on this seed."
     )
-    logging.info(BOLD + WARNING + "Detected soundness bug! " + path + ENDC)
+    logging.info(BOLD + WARNING + "Detected soundness bug! " + path + NC)
 
 
 def log_crash_trigger(path):
     logging.debug("Crash! Stop testing on this seed.")
-    logging.info(BOLD + WARNING + "Detected crash bug: " + path + ENDC)
+    logging.info(BOLD + WARNING + "Detected crash bug: " + path + NC)
 
 
 def log_duplicate_trigger():
@@ -83,11 +79,11 @@ def log_segfault_trigger(iterations, path, i):
     logging.debug(
         f"{i}/{iterations} Segfault! Stop testing on this seed."
     )
-    logging.info(BOLD + WARNING + "Detected segfault: " + path + ENDC)
+    logging.info(BOLD + WARNING + "Detected segfault: " + path + NC)
 
 
-def log_ignore_list_mutant(solver_client):
-    logging.debug(f"Invalid mutant:ignore_list. solver={solver_client}")
+def log_ignore_list_morph(solver_client):
+    logging.debug(f"Invalid morph:ignore_list. solver={solver_client}")
 
 
 def log_solver_timeout(iterations, solver_client, i):
@@ -96,15 +92,15 @@ def log_solver_timeout(iterations, solver_client, i):
     )
 
 
-def log_invalid_mutant(iterations, i):
+def log_invalid_morph(iterations, i, g):
     logging.debug(
-        f"{i}/{iterations} Invalid mutant:no '^sat$' or '^unsat$' in output."
+        f"In {i}/{iterations}, #{g} Invalid morph:no '^sat$' or '^unsat$' in output."
     )
 
 
-def log_skip_seed(iterations, i):
+def log_skip_seed(iterations, i, g):
     logging.debug(
-        f"{i}/{iterations} skip the seed."
+        f"In {i}/{iterations}, #{g} skip the seed."
     )
 
 

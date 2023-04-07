@@ -1,5 +1,4 @@
-from smort.src.tools.utils import list2str
-from smort.src.tools.StrEnum import StrEnum
+from smort.src.tools.utils import list2str, StrEnum
 
 
 class Status(StrEnum):
@@ -18,7 +17,7 @@ class SMTMRKeyword(StrEnum):
     SEED    = ':seed'
     # in template
     FREE    = ':free'
-    BOUND   = ':bound'
+    # BOUND   = ':bound'
 
 
 
@@ -61,6 +60,17 @@ class Method:
         self.name = name
         self.formula = formula
         self.attributes = attributes
+
+        self.is_seed = False
+        self.is_snpt = False
+
+        for attr in self.attributes:
+            if attr.keyword == SMTMRKeyword.SEED:
+                self.is_seed = True
+                break
+            if attr.keyword == SMTMRKeyword.SNIPPET:
+                self.is_snpt = True
+                break
     
     def __str__(self):
         return f"(method {self.name} {self.formula} {list2str(self.attribute)})"
@@ -70,11 +80,11 @@ class Method:
 
 
 class MetamorphicRelation:
-    def __init__(self, seed_status_list, index_of_seed, seed_on_index, mutant, notations, subst_templates, methods, fuse_term):
+    def __init__(self, seed_status_list, index_of_seed, seed_on_index, morph, notations, subst_templates, methods, fuse_term):
         self.seed_status_list = seed_status_list
         self.index_of_seed = index_of_seed
         self.seed_on_index = seed_on_index 
-        self.mutant = mutant
+        self.morph = morph
         self.notations = notations
         self.subst_templates = subst_templates
         self.methods = methods
@@ -82,15 +92,15 @@ class MetamorphicRelation:
  
     def get_oracle(self):
         """
-        Test Oracle: status of mutant
+        Test Oracle: status of morph
         """
-        return self.mutant[1]
+        return self.morph[1]
  
     def __str__(self):
         seed_decls = [(symbol, self.seed_status_list[index]) for symbol, index in self.index_of_seed.items()]
         mr_str = list2str(seed_decls, separator='\n')
 
-        mr_str += f"\n({self.mutant[0]} {self.mutant[1]})"
+        mr_str += f"\n({self.morph[0]} {self.morph[1]})"
 
         if self.notations:
             notation_decls = [(symbol, info) for symbol, info in self.notations.items()]

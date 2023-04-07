@@ -215,12 +215,12 @@ class SMTMRListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SMTMRParser#mutant_dec.
-    def enterMutant_dec(self, ctx:SMTMRParser.Mutant_decContext):
+    # Enter a parse tree produced by SMTMRParser#morph_dec.
+    def enterMorph_dec(self, ctx:SMTMRParser.Morph_decContext):
         pass
 
-    # Exit a parse tree produced by SMTMRParser#mutant_dec.
-    def exitMutant_dec(self, ctx:SMTMRParser.Mutant_decContext):
+    # Exit a parse tree produced by SMTMRParser#morph_dec.
+    def exitMorph_dec(self, ctx:SMTMRParser.Morph_decContext):
         pass
 
 

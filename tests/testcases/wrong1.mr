@@ -1,7 +1,7 @@
 (seed s1 sat)
 (seed s2 sat)
 (seed s1 sat)
-(mutant m sat)
+(morph m sat)
 
 (notation x s1)
 (notation y s2)

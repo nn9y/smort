@@ -1,6 +1,6 @@
 (seed s1 sat)
 (seed s2 sat)
-(mutant m sat)
+(morph m sat)
 
 (notation x m)
 (notation y s2)
