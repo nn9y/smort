@@ -1,14 +1,14 @@
 import time
 import logging
 
+from smort.src.sys.exitcodes import OK_BUGS, OK_NOBUGS
+
 
 class Statistic:
     def __init__(self):
         self.start_time = time.time()
         self.total_seeds = 0
         self.invalid_seeds = 0
-        self.total_generations = 0
-        self.unsuccessful_generations = 0
         self.morphs = 0
         self.invalid_morphs = 0
         self.crashes = 0
@@ -44,3 +44,8 @@ class Statistic:
         summary = f"\b\b{self.total_seeds} seeds processed, \
 {valid_seeds} valid, {self.invalid_seeds} invalid \n{num_bugs} bug triggers found"
         print(summary)
+
+    def check_bugs(self):
+        if self.crashes + self.soundness == 0:
+            exit(OK_NOBUGS)
+        exit(OK_BUGS)

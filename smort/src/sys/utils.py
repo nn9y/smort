@@ -39,11 +39,11 @@ def get_all_seed_files(seed_path_list):
     return seeds_list
 
 
-def stats_control_c(sig, frame, Tester):
+def stats_control_c(sig, frame, tester):
     print("\b\b\rUser interrupt", flush=True)
-    Tester.printsum_exit(False)
+    tester.printsum_exit(False)
 
 
-def silent_control_c(sig, frame, Tester):
-    Tester.printsum_exit(True)
+def silent_control_c(sig, frame, tester):
+    tester.printsum_exit(True)
 

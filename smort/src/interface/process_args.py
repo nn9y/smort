@@ -3,15 +3,15 @@ from smort.src.sys.exitcodes import ERR_USAGE
 from smort.src.sys.utils import create_folder, get_all_seed_files 
 
 
-def check_solver_clis(solver_clis):
-    if solver_clis == "":
+def check_solver_cmds(solver_cmds):
+    if solver_cmds == "":
         if len(solvers) == 0:
             print("error: no solver specified", flush=True)
             exit(ERR_USAGE)
-        solver_clis = solvers
+        solver_cmds = solvers
     else:
-        solver_clis = solver_clis.split(";") + solvers
-    return solver_clis
+        solver_cmds = solver_cmds.split(";") + solvers
+    return solver_cmds
 
 
 def check_timeout(timeout):
@@ -39,11 +39,11 @@ def process(arg_parser):
     if not (args.sat_seeds or args.unsat_seeds):
         arg_parser.error("no seed file/folder specified")
 
-    args.SOLVER_CLIS = check_solver_clis(args.SOLVER_CLIS)
+    args.SOLVER_CMDS = check_solver_cmds(args.SOLVER_CMDS)
     check_timeout(args.timeout)
     check_iterations(args.iterations)
     check_incremental(args)
-    folder_path_list = [args.bugfolder, args.logfolder, args.scratchfolder]
+    folder_path_list = [args.bugfolder, args.logfolder, args.testfolder]
     for folder_path in folder_path_list:
         create_folder(folder_path)
     args.sat_seeds = get_all_seed_files(args.sat_seeds)

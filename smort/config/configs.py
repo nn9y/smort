@@ -36,7 +36,6 @@ ignore_list = [
     "Parse Error",
     "Cannot get model",
     "Symbol 'str.to-re' not declared as a variable",
-    "Symbol 'str.to.re' not declared as a variable",
     "Unimplemented code encountered",
 ]
 

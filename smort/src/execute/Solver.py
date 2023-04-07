@@ -2,21 +2,18 @@ import subprocess
 
 from smort.src.sys.exitcodes import ERR_USAGE
 from smort.src.execute.returncodes import *
-from smort.src.translate.smtmr.MetamorphicRelation import Status
 
 
 class Solver:
-    """
-    Class to call SMT solvers 
-    """
-
-    def __init__(self, cli):
+    def __init__(self, cmd):
         # command
-        self.cli = cli 
+        self.cmd = cmd 
 
     def solve(self, file, timeout, debug=False):
+        stdout = ""
+        stderr = ""
         try:
-            cmd = self.cli.split(" ") + [file]
+            cmd = self.cmd.split(" ") + [file]
             if debug:
                 print("cmd: " + " ".join(cmd), flush=True)
             output = subprocess.run(
@@ -26,23 +23,17 @@ class Solver:
                 stderr=subprocess.PIPE,
                 shell=False,
             )
-
         except subprocess.TimeoutExpired as te:
             if te.stdout and te.stderr:
                 stdout = te.stdout.decode()
                 stderr = te.stderr.decode()
-            else:
-                stdout = ""
-                stderr = ""
             return stdout, stderr, TIMEOUT 
 
         except ValueError:
-            stdout = ""
-            stderr = ""
             return stdout, stderr, SUCCESS 
 
         except FileNotFoundError:
-            print(f'error: solver "{cmd[0]}" not found', flush=True)
+            print(f"error: solver '{cmd[0]}' not found", flush=True)
             exit(ERR_USAGE)
 
         stdout = output.stdout.decode()

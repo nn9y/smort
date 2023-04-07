@@ -1,23 +1,9 @@
 import random
-import re
 import pathlib
 
-from smort.config.configs import crash_list, duplicate_list, ignore_list
 from smort.src.sys.exitcodes import ERR_USAGE
-from smort.src.tools.utils import in_list, cartesian_product
+from smort.src.tools.utils import cartesian_product
 from smort.src.translate.smtmr.MetamorphicRelation import Status
-
-
-def in_crash_list(stdout, stderr):
-    return in_list(stdout, stderr, crash_list)
-
-
-def in_duplicate_list(stdout, stderr):
-    return in_list(stdout, stderr, duplicate_list)
-
-
-def in_ignore_list(stdout, stderr):
-    return in_list(stdout, stderr, ignore_list)
 
 
 def admissible_seed_size(seed, file_size):

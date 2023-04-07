@@ -8,7 +8,7 @@ import inspect
 from smort.src.interface.process_args import process
 from smort.src.sys.errors import raise_runtime_error
 from smort.src.interface.ArgParser import build_argparser
-from smort.src.sys.exitcodes import OK_BUGS, OK_NOBUGS, ERR_USAGE, ERR_INTERNAL
+from smort.src.sys.exitcodes import ERR_USAGE, ERR_INTERNAL
 from smort.src.interface.info import *
 from smort.src.sys.utils import stats_control_c, silent_control_c 
 from smort.src.core.Tester import Tester
@@ -27,13 +27,11 @@ def main():
             tester = Tester(args)
 
             if not args.quiet:
-                signal.signal(signal.SIGINT, stats_control_c)
+                signal.signal(signal.SIGINT, lambda signum, frame: stats_control_c(signum, frame, tester))
             else:
-                signal.signal(signal.SIGINT, silent_control_c)
+                signal.signal(signal.SIGINT, lambda signum, frame: silent_control_c(signum, frame, tester))
 
             tester.run()
-            # TODO
-            # exit
 
         except Exception as e:
             trace = inspect.trace()

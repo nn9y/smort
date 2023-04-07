@@ -20,8 +20,8 @@ def add_args(arg_parser, current_dir):
     """
     # positional parameters
     arg_parser.add_argument(
-        "SOLVER_CLIS",
-        metavar="solver_clis",
+        "SOLVER_CMDS",
+        metavar="solver_cmds",
         help="SMT solver commands, separated by ';'"
     )
     arg_parser.add_argument(
@@ -64,10 +64,10 @@ def add_args(arg_parser, current_dir):
     )
     arg_parser.add_argument(
         "-s",
-        "--scratchfolder",
+        "--testfolder",
         metavar="path_to_folder",
-        default=current_dir+"/scratchs",
-        help="SMTLIBv2 files of generated test cases (default: <current_dir>/scratchs/)"
+        default=current_dir+"/tests",
+        help="SMTLIBv2 files of generated test cases (default: <current_dir>/tests/)"
     )
     # arg_parser.add_argument(
     #     "-h",
@@ -119,7 +119,7 @@ def add_args(arg_parser, current_dir):
         "-k",
         "--keep-morphs",
         action="store_true",
-        help="do not remove temporary scratch files"
+        help="do not remove temporary test files"
     )
     arg_parser.add_argument(
         "-q",

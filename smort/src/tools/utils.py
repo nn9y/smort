@@ -51,16 +51,18 @@ def random_string(length=5):
     return "".join(random.sample(string.ascii_letters + string.digits, length))
 
 
-def plain(cli):
-    plain_cli = ""
-    for token in cli.split(" "):
-        plain_cli += token.split("/")[-1]
-    return escape(plain_cli)
+def plain(cmd):
+    plain_cmd = ""
+    for token in cmd.split(" "):
+        plain_cmd += token.split("/")[-1]
+    return escape(plain_cmd)
 
 
 def escape(s):
-    s = s.replace(".", "")
-    s = s.replace("=", "")
+    """
+    replace all '.' by '_'
+    """
+    s = s.replace(".", "_")
     return s
 
 
@@ -68,5 +70,5 @@ def in_list(stdout, stderr, lst):
     stdstream = f"{stdout} {stderr}"
     for err in lst:
         if err in stdstream:
-            return True
-    return False
+            return True 
+    return False 
