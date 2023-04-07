@@ -6,7 +6,7 @@ from smort.src.translate.smtlibv2.Script import DeclareConst, DefineFun, Assert
 from smort.src.translate.tools.Term import Expr, Var, Const, TermType
 from smort.src.translate.theory.available_sorts import random_constant_value 
 from smort.src.translate.smtmr.MetamorphicRelation import SMTMRKeyword
-from smort.src.generator.utils import (
+from smort.src.generate.utils import (
     merge, 
     find_valid_templates,
     random_term_tuples,

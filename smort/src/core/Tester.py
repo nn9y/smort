@@ -19,7 +19,7 @@ from smort.src.evaluate.testcodes import *
 from smort.src.evaluate.utils import evaluate_test
 from smort.src.translate.smtmr.translate import translate_mr_file
 from smort.src.translate.smtlibv2.translate import translate_script_file
-from smort.src.generator.Generator import Generator
+from smort.src.generate.Generator import Generator
 
 
 class Tester:
