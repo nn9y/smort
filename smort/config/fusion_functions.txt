@@ -1,114 +1,307 @@
 ; Generated with: https://github.com/nicdard/fusion-function-generator
-; 10 functions (number of subst-template blocks)
-; 25 operators per function
+; 30 functions (number of subst-template blocks)
+; 10 operators per function
 
 (notation c0 :cons)
 (notation c1 :cons)
+(subst-template :free
+	(
+		(x (_ BitVec 16)) (y (_ BitVec 20)) (z (_ BitVec 78)) (c0 (_ BitVec 62)) (c1 (_ BitVec 58)) 
+	)
+	(
+		(x ((_ extract 77 62) (bvxor (concat c1 (bvnot y)) z)))
+		(y (bvnot ((_ extract 19 0) (bvxor (concat x c0) z))))
+		(z (bvxor (concat x c0) (concat c1 (bvnot y))))
+	)
+)
+(subst-template :free
+	(
+		(x String) (y String) (z String) (c0 (_ BitVec 16)) 
+	)
+	(
+		(x (str.substr (ite (str.contains (str.++ x (ite (< (- (bv2nat c0)) 0) (str.++ "-" (str.from_int (- (- (bv2nat c0))))) (str.from_int (- (bv2nat c0))))) y) z (str.++ x (ite (< (- (bv2nat c0)) 0) (str.++ "-" (str.from_int (- (- (bv2nat c0))))) (str.from_int (- (bv2nat c0)))))) 0 (str.len x)))
+		(y (ite (str.contains (str.++ x (ite (< (- (bv2nat c0)) 0) (str.++ "-" (str.from_int (- (- (bv2nat c0))))) (str.from_int (- (bv2nat c0))))) y) y z))
+		(z (ite (str.contains (str.++ x (ite (< (- (bv2nat c0)) 0) (str.++ "-" (str.from_int (- (- (bv2nat c0))))) (str.from_int (- (bv2nat c0))))) y) (str.++ x (ite (< (- (bv2nat c0)) 0) (str.++ "-" (str.from_int (- (- (bv2nat c0))))) (str.from_int (- (bv2nat c0))))) y))
+	)
+)
+(subst-template :free
+	(
+		(x Int) (y Int) (z String) (c0 Int) (c1 Int) 
+	)
+	(
+		(x (- (div (- (ite (= (str.at z 0) "-") (- (str.to_int (str.substr z 1 (str.len z)))) (str.to_int z)) c1) c0) y))
+		(y (- (div (- (ite (= (str.at z 0) "-") (- (str.to_int (str.substr z 1 (str.len z)))) (str.to_int z)) c1) c0) x))
+		(z (ite (< (+ (* (+ x y) c0) c1) 0) (str.++ "-" (str.from_int (- (+ (* (+ x y) c0) c1)))) (str.from_int (+ (* (+ x y) c0) c1))))
+	)
+)
+(subst-template :free
+	(
+		(x Int) (y Int) (z Int) (c0 Int) (c1 Int) 
+	)
+	(
+		(x (- c0 (- (- z) (ite (> y c1) y c1))))
+		(y (ite (> y c1) (- (- z) (- c0 x)) y))
+		(z (- (+ (- c0 x) (ite (> y c1) y c1))))
+	)
+)
+(subst-template :free
+	(
+		(x Int) (y String) (z String) (c0 Int) 
+	)
+	(
+		(x (ite (= (str.at (str.substr z 0 (str.indexof z (str.++ (ite (< (- c0) 0) (str.++ "-" (str.from_int (- (- c0)))) (str.from_int (- c0))) y) (str.len (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x))))) 0) "-") (- (str.to_int (str.substr (str.substr z 0 (str.indexof z (str.++ (ite (< (- c0) 0) (str.++ "-" (str.from_int (- (- c0)))) (str.from_int (- c0))) y) (str.len (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x))))) 1 (str.len (str.substr z 0 (str.indexof z (str.++ (ite (< (- c0) 0) (str.++ "-" (str.from_int (- (- c0)))) (str.from_int (- c0))) y) (str.len (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x))))))))) (str.to_int (str.substr z 0 (str.indexof z (str.++ (ite (< (- c0) 0) (str.++ "-" (str.from_int (- (- c0)))) (str.from_int (- c0))) y) (str.len (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x))))))))
+		(y (str.substr (str.replace z (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x)) "") (str.len (ite (< (- c0) 0) (str.++ "-" (str.from_int (- (- c0)))) (str.from_int (- c0)))) (str.len y)))
+		(z (str.++ (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x)) (str.++ (ite (< (- c0) 0) (str.++ "-" (str.from_int (- (- c0)))) (str.from_int (- c0))) y)))
+	)
+)
+(subst-template :free
+	(
+		(x Int) (y String) (z String) (c0 String) (c1 String) 
+	)
+	(
+		(x (ite (= (str.at (str.substr (str.substr (str.replace z c0 "") 0 (str.indexof (str.replace z c0 "") c1 (str.len (str.++ (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x)) y)))) 0 (str.indexof (str.substr (str.replace z c0 "") 0 (str.indexof (str.replace z c0 "") c1 (str.len (str.++ (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x)) y)))) y (str.len (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x))))) 0) "-") (- (str.to_int (str.substr (str.substr (str.substr (str.replace z c0 "") 0 (str.indexof (str.replace z c0 "") c1 (str.len (str.++ (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x)) y)))) 0 (str.indexof (str.substr (str.replace z c0 "") 0 (str.indexof (str.replace z c0 "") c1 (str.len (str.++ (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x)) y)))) y (str.len (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x))))) 1 (str.len (str.substr (str.substr (str.replace z c0 "") 0 (str.indexof (str.replace z c0 "") c1 (str.len (str.++ (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x)) y)))) 0 (str.indexof (str.substr (str.replace z c0 "") 0 (str.indexof (str.replace z c0 "") c1 (str.len (str.++ (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x)) y)))) y (str.len (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x))))))))) (str.to_int (str.substr (str.substr (str.replace z c0 "") 0 (str.indexof (str.replace z c0 "") c1 (str.len (str.++ (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x)) y)))) 0 (str.indexof (str.substr (str.replace z c0 "") 0 (str.indexof (str.replace z c0 "") c1 (str.len (str.++ (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x)) y)))) y (str.len (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x))))))))
+		(y (str.substr (str.substr (str.replace z c0 "") 0 (str.indexof (str.replace z c0 "") c1 (str.len (str.++ (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x)) y)))) (str.indexof (str.substr (str.replace z c0 "") 0 (str.indexof (str.replace z c0 "") c1 (str.len (str.++ (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x)) y)))) y (str.len (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x)))) (str.len y)))
+		(z (str.++ c0 (str.++ (str.++ (ite (< x 0) (str.++ "-" (str.from_int (- x))) (str.from_int x)) y) c1)))
+	)
+)
+(subst-template :free
+	(
+		(x (_ BitVec 32)) (y Int) (z Int) (c0 Int) (c1 Int) 
+	)
+	(
+		(x ((_ nat2bv 32) (- z (* c0 (+ y c1)))))
+		(y (- (div (- z (bv2nat x)) c0) c1))
+		(z (+ (bv2nat x) (* c0 (+ y c1))))
+	)
+)
+(subst-template :free
+	(
+		(x (_ BitVec 64)) (y (_ BitVec 16)) (z (_ BitVec 64)) (c0 (_ BitVec 48)) 
+	)
+	(
+		(x (bvneg (bvnot (bvxor (bvnot (concat y c0)) (bvnot (bvnot z))))))
+		(y ((_ extract 63 48) (bvnot (bvxor (bvnot (bvneg x)) (bvnot (bvnot z))))))
+		(z (bvnot (bvnot (bvxor (bvnot (bvneg x)) (bvnot (concat y c0))))))
+	)
+)
+(subst-template :free
+	(
+		(x Int) (y Int) (z Real) (c0 (_ BitVec 35)) 
+	)
+	(
+		(x (- (div (to_int (- z)) (bv2nat c0)) y))
+		(y (- (div (to_int (- z)) (bv2nat c0)) x))
+		(z (- (to_real (* (+ x y) (bv2nat c0)))))
+	)
+)
+(subst-template :free
+	(
+		(x Bool) (y Bool) (z Bool) (c0 Bool) 
+	)
+	(
+		(x (ite (or x (not (not y))) (ite (=> (ite (or x (not (not y))) x (not (not y))) (not c0)) z (ite (or x (not (not y))) x (not (not y)))) x))
+		(y (not (not (ite (or x (not (not y))) (not (not y)) (ite (=> (ite (or x (not (not y))) x (not (not y))) (not c0)) z (ite (or x (not (not y))) x (not (not y))))))))
+		(z (ite (=> (ite (or x (not (not y))) x (not (not y))) (not c0)) (ite (or x (not (not y))) x (not (not y))) (not c0)))
+	)
+)
+(subst-template :free
+	(
+		(x Real) (y (_ BitVec 32)) (z Real) (c0 Int) 
+	)
+	(
+		(x (+ z (to_real (+ (- (bv2nat y)) c0))))
+		(y ((_ nat2bv 32) (- (- (to_int (- x z)) c0))))
+		(z (- x (to_real (+ (- (bv2nat y)) c0))))
+	)
+)
+(subst-template :free
+	(
+		(x Int) (y Int) (z Int) (c0 (_ BitVec 15)) 
+	)
+	(
+		(x (- z (* (- (bv2nat (bvnot c0))) y)))
+		(y (div (- z x) (- (bv2nat (bvnot c0)))))
+		(z (+ x (* (- (bv2nat (bvnot c0))) y)))
+	)
+)
+(subst-template :free
+	(
+		(x String) (y Int) (z String) (c0 String) (c1 Int) 
+	)
+	(
+		(x (str.substr (ite (str.prefixof (str.++ c0 x) (ite (< (* c1 y) 0) (str.++ "-" (str.from_int (- (* c1 y)))) (str.from_int (* c1 y)))) z (str.++ c0 x)) (str.len c0) (str.len x)))
+		(y (div (ite (= (str.at (ite (str.prefixof (str.++ c0 x) (ite (< (* c1 y) 0) (str.++ "-" (str.from_int (- (* c1 y)))) (str.from_int (* c1 y)))) (ite (< (* c1 y) 0) (str.++ "-" (str.from_int (- (* c1 y)))) (str.from_int (* c1 y))) z) 0) "-") (- (str.to_int (str.substr (ite (str.prefixof (str.++ c0 x) (ite (< (* c1 y) 0) (str.++ "-" (str.from_int (- (* c1 y)))) (str.from_int (* c1 y)))) (ite (< (* c1 y) 0) (str.++ "-" (str.from_int (- (* c1 y)))) (str.from_int (* c1 y))) z) 1 (str.len (ite (str.prefixof (str.++ c0 x) (ite (< (* c1 y) 0) (str.++ "-" (str.from_int (- (* c1 y)))) (str.from_int (* c1 y)))) (ite (< (* c1 y) 0) (str.++ "-" (str.from_int (- (* c1 y)))) (str.from_int (* c1 y))) z))))) (str.to_int (ite (str.prefixof (str.++ c0 x) (ite (< (* c1 y) 0) (str.++ "-" (str.from_int (- (* c1 y)))) (str.from_int (* c1 y)))) (ite (< (* c1 y) 0) (str.++ "-" (str.from_int (- (* c1 y)))) (str.from_int (* c1 y))) z))) c1))
+		(z (ite (str.prefixof (str.++ c0 x) (ite (< (* c1 y) 0) (str.++ "-" (str.from_int (- (* c1 y)))) (str.from_int (* c1 y)))) (str.++ c0 x) (ite (< (* c1 y) 0) (str.++ "-" (str.from_int (- (* c1 y)))) (str.from_int (* c1 y)))))
+	)
+)
+(subst-template :free
+	(
+		(x (_ BitVec 8)) (y Int) (z Int) 
+	)
+	(
+		(x (bvneg ((_ nat2bv 8) (- (- (+ z (- y)))))))
+		(y (- (- (- (- (bv2nat (bvneg x)))) z)))
+		(z (- (- (- (bv2nat (bvneg x)))) (- y)))
+	)
+)
 (notation c2 :cons)
-(notation c3 :cons)
-(notation c4 :cons)
-(notation c5 :cons)
-(notation c6 :cons)
 (subst-template :free
 	(
-		(x Bool) (y Bool) (z Bool) (c0 Bool) (c1 Bool) (c2 Bool) (c3 Bool) (c4 Bool) (c5 Bool) (c6 Bool) 
+		(x (_ BitVec 20)) (y (_ BitVec 32)) (z (_ BitVec 55)) (c0 (_ BitVec 23)) (c2 (_ BitVec 12)) (c1 (_ BitVec 55)) 
 	)
 	(
-		(x (ite (distinct (not c0) x) x (xor (not (not (not (not c1)))) (xor (xor (not (xor y (xor c2 (xor (xor c3 c4) c5)))) c6) z))))
-		(y (xor (xor c2 (xor (xor c3 c4) c5)) (not (xor c6 (xor (xor (ite (distinct (not c0) x) (not c0) x) (not (not (not (not c1))))) z)))))
-		(z (xor (xor (ite (distinct (not c0) x) (not c0) x) (not (not (not (not c1))))) (xor (not (xor y (xor c2 (xor (xor c3 c4) c5)))) c6)))
+		(x ((_ extract 31 12) (bvxor y ((_ extract 31 0) (bvxor c1 (bvneg z))))))
+		(y (bvxor (concat x c2) ((_ extract 31 0) (bvxor c1 (bvneg z)))))
+		(z (bvneg (bvxor (concat c0 (bvxor (concat x c2) y)) c1)))
 	)
 )
 (subst-template :free
 	(
-		(x (_ BitVec 20)) (y (_ BitVec 64)) (z (_ BitVec 108)) (c0 (_ BitVec 24)) (c1 (_ BitVec 108)) (c2 (_ BitVec 108)) 
+		(x Bool) (y Bool) (z Bool) 
 	)
 	(
-		(x (bvnot ((_ extract 83 64) (bvnot ((_ extract 83 0) (bvnot (bvxor (bvnot (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg c1))))))) (bvxor (bvneg (bvnot (bvneg c2))) z))))))))
-		(y ((_ extract 63 0) (bvnot ((_ extract 83 0) (bvnot (bvxor (bvnot (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg c1))))))) (bvxor (bvneg (bvnot (bvneg c2))) z)))))))
-		(z (bvxor (bvxor (bvnot (concat (bvnot c0) (bvnot (concat (bvnot x) y)))) (bvnot (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg c1)))))))) (bvneg (bvnot (bvneg c2)))))
-	)
-)
-(subst-template :free
-	(
-		(x Int) (y Int) (z String) (c0 (_ BitVec 11)) (c1 Int) (c2 Int) (c3 Int) 
-	)
-	(
-		(x (ite (> c1 x) x (ite (>= (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) (- (ite (<= (bv2nat (bvneg (bvnot (bvneg (bvneg (bvnot (bvneg (bvnot (bvneg (bvnot (bvnot c0))))))))))) (+ (ite (>= (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) c3)) (+ (ite (>= (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) c3) (ite (= (str.at z 0) "-") (- (str.to_int (str.substr z 1 (str.len z)))) (str.to_int z))) c3) (ite (> c1 x) c1 x))))
-		(y (ite (< c2 y) y (ite (>= (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) (ite (< c2 y) c2 y) (- (ite (<= (bv2nat (bvneg (bvnot (bvneg (bvneg (bvnot (bvneg (bvnot (bvneg (bvnot (bvnot c0))))))))))) (+ (ite (>= (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) c3)) (+ (ite (>= (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) c3) (ite (= (str.at z 0) "-") (- (str.to_int (str.substr z 1 (str.len z)))) (str.to_int z))) c3))))
-		(z (ite (< (ite (<= (bv2nat (bvneg (bvnot (bvneg (bvneg (bvnot (bvneg (bvnot (bvneg (bvnot (bvnot c0))))))))))) (+ (ite (>= (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) c3)) (bv2nat (bvneg (bvnot (bvneg (bvneg (bvnot (bvneg (bvnot (bvneg (bvnot (bvnot c0))))))))))) (+ (ite (>= (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) c3)) 0) (str.++ "-" (str.from_int (- (ite (<= (bv2nat (bvneg (bvnot (bvneg (bvneg (bvnot (bvneg (bvnot (bvneg (bvnot (bvnot c0))))))))))) (+ (ite (>= (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) c3)) (bv2nat (bvneg (bvnot (bvneg (bvneg (bvnot (bvneg (bvnot (bvneg (bvnot (bvnot c0))))))))))) (+ (ite (>= (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) c3))))) (str.from_int (ite (<= (bv2nat (bvneg (bvnot (bvneg (bvneg (bvnot (bvneg (bvnot (bvneg (bvnot (bvnot c0))))))))))) (+ (ite (>= (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) c3)) (bv2nat (bvneg (bvnot (bvneg (bvneg (bvnot (bvneg (bvnot (bvneg (bvnot (bvnot c0))))))))))) (+ (ite (>= (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) (ite (> c1 x) c1 x) (ite (< c2 y) c2 y)) c3)))))
-	)
-)
-(notation c7 :cons)
-(notation c8 :cons)
-(notation c9 :cons)
-(subst-template :free
-	(
-		(x Bool) (y Bool) (z Bool) (c0 Bool) (c1 Bool) (c2 Bool) (c3 Bool) (c4 Bool) (c5 Bool) (c6 Bool) (c7 Bool) (c8 Bool) (c9 Bool) 
-	)
-	(
-		(x (xor c6 (xor c7 (xor c8 (xor y (ite (distinct (xor (xor (xor (xor x c6) c7) c8) y) c9) (ite (or (xor (xor c3 c4) c5) (ite (distinct (xor (xor (xor (xor x c6) c7) c8) y) c9) (xor (xor (xor (xor x c6) c7) c8) y) c9)) (ite (distinct (xor (xor (xor (xor x c6) c7) c8) y) c9) (xor (xor (xor (xor x c6) c7) c8) y) c9) (xor (ite (distinct (xor c0 c1) c2) (xor c0 c1) c2) z)) (xor (xor (xor (xor x c6) c7) c8) y)))))))
-		(y (xor (xor (xor (xor x c6) c7) c8) (ite (distinct (xor (xor (xor (xor x c6) c7) c8) y) c9) (ite (or (xor (xor c3 c4) c5) (ite (distinct (xor (xor (xor (xor x c6) c7) c8) y) c9) (xor (xor (xor (xor x c6) c7) c8) y) c9)) (ite (distinct (xor (xor (xor (xor x c6) c7) c8) y) c9) (xor (xor (xor (xor x c6) c7) c8) y) c9) (xor (ite (distinct (xor c0 c1) c2) (xor c0 c1) c2) z)) (xor (xor (xor (xor x c6) c7) c8) y))))
-		(z (xor (ite (distinct (xor c0 c1) c2) (xor c0 c1) c2) (ite (or (xor (xor c3 c4) c5) (ite (distinct (xor (xor (xor (xor x c6) c7) c8) y) c9) (xor (xor (xor (xor x c6) c7) c8) y) c9)) (xor (xor c3 c4) c5) (ite (distinct (xor (xor (xor (xor x c6) c7) c8) y) c9) (xor (xor (xor (xor x c6) c7) c8) y) c9))))
+		(x (not (not (not (ite (=> (not (not (not x))) (not (not y))) z (not (not (not x))))))))
+		(y (not (not (ite (=> (not (not (not x))) (not (not y))) (not (not y)) z))))
+		(z (ite (=> (not (not (not x))) (not (not y))) (not (not (not x))) (not (not y))))
 	)
 )
 (subst-template :free
 	(
-		(x Bool) (y Bool) (z Bool) (c0 Bool) (c1 Bool) (c2 Bool) (c3 Bool) (c4 Bool) (c5 Bool) (c6 Bool) 
+		(x Int) (y Int) (z Real) (c0 Int) 
 	)
 	(
-		(x (ite (distinct (not (not c0)) x) x (xor (xor c1 (ite (=> (xor c2 y) (ite (and c3 c4) c3 c4)) (xor c2 y) (ite (and c3 c4) c3 c4))) (not (not (xor (xor (not c5) (not c6)) z))))))
-		(y (xor c2 (ite (=> (xor c2 y) (ite (and c3 c4) c3 c4)) (xor c1 (xor (ite (distinct (not (not c0)) x) (not (not c0)) x) (not (not (xor (xor (not c5) (not c6)) z))))) (xor c2 y))))
-		(z (xor (not (not (xor (ite (distinct (not (not c0)) x) (not (not c0)) x) (xor c1 (ite (=> (xor c2 y) (ite (and c3 c4) c3 c4)) (xor c2 y) (ite (and c3 c4) c3 c4)))))) (xor (not c5) (not c6))))
-	)
-)
-(subst-template :free
-	(
-		(x Real) (y Real) (z Real) (c0 Real) (c1 Real) (c2 Real) (c3 Real) (c4 Real) (c5 Real) (c6 Real) (c7 Real) (c8 Real) (c9 Real) 
-	)
-	(
-		(x (/ (- (/ z (+ (* c0 (- c1 c2)) (ite (>= (ite (<= c3 (- c4 c5)) c3 (- c4 c5)) (ite (< c6 c7) c6 c7)) (ite (<= c3 (- c4 c5)) c3 (- c4 c5)) (ite (< c6 c7) c6 c7)))) (ite (<= y c9) y c9)) c8))
-		(y (ite (<= y c9) (- (/ z (+ (* c0 (- c1 c2)) (ite (>= (ite (<= c3 (- c4 c5)) c3 (- c4 c5)) (ite (< c6 c7) c6 c7)) (ite (<= c3 (- c4 c5)) c3 (- c4 c5)) (ite (< c6 c7) c6 c7)))) (* x c8)) y))
-		(z (* (+ (* c0 (- c1 c2)) (ite (>= (ite (<= c3 (- c4 c5)) c3 (- c4 c5)) (ite (< c6 c7) c6 c7)) (ite (<= c3 (- c4 c5)) c3 (- c4 c5)) (ite (< c6 c7) c6 c7))) (+ (* x c8) (ite (<= y c9) y c9))))
+		(x (- (- (to_int z) (- (- y))) c0))
+		(y (- (- (- (to_int z) (+ c0 x)))))
+		(z (to_real (+ (+ c0 x) (- (- y)))))
 	)
 )
 (subst-template :free
 	(
-		(x Real) (y Real) (z Real) (c0 Real) (c1 Real) (c2 Real) (c3 Real) (c4 Real) (c5 Real) (c6 Real) (c7 Real) (c8 Real) (c9 Real) 
+		(x Int) (y Real) (z Real) (c0 Real) 
 	)
 	(
-		(x (- (ite (> c0 (+ x (+ c1 c2))) (+ x (+ c1 c2)) (/ z (ite (< (- (ite (>= c3 c4) c3 c4) (- c5 c6)) (* (* c7 (ite (>= c8 c9) c8 c9)) y)) (- (ite (>= c3 c4) c3 c4) (- c5 c6)) (* (* c7 (ite (>= c8 c9) c8 c9)) y)))) (+ c1 c2)))
-		(y (/ (ite (< (- (ite (>= c3 c4) c3 c4) (- c5 c6)) (* (* c7 (ite (>= c8 c9) c8 c9)) y)) (* (* c7 (ite (>= c8 c9) c8 c9)) y) (/ z (ite (> c0 (+ x (+ c1 c2))) c0 (+ x (+ c1 c2))))) (* c7 (ite (>= c8 c9) c8 c9))))
-		(z (* (ite (> c0 (+ x (+ c1 c2))) c0 (+ x (+ c1 c2))) (ite (< (- (ite (>= c3 c4) c3 c4) (- c5 c6)) (* (* c7 (ite (>= c8 c9) c8 c9)) y)) (- (ite (>= c3 c4) c3 c4) (- c5 c6)) (* (* c7 (ite (>= c8 c9) c8 c9)) y))))
-	)
-)
-(subst-template :free
-	(
-		(x (_ BitVec 20)) (y (_ BitVec 20)) (z Int) (c0 (_ BitVec 5)) (c1 (_ BitVec 12)) (c2 (_ BitVec 54)) (c3 (_ BitVec 31)) (c4 (_ BitVec 36)) (c5 (_ BitVec 33)) (c6 (_ BitVec 13)) (c7 (_ BitVec 31)) 
-	)
-	(
-		(x ((_ extract 19 0) (ite (distinct (concat (ite (distinct c2 c3) c2 c3) c4) (concat (concat c5 c6) x)) (concat (concat c5 c6) x) ((_ extract 120 31) ((_ extract 120 0) (bvnot ((_ nat2bv 133) (- z))))))))
-		(y (ite (distinct y c7) ((_ extract 30 0) ((_ extract 120 0) (bvnot ((_ nat2bv 133) (- z))))) y))
-		(z (- (bv2nat (bvnot (concat (bvnot (bvxor c0 c1)) (concat (ite (distinct (concat (ite (distinct c2 c3) c2 c3) c4) (concat (concat c5 c6) x)) (concat (ite (distinct c2 c3) c2 c3) c4) (concat (concat c5 c6) x)) (ite (distinct y c7) y c7)))))))
+		(x (to_int (- (- c0) (- (- z) y))))
+		(y (- (- z) (- (- c0) (to_real x))))
+		(z (- (+ (- (- c0) (to_real x)) y)))
 	)
 )
 (subst-template :free
 	(
-		(x (_ BitVec 20)) (y (_ BitVec 16)) (z String) 
+		(x Real) (y Real) (z Real) (c0 Real) (c1 Real) 
 	)
 	(
-		(x (bvneg (bvnot (bvneg (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot ((_ nat2bv 20) (ite (= (str.at (str.substr z 0 (str.len (ite (< (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x))))))))))))) 0) (str.++ "-" (str.from_int (- (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x)))))))))))))))) (str.from_int (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x))))))))))))))))) 0) "-") (- (str.to_int (str.substr (str.substr z 0 (str.len (ite (< (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x))))))))))))) 0) (str.++ "-" (str.from_int (- (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x)))))))))))))))) (str.from_int (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x))))))))))))))))) 1 (str.len (str.substr z 0 (str.len (ite (< (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x))))))))))))) 0) (str.++ "-" (str.from_int (- (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x)))))))))))))))) (str.from_int (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x))))))))))))))))))))) (str.to_int (str.substr z 0 (str.len (ite (< (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x))))))))))))) 0) (str.++ "-" (str.from_int (- (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x)))))))))))))))) (str.from_int (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x)))))))))))))))))))))))))))))))))
-		(y (bvnot (bvneg (bvneg (bvneg ((_ nat2bv 16) (ite (= (str.at (str.replace z (ite (< (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x))))))))))))) 0) (str.++ "-" (str.from_int (- (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x)))))))))))))))) (str.from_int (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x))))))))))))))) "") 0) "-") (- (str.to_int (str.substr (str.replace z (ite (< (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x))))))))))))) 0) (str.++ "-" (str.from_int (- (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x)))))))))))))))) (str.from_int (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x))))))))))))))) "") 1 (str.len (str.replace z (ite (< (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x))))))))))))) 0) (str.++ "-" (str.from_int (- (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x)))))))))))))))) (str.from_int (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x))))))))))))))) ""))))) (str.to_int (str.replace z (ite (< (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x))))))))))))) 0) (str.++ "-" (str.from_int (- (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x)))))))))))))))) (str.from_int (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x))))))))))))))) "")))))))))
-		(z (str.++ (ite (< (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x))))))))))))) 0) (str.++ "-" (str.from_int (- (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x)))))))))))))))) (str.from_int (bv2nat (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvneg (bvnot (bvneg x))))))))))))))) (ite (< (bv2nat (bvneg (bvneg (bvneg (bvnot y))))) 0) (str.++ "-" (str.from_int (- (bv2nat (bvneg (bvneg (bvneg (bvnot y)))))))) (str.from_int (bv2nat (bvneg (bvneg (bvneg (bvnot y)))))))))
+		(x (- (/ (- z) (* y c1)) c0))
+		(y (/ (/ (- z) (+ x c0)) c1))
+		(z (- (* (+ x c0) (* y c1))))
 	)
 )
 (subst-template :free
 	(
-		(x (_ BitVec 8)) (y (_ BitVec 32)) (z String) 
+		(x Int) (y Int) (z Real) (c0 Int) 
 	)
 	(
-		(x (bvnot ((_ nat2bv 8) (ite (= (str.at (str.substr z 0 (str.len (ite (< (bv2nat (bvnot x)) 0) (str.++ "-" (str.from_int (- (bv2nat (bvnot x))))) (str.from_int (bv2nat (bvnot x)))))) 0) "-") (- (str.to_int (str.substr (str.substr z 0 (str.len (ite (< (bv2nat (bvnot x)) 0) (str.++ "-" (str.from_int (- (bv2nat (bvnot x))))) (str.from_int (bv2nat (bvnot x)))))) 1 (str.len (str.substr z 0 (str.len (ite (< (bv2nat (bvnot x)) 0) (str.++ "-" (str.from_int (- (bv2nat (bvnot x))))) (str.from_int (bv2nat (bvnot x)))))))))) (str.to_int (str.substr z 0 (str.len (ite (< (bv2nat (bvnot x)) 0) (str.++ "-" (str.from_int (- (bv2nat (bvnot x))))) (str.from_int (bv2nat (bvnot x)))))))))))
-		(y (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot (bvnot (bvnot (bvneg (bvnot (bvneg (bvneg ((_ nat2bv 32) (- (ite (= (str.at (str.substr z (str.indexof z (ite (< (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y)))))))))))))))) 0) (str.++ "-" (str.from_int (- (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y))))))))))))))))))) (str.from_int (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y)))))))))))))))))) (str.len (ite (< (bv2nat (bvnot x)) 0) (str.++ "-" (str.from_int (- (bv2nat (bvnot x))))) (str.from_int (bv2nat (bvnot x)))))) (str.len (ite (< (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y)))))))))))))))) 0) (str.++ "-" (str.from_int (- (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y))))))))))))))))))) (str.from_int (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y)))))))))))))))))))) 0) "-") (- (str.to_int (str.substr (str.substr z (str.indexof z (ite (< (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y)))))))))))))))) 0) (str.++ "-" (str.from_int (- (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y))))))))))))))))))) (str.from_int (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y)))))))))))))))))) (str.len (ite (< (bv2nat (bvnot x)) 0) (str.++ "-" (str.from_int (- (bv2nat (bvnot x))))) (str.from_int (bv2nat (bvnot x)))))) (str.len (ite (< (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y)))))))))))))))) 0) (str.++ "-" (str.from_int (- (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y))))))))))))))))))) (str.from_int (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y)))))))))))))))))))) 1 (str.len (str.substr z (str.indexof z (ite (< (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y)))))))))))))))) 0) (str.++ "-" (str.from_int (- (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y))))))))))))))))))) (str.from_int (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y)))))))))))))))))) (str.len (ite (< (bv2nat (bvnot x)) 0) (str.++ "-" (str.from_int (- (bv2nat (bvnot x))))) (str.from_int (bv2nat (bvnot x)))))) (str.len (ite (< (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y)))))))))))))))) 0) (str.++ "-" (str.from_int (- (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y))))))))))))))))))) (str.from_int (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y)))))))))))))))))))))))) (str.to_int (str.substr z (str.indexof z (ite (< (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y)))))))))))))))) 0) (str.++ "-" (str.from_int (- (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y))))))))))))))))))) (str.from_int (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y)))))))))))))))))) (str.len (ite (< (bv2nat (bvnot x)) 0) (str.++ "-" (str.from_int (- (bv2nat (bvnot x))))) (str.from_int (bv2nat (bvnot x)))))) (str.len (ite (< (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y)))))))))))))))) 0) (str.++ "-" (str.from_int (- (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y))))))))))))))))))) (str.from_int (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y)))))))))))))))))))))))))))))))))))))))
-		(z (str.++ (ite (< (bv2nat (bvnot x)) 0) (str.++ "-" (str.from_int (- (bv2nat (bvnot x))))) (str.from_int (bv2nat (bvnot x)))) (ite (< (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y)))))))))))))))) 0) (str.++ "-" (str.from_int (- (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y))))))))))))))))))) (str.from_int (- (bv2nat (bvneg (bvneg (bvnot (bvneg (bvnot (bvnot (bvnot (bvneg (bvneg (bvneg (bvneg (bvneg (bvneg (bvnot y))))))))))))))))))))
+		(x (to_int (- z (to_real (+ (- y) c0)))))
+		(y (- (- (to_int (- z (to_real x))) c0)))
+		(z (+ (to_real x) (to_real (+ (- y) c0))))
+	)
+)
+(subst-template :free
+	(
+		(x Bool) (y Bool) (z Bool) (c0 Bool) (c1 Bool) 
+	)
+	(
+		(x (xor (ite (distinct (not (xor y c0)) c1) (not (xor y c0)) c1) z))
+		(y (xor c0 (not (ite (distinct (not (xor y c0)) c1) (xor x z) (not (xor y c0))))))
+		(z (xor x (ite (distinct (not (xor y c0)) c1) (not (xor y c0)) c1)))
+	)
+)
+(subst-template :free
+	(
+		(x Real) (y Real) (z Real) (c0 (_ BitVec 14)) 
+	)
+	(
+		(x (- (ite (> (to_real (bv2nat c0)) (+ x y)) (+ x y) (- z)) y))
+		(y (- (ite (> (to_real (bv2nat c0)) (+ x y)) (+ x y) (- z)) x))
+		(z (- (ite (> (to_real (bv2nat c0)) (+ x y)) (to_real (bv2nat c0)) (+ x y))))
+	)
+)
+(subst-template :free
+	(
+		(x Real) (y (_ BitVec 16)) (z Real) (c0 Real) 
+	)
+	(
+		(x (/ (ite (<= (* x c0) (to_real (bv2nat y))) (- z) (* x c0)) c0))
+		(y ((_ nat2bv 16) (to_int (ite (<= (* x c0) (to_real (bv2nat y))) (to_real (bv2nat y)) (- z)))))
+		(z (- (ite (<= (* x c0) (to_real (bv2nat y))) (* x c0) (to_real (bv2nat y)))))
+	)
+)
+(subst-template :free
+	(
+		(x (_ BitVec 1)) (y (_ BitVec 1)) (z (_ BitVec 10)) (c0 (_ BitVec 9)) (c2 (_ BitVec 8)) (c1 (_ BitVec 9)) 
+	)
+	(
+		(x ((_ extract 8 8) (bvxor c1 (bvxor c0 (bvnot ((_ extract 9 1) z))))))
+		(y ((_ extract 0 0) z))
+		(z (concat (bvnot (bvxor c0 (bvxor (concat x c2) c1))) y))
+	)
+)
+(subst-template :free
+	(
+		(x (_ BitVec 8)) (y (_ BitVec 32)) (z (_ BitVec 32)) (c0 (_ BitVec 24)) 
+	)
+	(
+		(x ((_ extract 31 24) (bvnot (ite (distinct (bvnot (concat x c0)) (bvnot (bvneg y))) (bvnot (bvnot z)) (bvnot (concat x c0))))))
+		(y (bvneg (bvnot (ite (distinct (bvnot (concat x c0)) (bvnot (bvneg y))) (bvnot (bvneg y)) (bvnot (bvnot z))))))
+		(z (bvnot (bvnot (ite (distinct (bvnot (concat x c0)) (bvnot (bvneg y))) (bvnot (concat x c0)) (bvnot (bvneg y))))))
+	)
+)
+(subst-template :free
+	(
+		(x Real) (y (_ BitVec 32)) (z Real) 
+	)
+	(
+		(x (+ z (- (- (to_real (bv2nat (bvneg y)))))))
+		(y (bvneg ((_ nat2bv 32) (to_int (- (- (- x z)))))))
+		(z (- x (- (- (to_real (bv2nat (bvneg y)))))))
+	)
+)
+(subst-template :free
+	(
+		(x Int) (y Int) (z Int) (c0 Int) (c1 (_ BitVec 10)) 
+	)
+	(
+		(x (ite (<= x y) (ite (>= (ite (<= x y) x y) (ite (< c0 (bv2nat c1)) c0 (bv2nat c1))) z (ite (<= x y) x y)) x))
+		(y (ite (<= x y) y (ite (>= (ite (<= x y) x y) (ite (< c0 (bv2nat c1)) c0 (bv2nat c1))) z (ite (<= x y) x y))))
+		(z (ite (>= (ite (<= x y) x y) (ite (< c0 (bv2nat c1)) c0 (bv2nat c1))) (ite (<= x y) x y) (ite (< c0 (bv2nat c1)) c0 (bv2nat c1))))
+	)
+)
+(subst-template :free
+	(
+		(x Int) (y (_ BitVec 20)) (z Int) 
+	)
+	(
+		(x (ite (<= x (bv2nat (bvnot (bvnot (bvnot (bvnot y)))))) z x))
+		(y (bvnot (bvnot (bvnot (bvnot ((_ nat2bv 20) (ite (<= x (bv2nat (bvnot (bvnot (bvnot (bvnot y)))))) (bv2nat (bvnot (bvnot (bvnot (bvnot y))))) z)))))))
+		(z (ite (<= x (bv2nat (bvnot (bvnot (bvnot (bvnot y)))))) x (bv2nat (bvnot (bvnot (bvnot (bvnot y)))))))
+	)
+)
+(subst-template :free
+	(
+		(x (_ BitVec 16)) (y Int) (z Int) 
+	)
+	(
+		(x (bvnot (bvneg (bvnot ((_ nat2bv 16) (ite (< (bv2nat (bvnot (bvneg (bvnot x)))) y) (- z) (bv2nat (bvnot (bvneg (bvnot x))))))))))
+		(y (ite (< (bv2nat (bvnot (bvneg (bvnot x)))) y) y (- z)))
+		(z (- (ite (< (bv2nat (bvnot (bvneg (bvnot x)))) y) (bv2nat (bvnot (bvneg (bvnot x)))) y)))
+	)
+)
+(subst-template :free
+	(
+		(x Int) (y Real) (z Real) (c0 Real) (c1 Real) 
+	)
+	(
+		(x (to_int (/ z (ite (>= (ite (>= c0 c1) c0 c1) y) (ite (>= c0 c1) c0 c1) y))))
+		(y (ite (>= (ite (>= c0 c1) c0 c1) y) y (/ z (to_real x))))
+		(z (* (to_real x) (ite (>= (ite (>= c0 c1) c0 c1) y) (ite (>= c0 c1) c0 c1) y)))
 	)
 )

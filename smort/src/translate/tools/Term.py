@@ -217,7 +217,6 @@ class Term:
         find all terms t in self and add them to the list occs.
         """
         if self.equals(t, free):
-            # self.update_var_name_mapping(t, var_name_map)
             return occs.append(self)
         if self.subterms:
             for subterm in self.subterms:
@@ -369,3 +368,4 @@ class Term:
                 term_copied.pointers_map[k].extend(pointers)
             term_copied.subterms.append(t_copied)
         return term_copied 
+

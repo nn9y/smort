@@ -9,7 +9,7 @@ def preprocess(file_path):
     with open(file_path, 'r') as f:
         content = f.read()
     
-    imports = re.findall(r'\(\s*import\s+\"(.*)\"\s*\)', content)
+    imports = re.findall(r'(?<!;)\(\s*import\s+\"(.*)\"\s*\)', content)
 
     if len(imports) == 0:
         return file_path

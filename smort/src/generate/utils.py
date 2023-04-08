@@ -75,16 +75,18 @@ def random_tuple_list(lsts, dups, multiple_substs=False):
     return new_tups
 
 
-def random_term_tuples(formulas, templates, multiple_substs, valid_index_list):
+def random_term_tuples(formulas, templates, multiple_substs, index_list):
     """
-    :return: a list, index is mapping to index of templates:
-        [0]: a list of random term (to be replaced) tuples
-        [1]: a dict mapping from var name in the template to var name in actual formulas
+    :return: a list of 3-tuples:
+        [0]: index of mr.subst_templates
+        [1]: a list of random term (to be replaced) tuples
+        [2]: a dict mapping from var name in the template to var name in actual formulas
     """
     lst = []
     # make sure no term will be replaced more than once in each generation, which may cause invalid formula
     dups = [[] for _ in range(len(formulas))]
-    for k, template in enumerate(templates): 
+    for k in index_list: 
+        template = templates[k]
         term_occs_list = []
         for i, formula in enumerate(formulas):
             term_occs = []
@@ -92,7 +94,7 @@ def random_term_tuples(formulas, templates, multiple_substs, valid_index_list):
             # assuming assertions have been merged into single one in each formula
             # formula.assert_cmds[0].term.find_all_terms(term, term_occs, template.free)
             # here occs list are already "deepcopied"
-            term_occs = formula.assert_cmds[0].term.pointers_map[valid_index_list[k]]
+            term_occs = formula.assert_cmds[0].term.pointers_map[k]
             term_occs_list.append(term_occs)
         rnd_tuples = random_tuple_list(term_occs_list, dups, multiple_substs)
         var_name_maps = []
@@ -106,7 +108,7 @@ def random_term_tuples(formulas, templates, multiple_substs, valid_index_list):
                 if not var in var_name_map:
                     var_name_map[var] = f"{var}_random{k}_{i}"
             var_name_maps.append(var_name_map)
-        lst.append([rnd_tuples, var_name_maps])
+        lst.append((k, rnd_tuples, var_name_maps))
     return lst 
 
 
@@ -118,17 +120,19 @@ def find_valid_templates(formulas, templates):
             term, _ = template.repl_pairs[i]
             term_occs = []
             # assuming assertions have been merged into single one in each formula
-            assert_term = formula.assert_cmds[0].term
-            if k in assert_term.pointers_map:
-                term_occs = assert_term.pointers_map[k]
-            else:
-                formula.assert_cmds[0].term.find_all_terms(term, term_occs, template.free)
+            # assert_term = formula.assert_cmds[0].term
+            # if k in assert_term.pointers_map:
+            #     term_occs = assert_term.pointers_map[k]
+            # else:
+            #     formula.assert_cmds[0].term.find_all_terms(term, term_occs, template.free)
+            #     # save occs list
+            #     formula.assert_cmds[0].term.pointers_map[k] = term_occs
+            formula.assert_cmds[0].term.find_all_terms(term, term_occs, template.free)
+            formula.assert_cmds[0].term.pointers_map[k] = term_occs
             # invalid template
             if len(term_occs) == 0:
                 matched = False
                 break 
-            # save occs list
-            formula.assert_cmds[0].term.pointers_map[k] = term_occs
         if matched:
             valid_index_list.append(k)
     return valid_index_list 
