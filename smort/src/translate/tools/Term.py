@@ -1,5 +1,6 @@
 import copy
 from enum import Enum
+from collections import defaultdict
 
 from smort.src.tools.utils import list2str
 from smort.src.translate.tools.utils import *
@@ -102,6 +103,7 @@ class Term:
         annotations=[],
         local_free_vars={},
         qual_id=False,
+        pointers_map={},
     ):
         self._set(
             name=name,
@@ -116,6 +118,7 @@ class Term:
             annotations=annotations,
             local_free_vars=local_free_vars,
             qual_id=qual_id,
+            pointers_map=pointers_map,
         )
  
     def _set(
@@ -132,6 +135,7 @@ class Term:
         annotations=None,
         local_free_vars=None,
         qual_id=False,
+        pointers_map=None,
     ):
         self.name = name
         self.sort = sort
@@ -145,6 +149,7 @@ class Term:
         self.annotations = annotations
         self.local_free_vars = local_free_vars
         self.qual_id = qual_id
+        self.pointers_map = pointers_map
 
     def equals(self, other, free=False):
         """
@@ -251,6 +256,7 @@ class Term:
                 annotations=copy.deepcopy(r.annotations),
                 local_free_vars=occ.local_free_vars,
                 qual_id=occ.qual_id,
+                pointers_map=occ.pointers_map,
             )
 
     def replace_symbols_by_terms(self, repl_dict):
@@ -273,6 +279,7 @@ class Term:
                 annotations=copy.deepcopy(repl.annotations),
                 local_free_vars=copy.deepcopy(repl.local_free_vars),
                 qual_id=copy.deepcopy(repl.qual_id),
+                pointers_map=copy.deepcopy(repl.pointers_map),
             )
             return
         for t in self.subterms:
@@ -329,6 +336,36 @@ class Term:
                 else:
                     return f"({self.name} {list2str(self.subterms)})"
 
-    
     def __repr__(self):
         return self.__str__()
+    
+    def __deepcopy__(self, memo):
+        """
+        also "deepcopy" pointers map
+        """
+        term_copied = Term(
+            name=copy.deepcopy(self.name),
+            sort=copy.deepcopy(self.sort),
+            term_type=copy.deepcopy(self.term_type),
+            var_bindings=copy.deepcopy(self.var_bindings),
+            quantifier=copy.deepcopy(self.quantifier),
+            sorted_vars=copy.deepcopy(self.sorted_vars),
+            match_cases=copy.deepcopy(self.match_cases),
+            bound_vars=copy.deepcopy(self.bound_vars),
+            annotations=copy.deepcopy(self.annotations),
+            local_free_vars=copy.deepcopy(self.local_free_vars),
+            qual_id=copy.deepcopy(self.qual_id),
+        )
+        memo[id(self)] = term_copied 
+        term_copied.pointers_map = defaultdict(list) 
+        for k, pointers in self.pointers_map.items():
+            if self in pointers:
+                term_copied.pointers_map[k].append(term_copied)
+        term_copied.subterms = []
+        for t in self.subterms:
+            t.pointers_map = self.pointers_map
+            t_copied = copy.deepcopy(t, memo)
+            for k, pointers in t_copied.pointers_map.items():
+                term_copied.pointers_map[k].extend(pointers)
+            term_copied.subterms.append(t_copied)
+        return term_copied 

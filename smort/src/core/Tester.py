@@ -40,7 +40,7 @@ class Tester:
         self.name = random_string()
         self.timeout_of_current_seeds = 0
 
-        config_logging("smort", self.args.quiet, self.name, self.args.bugfolder)
+        config_logging("smort", self.args.quiet, self.name, self.args.logfolder)
 
     def process_seed(self, seed):
         if seed in self.scripts:
