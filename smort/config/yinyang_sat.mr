@@ -1,0 +1,11 @@
+(seed s1 sat)
+(seed s2 sat)
+(morph m sat)
+
+(notation x s1)
+(notation y s2)
+(notation z :var)
+
+(import "fusion_functions.txt")
+
+(fuse (and s1 s2))

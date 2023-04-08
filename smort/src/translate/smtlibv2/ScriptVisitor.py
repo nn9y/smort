@@ -559,7 +559,7 @@ class ScriptVisitor(SMTLIBv2Visitor):
         parsorts = sort.parsorts
         if isinstance(parsorts, list) and len(parsorts) > 0:
             par_dict = {}
-            name = sort.name
+            name = sort.id_
             if str(name) in self.datatypes:
                 sort_template = self.datatypes(str(name))
                 if len(sort_template.parsorts) == len(parsorts):

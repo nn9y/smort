@@ -27,13 +27,13 @@ duplicate_list = [
 ]
 
 ignore_list = [
+    "Parse Error",
     "(error ",
     "unsupported",
     "unexpected char",
     "failed to open file",
     "Expected result sat but got unsat",
     "Expected result unsat but got sat",
-    "Parse Error",
     "Cannot get model",
     "Symbol 'str.to-re' not declared as a variable",
     "Unimplemented code encountered",

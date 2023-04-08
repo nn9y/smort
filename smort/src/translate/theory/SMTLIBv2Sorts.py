@@ -134,26 +134,26 @@ def random_constant_value(sort):
                 sort=ROUNDING_MODE
                 )
     elif sort.same_indexed_type(BIT_VECTOR):
-        bitwidth = sort.name.indices[0]
+        bitwidth = sort.id_.indices[0]
         return _random_bitvec_literal(bitwidth)
     elif sort.same_indexed_type(FLOATING_POINT):
-        eb, sb = sort.name.indices
+        eb, sb = sort.id_.indices
         return _random_fp_literal(eb, sb)
     elif sort == FLOAT16:
         fp_sort = synonym2fp[FLOAT16_NAME]
-        eb, sb = fp_sort.name.indices
+        eb, sb = fp_sort.id_.indices
         return _random_fp_literal(eb, sb)
     elif sort == FLOAT32:
         fp_sort = synonym2fp[FLOAT32_NAME]
-        eb, sb = fp_sort.name.indices
+        eb, sb = fp_sort.id_.indices
         return _random_fp_literal(eb, sb)
     elif sort == FLOAT64:
         fp_sort = synonym2fp[FLOAT64_NAME]
-        eb, sb = fp_sort.name.indices
+        eb, sb = fp_sort.id_.indices
         return _random_fp_literal(eb, sb)
     elif sort == FLOAT128:
         fp_sort = synonym2fp[FLOAT128_NAME]
-        eb, sb = fp_sort.name.indices
+        eb, sb = fp_sort.id_.indices
         return _random_fp_literal(eb, sb)
     elif sort == STRING:
         length = random.randint(0, 20)
