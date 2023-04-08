@@ -40,5 +40,5 @@ ignore_list = [
 ]
 
 filesize = 100000
-iterations = 50
+iterations = 30
 timeout = 8 

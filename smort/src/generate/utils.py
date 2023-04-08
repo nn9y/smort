@@ -119,7 +119,11 @@ def find_valid_templates(formulas, templates):
             term, _ = template.repl_pairs[i]
             term_occs = []
             # assuming assertions have been merged into single one in each formula
-            formula.assert_cmds[0].term.find_all_terms(term, term_occs, template.free)
+            assert_term = formula.assert_cmds[0].term
+            if valid_count in assert_term.pointers_map:
+                term_occs = assert_term.pointers_map[valid_count]
+            else:
+                formula.assert_cmds[0].term.find_all_terms(term, term_occs, template.free)
             # invalid template
             if len(term_occs) == 0:
                 matched = False

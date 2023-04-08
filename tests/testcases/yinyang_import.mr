@@ -1,0 +1,12 @@
+(seed s1 sat)
+(seed s2 sat)
+(morph m sat)
+
+(notation x s1)
+(notation y s2)
+(notation z :var)
+(notation c :cons)
+
+(import "yinyang_templates.txt")
+
+(fuse (and s1 s2))

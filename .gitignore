@@ -3,3 +3,4 @@ examples
 *.pyc
 .vscode
 .smort
+tmp

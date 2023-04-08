@@ -1,0 +1,2 @@
+(subst-template :free ((x Int) (y Int) (z Int)) ((x (div z y)) (y (div z x)) (z (* x y))) )
+(subst-template :free ( (x String) (y String) (z String) (c String) ) ( (x (str.substr z 0 (str.len x))) ( y (str.replace (str.replace z x "") c "")) ( z (str.++ (str.++ x c) y)) ) )
