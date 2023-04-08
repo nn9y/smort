@@ -75,7 +75,7 @@ def random_tuple_list(lsts, dups, multiple_substs=False):
     return new_tups
 
 
-def random_term_tuples(formulas, templates, multiple_substs=False):
+def random_term_tuples(formulas, templates, multiple_substs, valid_index_list):
     """
     :return: a list, index is mapping to index of templates:
         [0]: a list of random term (to be replaced) tuples
@@ -92,7 +92,7 @@ def random_term_tuples(formulas, templates, multiple_substs=False):
             # assuming assertions have been merged into single one in each formula
             # formula.assert_cmds[0].term.find_all_terms(term, term_occs, template.free)
             # here occs list are already "deepcopied"
-            term_occs = formula.assert_cmds[0].term.pointers_map[k]
+            term_occs = formula.assert_cmds[0].term.pointers_map[valid_index_list[k]]
             term_occs_list.append(term_occs)
         rnd_tuples = random_tuple_list(term_occs_list, dups, multiple_substs)
         var_name_maps = []
@@ -112,7 +112,6 @@ def random_term_tuples(formulas, templates, multiple_substs=False):
 
 def find_valid_templates(formulas, templates):
     valid_index_list = []
-    valid_count = 0
     for k, template in enumerate(templates):
         matched = True
         for i, formula in enumerate(formulas):
@@ -120,8 +119,8 @@ def find_valid_templates(formulas, templates):
             term_occs = []
             # assuming assertions have been merged into single one in each formula
             assert_term = formula.assert_cmds[0].term
-            if valid_count in assert_term.pointers_map:
-                term_occs = assert_term.pointers_map[valid_count]
+            if k in assert_term.pointers_map:
+                term_occs = assert_term.pointers_map[k]
             else:
                 formula.assert_cmds[0].term.find_all_terms(term, term_occs, template.free)
             # invalid template
@@ -129,10 +128,9 @@ def find_valid_templates(formulas, templates):
                 matched = False
                 break 
             # save occs list
-            formula.assert_cmds[0].term.pointers_map[valid_count] = term_occs
+            formula.assert_cmds[0].term.pointers_map[k] = term_occs
         if matched:
             valid_index_list.append(k)
-            valid_count += 1
     return valid_index_list 
   
 
@@ -140,6 +138,7 @@ def call_function_from_module(path, function_name, *args):
     module = importlib.import_module(path)
     function = getattr(module, function_name)
     return function(*args)
+
 
 def generate_additions(template, notations, var_name_map, decls, defs, asserts):
     # generate new variables and constants
@@ -162,6 +161,7 @@ def generate_additions(template, notations, var_name_map, decls, defs, asserts):
                             break
                     # asserts.append(Assert(term=Expr(name=Identifier("="), subterms=[Var(var), repl])))
                     asserts.append(Assert(term=Expr(name="=", subterms=[Var(var), repl])))
+
 
 def replace(template, term_tup, var_name_map, formulas):
     # replace terms in seed formulas

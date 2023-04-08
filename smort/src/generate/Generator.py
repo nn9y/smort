@@ -107,7 +107,7 @@ class Generator:
             for i, formula in enumerate(formulas):
                 formula.prefix_vars(f"seed{i}_")
             self.substs_list = random_term_tuples(
-                formulas, templates, self.args.multiple_substs
+                formulas, templates, self.args.multiple_substs, self.valid_index_list
             )
             decls = []
             defs = []
