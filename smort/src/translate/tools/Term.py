@@ -331,9 +331,15 @@ class Term:
                     return f"{self.name}"
             case TermType.EXPR:
                 if self.qual_id:
-                    return f"((as {self.name} {self.sort}) {list2str(self.subterms)})"
+                    expr = f"((as {self.name} {self.sort}) {list2str(self.subterms)})"
+                    if len(self.subterms) == 0:
+                        return expr[1:-1]
+                    return expr 
                 else:
-                    return f"({self.name} {list2str(self.subterms)})"
+                    expr = f"({self.name} {list2str(self.subterms)})"
+                    if len(self.subterms) == 0:
+                        return expr[1:-1]
+                    return expr 
 
     def __repr__(self):
         return self.__str__()
