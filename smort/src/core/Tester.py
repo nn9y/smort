@@ -53,7 +53,7 @@ class Tester:
             script = translate_script_file(seed, 100, silent=False)
             script.merge_asserts()
             self.scripts[seed] = script
-            self.currentseeds.append(pathlib.Path(seed).stem)
+        self.currentseeds.append(pathlib.Path(seed).stem)
 
         if not script:
             self.statistic.invalid_seeds += 1
