@@ -53,7 +53,7 @@ class Tester:
             script = translate_script_file(seed, 100, silent=False)
             script.merge_asserts()
             self.scripts[seed] = script
-            self.currentseeds.append(pathlib.Path(seed).stem)
+        self.currentseeds.append(pathlib.Path(seed).stem)
 
         if not script:
             self.statistic.invalid_seeds += 1
@@ -128,11 +128,12 @@ class Tester:
     def test(self, solver_cmds, script, iteration, generation):
         """
         Tests the solvers on the provided script.
-        Checks for crashes, segfaults, invalid models and soundness issues, ignores duplicates.
-        Stores bug triggers in ./bugs along with .record files for bug reproduction.
+        checks for crashes, segfaults, invalid models and soundness issues, ignores duplicates.
+        stores bug triggers in ./bugs along with .record files for bug reproduction.
 
         :returns:   continue generating morphs using current seeds, testfile (generated script file)
         """
+        print(self.currentseeds)
         test_list = create_test_list(script, solver_cmds, self.args.testfolder, self.currentseeds, self.name)
         for testitem in test_list:
             solver_cmd, testfile = testitem
