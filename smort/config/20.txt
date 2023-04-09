@@ -1,0 +1,205 @@
+; Generated with: https://github.com/nicdard/fusion-function-generator
+; 20 functions (number of subst-template blocks)
+; 5 operators per function
+
+(subst-template :free
+	(
+		(x Int) (y Int) (z Int) 
+	)
+	(
+		(x (ite (>= x y) z x))
+		(y (ite (>= x y) y z))
+		(z (ite (>= x y) x y))
+	)
+)
+(subst-template :free
+	(
+		(x Int) (y Int) (z Int) 
+	)
+	(
+		(x (+ z y))
+		(y (- x z))
+		(z (- x y))
+	)
+)
+(notation c0 :cons)
+(subst-template :free
+	(
+		(x (_ BitVec 1)) (y (_ BitVec 20)) (z (_ BitVec 20)) (c0 (_ BitVec 19)) 
+	)
+	(
+		(x ((_ extract 19 19) (bvxor y z)))
+		(y (bvxor (concat x c0) z))
+		(z (bvxor (concat x c0) y))
+	)
+)
+(subst-template :free
+	(
+		(x Real) (y Real) (z Real) 
+	)
+	(
+		(x (- z y))
+		(y (- z x))
+		(z (+ x y))
+	)
+)
+(subst-template :free
+	(
+		(x Bool) (y Bool) (z Bool) 
+	)
+	(
+		(x (ite (=> x y) z x))
+		(y (ite (=> x y) y z))
+		(z (ite (=> x y) x y))
+	)
+)
+(subst-template :free
+	(
+		(x Int) (y Int) (z Int) 
+	)
+	(
+		(x (div z y))
+		(y (div z x))
+		(z (* x y))
+	)
+)
+(subst-template :free
+	(
+		(x Bool) (y Bool) (z Bool) 
+	)
+	(
+		(x (ite (or x y) z x))
+		(y (ite (or x y) y z))
+		(z (ite (or x y) x y))
+	)
+)
+(subst-template :free
+	(
+		(x Real) (y Real) (z Real) 
+	)
+	(
+		(x (+ z y))
+		(y (- x z))
+		(z (- x y))
+	)
+)
+(subst-template :free
+	(
+		(x String) (y String) (z String) 
+	)
+	(
+		(x (str.substr z 0 (str.indexof z y (str.len x))))
+		(y (str.substr z (str.len x) (str.len y)))
+		(z (str.++ x y))
+	)
+)
+(subst-template :free
+	(
+		(x Int) (y Int) (z Int) 
+	)
+	(
+		(x (- z y))
+		(y (- z x))
+		(z (+ x y))
+	)
+)
+(subst-template :free
+	(
+		(x (_ BitVec 20)) (y (_ BitVec 8)) (z (_ BitVec 20)) (c0 (_ BitVec 12)) 
+	)
+	(
+		(x (ite (distinct x (concat y c0)) z x))
+		(y ((_ extract 19 12) (ite (distinct x (concat y c0)) (concat y c0) z)))
+		(z (ite (distinct x (concat y c0)) x (concat y c0)))
+	)
+)
+(subst-template :free
+	(
+		(x String) (y String) (z String) 
+	)
+	(
+		(x (str.substr z 0 (str.indexof z y (str.len x))))
+		(y (str.substr z (str.len x) (str.len y)))
+		(z (str.++ x y))
+	)
+)
+(subst-template :free
+	(
+		(x String) (y String) (z String) 
+	)
+	(
+		(x (str.substr z 0 (str.indexof z y (str.len x))))
+		(y (str.substr z (str.indexof z y (str.len x)) (str.len y)))
+		(z (str.++ x y))
+	)
+)
+(subst-template :free
+	(
+		(x Real) (y Real) (z Real) 
+	)
+	(
+		(x (+ z y))
+		(y (- x z))
+		(z (- x y))
+	)
+)
+(subst-template :free
+	(
+		(x Real) (y Real) (z Real) 
+	)
+	(
+		(x (- z y))
+		(y (- z x))
+		(z (+ x y))
+	)
+)
+(subst-template :free
+	(
+		(x Int) (y Int) (z Int) 
+	)
+	(
+		(x (- z y))
+		(y (- z x))
+		(z (+ x y))
+	)
+)
+(subst-template :free
+	(
+		(x String) (y String) (z String) 
+	)
+	(
+		(x (ite (str.prefixof x y) z x))
+		(y (ite (str.prefixof x y) y z))
+		(z (ite (str.prefixof x y) x y))
+	)
+)
+(subst-template :free
+	(
+		(x (_ BitVec 8)) (y (_ BitVec 32)) (z (_ BitVec 40)) 
+	)
+	(
+		(x ((_ extract 39 32) z))
+		(y ((_ extract 31 0) z))
+		(z (concat x y))
+	)
+)
+(subst-template :free
+	(
+		(x Bool) (y Bool) (z Bool) 
+	)
+	(
+		(x (ite (or x y) z x))
+		(y (ite (or x y) y z))
+		(z (ite (or x y) x y))
+	)
+)
+(subst-template :free
+	(
+		(x Int) (y Int) (z Int) 
+	)
+	(
+		(x (+ z y))
+		(y (- x z))
+		(z (- x y))
+	)
+)

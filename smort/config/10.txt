@@ -1,0 +1,105 @@
+; Generated with: https://github.com/nicdard/fusion-function-generator
+; 10 functions (number of subst-template blocks)
+; 5 operators per function
+
+(subst-template :free
+	(
+		(x Bool) (y Bool) (z Bool) 
+	)
+	(
+		(x (ite (distinct x y) z x))
+		(y (ite (distinct x y) y z))
+		(z (ite (distinct x y) x y))
+	)
+)
+(subst-template :free
+	(
+		(x Real) (y Real) (z Real) 
+	)
+	(
+		(x (ite (< x y) z x))
+		(y (ite (< x y) y z))
+		(z (ite (< x y) x y))
+	)
+)
+(subst-template :free
+	(
+		(x Real) (y Real) (z Real) 
+	)
+	(
+		(x (+ z y))
+		(y (- x z))
+		(z (- x y))
+	)
+)
+(subst-template :free
+	(
+		(x (_ BitVec 16)) (y (_ BitVec 64)) (z (_ BitVec 80)) 
+	)
+	(
+		(x ((_ extract 79 64) z))
+		(y ((_ extract 63 0) z))
+		(z (concat x y))
+	)
+)
+(subst-template :free
+	(
+		(x String) (y String) (z String) 
+	)
+	(
+		(x (str.substr z 0 (str.indexof z y (str.len x))))
+		(y (str.substr z (str.indexof z y (str.len x)) (str.len y)))
+		(z (str.++ x y))
+	)
+)
+(subst-template :free
+	(
+		(x Real) (y Real) (z Real) 
+	)
+	(
+		(x (- z y))
+		(y (- z x))
+		(z (+ x y))
+	)
+)
+(subst-template :free
+	(
+		(x Bool) (y Bool) (z Bool) 
+	)
+	(
+		(x (ite (distinct x y) z x))
+		(y (ite (distinct x y) y z))
+		(z (ite (distinct x y) x y))
+	)
+)
+(subst-template :free
+	(
+		(x String) (y String) (z String) 
+	)
+	(
+		(x (ite (str.<= x y) z x))
+		(y (ite (str.<= x y) y z))
+		(z (ite (str.<= x y) x y))
+	)
+)
+(subst-template :free
+	(
+		(x Real) (y Real) (z Real) 
+	)
+	(
+		(x (ite (< x y) z x))
+		(y (ite (< x y) y z))
+		(z (ite (< x y) x y))
+	)
+)
+(notation c0 :cons)
+(subst-template :free
+	(
+		(x (_ BitVec 8)) (y (_ BitVec 1)) (z (_ BitVec 8)) (c0 (_ BitVec 7)) 
+	)
+	(
+		(x (ite (distinct x (concat y c0)) z x))
+		(y ((_ extract 7 7) (ite (distinct x (concat y c0)) (concat y c0) z)))
+		(z (ite (distinct x (concat y c0)) x (concat y c0)))
+	)
+)

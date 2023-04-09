@@ -41,9 +41,9 @@ def get_all_seed_files(seed_path_list):
 
 def stats_control_c(sig, frame, tester):
     print("\b\b\rUser interrupt", flush=True)
-    tester.printsum_exit(False)
+    tester.printsummary_exit(False)
 
 
 def silent_control_c(sig, frame, tester):
-    tester.printsum_exit(True)
+    tester.printsummary_exit(True)
 

@@ -6,6 +6,6 @@
 (notation y s2)
 (notation z :var :gen)
 
-(import "fusion_functions.txt")
+(import "5.txt")
 
 (fuse (or s1 s2))

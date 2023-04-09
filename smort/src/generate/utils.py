@@ -92,9 +92,9 @@ def random_term_tuples(formulas, templates, multiple_substs, index_list):
             term_occs = []
             term, _ = template.repl_pairs[i]
             # assuming assertions have been merged into single one in each formula
-            # formula.assert_cmds[0].term.find_all_terms(term, term_occs, template.free)
+            formula.assert_cmds[0].term.find_all_terms(term, term_occs, template.free)
             # here occs list are already "deepcopied"
-            term_occs = formula.assert_cmds[0].term.pointers_map[k]
+            # term_occs = formula.assert_cmds[0].term.pointers_map[k]
             term_occs_list.append(term_occs)
         rnd_tuples = random_tuple_list(term_occs_list, dups, multiple_substs)
         var_name_maps = []
@@ -128,7 +128,7 @@ def find_valid_templates(formulas, templates):
             #     # save occs list
             #     formula.assert_cmds[0].term.pointers_map[k] = term_occs
             formula.assert_cmds[0].term.find_all_terms(term, term_occs, template.free)
-            formula.assert_cmds[0].term.pointers_map[k] = term_occs
+            # formula.assert_cmds[0].term.pointers_map[k] = term_occs
             # invalid template
             if len(term_occs) == 0:
                 matched = False
@@ -160,11 +160,12 @@ def generate_additions(template, notations, var_name_map, decls, defs, asserts):
                 if attr.keyword == SMTMRKeyword.GEN:
                     # operator = Identifier(attr.value)
                     for t, r in template.repl_pairs:
-                        if t.term_type == TermType.VAR and t.name == var:
-                            repl = r.replace_var_name(var_name_map) 
+                        if t.term_type == TermType.VAR and str(t.name) == var:
+                            repl = copy.deepcopy(r)
+                            repl.replace_var_name(var_name_map)
                             break
                     # asserts.append(Assert(term=Expr(name=Identifier("="), subterms=[Var(var), repl])))
-                    asserts.append(Assert(term=Expr(name="=", subterms=[Var(var), repl])))
+                    asserts.append(Assert(term=Expr(name="=", subterms=[Var(mapped_name), repl])))
 
 
 def replace(template, term_tup, var_name_map, formulas):

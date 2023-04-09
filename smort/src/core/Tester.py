@@ -72,35 +72,6 @@ class Tester:
             script = self.process_seed(seed)
             scripts.append(script)
         return scripts
-    
-    def run(self):
-        if self.args.sat_seeds:
-            translate_sat = threading.Thread(target=self.translate_sat_scripts)
-            translate_sat.start()
-            translate_sat.join()
-        if self.args.unsat_seeds:
-            translate_unsat = threading.Thread(target=self.translate_unsat_scripts)
-            translate_unsat.start()
-            translate_unsat.join()
-        run_testing = threading.Thread(target=self.run_test)
-        run_testing.start()
-        run_testing.join()
-    
-    def translate_sat_scripts(self):
-        self.translate_scripts(self.args.sat_seeds)
-    
-    def translate_unsat_scripts(self):
-        self.translate_scripts(self.args.unsat_seeds)
- 
-    def translate_scripts(self, seeds):
-        for seed in seeds:
-            if seed not in self.scripts:
-                if not admissible_seed_size(seed, self.args.file_size):
-                    self.statistic.invalid_seeds += 1
-                    logging.debug(f"Skip invalid seed: exceeds max file size: {self.args.file_size}")
-                script = translate_script_file(seed, 100, silent=False)
-                script.merge_asserts()
-                self.scripts[seed] = script
 
     def run_test(self):
         """
@@ -119,36 +90,38 @@ class Tester:
                     continue
 
             self.generator = Generator(scripts, self.mr, self.args)
+            if len(self.generator.valid_index_list) == 0:
+                log_iterations_attempt(0)
+            else:
+                log_iterations_attempt(self.args.iterations)
 
-            log_iterations_attempt(self.args.iterations)
-
-            solver_cmds = copy.deepcopy(self.args.SOLVER_CMDS)
-            self.timeout_of_current_seeds = 0
-            total_iterations = 0
-            total_generations = 0
-            for i in range(self.args.iterations):
-                self.printbar()
-                generate_further = True
-                end_iteration = False
-                gens = 0
-                while not end_iteration:
-                    morph, end_iteration = self.generator.generate()
-                    gens += 1
-                    total_generations += 1
-                    generate_further, testfile = self.test(solver_cmds, morph, i+1, gens)
-                    if (len(solver_cmds) == 0) or (not generate_further):
-                        log_skip_seeds_group(self.args.iterations, i+1, gens)
+                solver_cmds = copy.deepcopy(self.args.SOLVER_CMDS)
+                self.timeout_of_current_seeds = 0
+                total_iterations = 0
+                total_generations = 0
+                for i in range(self.args.iterations):
+                    self.printbar()
+                    generate_further = True
+                    end_iteration = False
+                    gens = 0
+                    while not end_iteration:
+                        morph, end_iteration = self.generator.generate()
+                        gens += 1
+                        total_generations += 1
+                        generate_further, testfile = self.test(solver_cmds, morph, i+1, gens)
+                        if (len(solver_cmds) == 0) or (not generate_further):
+                            log_skip_seeds_group(self.args.iterations, i+1, gens)
+                            break
+                        self.statistic.morphs += 1
+                        if not self.args.keep_morphs:
+                            os.remove(testfile)
+                    total_iterations += 1
+                    if not generate_further:
+                        # break outer loop
                         break
-                    self.statistic.morphs += 1
-                    if not self.args.keep_morphs:
-                        os.remove(testfile)
-                total_iterations += 1
-                if not generate_further:
-                    # break outer loop
-                    break
 
-            log_finished_iterations(total_iterations)
-            log_finished_generations(total_generations)
+                log_finished_iterations(total_iterations)
+                log_finished_generations(total_generations)
 
         self.terminate()
     
@@ -219,9 +192,9 @@ class Tester:
 
         return (True, testfile)
 
-    def printsum_exit(self, quiet):
+    def printsummary_exit(self, quiet):
         if not quiet:
-            self.statistic.printsum()
+            self.statistic.printsummary()
         self.statistic.check_bugs()
     
     def printbar(self):
@@ -236,8 +209,8 @@ class Tester:
             self.last_time = time.time()
 
     def terminate(self):
-        print("All seeds processed", flush=True)
-        self.printsum_exit(self.args.quiet)
+        print("All seeds groups processed", flush=True)
+        self.printsummary_exit(self.args.quiet)
 
     def __del__(self):
         for fn in os.listdir(self.args.testfolder):

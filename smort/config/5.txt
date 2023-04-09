@@ -1,0 +1,55 @@
+; Generated with: https://github.com/nicdard/fusion-function-generator
+; 5 functions (number of subst-template blocks)
+; 5 operators per function
+
+(subst-template :free
+	(
+		(x Real) (y Real) (z Real) 
+	)
+	(
+		(x (+ z y))
+		(y (- x z))
+		(z (- x y))
+	)
+)
+(subst-template :free
+	(
+		(x Real) (y Real) (z Real) 
+	)
+	(
+		(x (ite (> x y) z x))
+		(y (ite (> x y) y z))
+		(z (ite (> x y) x y))
+	)
+)
+(notation c0 :cons)
+(subst-template :free
+	(
+		(x (_ BitVec 16)) (y (_ BitVec 20)) (z (_ BitVec 20)) (c0 (_ BitVec 4)) 
+	)
+	(
+		(x ((_ extract 19 4) (ite (distinct (concat x c0) y) z (concat x c0))))
+		(y (ite (distinct (concat x c0) y) y z))
+		(z (ite (distinct (concat x c0) y) (concat x c0) y))
+	)
+)
+(subst-template :free
+	(
+		(x Bool) (y Bool) (z Bool) 
+	)
+	(
+		(x (xor y z))
+		(y (xor x z))
+		(z (xor x y))
+	)
+)
+(subst-template :free
+	(
+		(x Int) (y Int) (z Int) 
+	)
+	(
+		(x (div z y))
+		(y (div z x))
+		(z (* x y))
+	)
+)

@@ -50,6 +50,7 @@ def evaluate_test(stdout, stderr, exitcode, oracle):
                 return TEST_TIMEOUT
         result = grep_checksat_result(stdout)
         if result == None:
+            print(stdout + " " + stderr)
             return TEST_INVALID
         else:
             # a valid test

@@ -38,10 +38,10 @@ class Statistic:
 ({solver_calls_per_sec} calls/s, eff: {eff_str}, {morphs_per_sec} morphs/s)"
         logging.info(bar)
 
-    def printsum(self):
+    def printsummary(self):
         valid_seeds = self.total_seeds - self.invalid_seeds
         num_bugs = self.crashes + self.soundness
-        summary = f"\b\b{self.total_seeds} seeds processed, \
+        summary = f"\b\b{self.total_seeds} seeds groups processed, \
 {valid_seeds} valid, {self.invalid_seeds} invalid \n{num_bugs} bug triggers found"
         print(summary)
 

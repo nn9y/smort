@@ -31,7 +31,7 @@ def main():
             else:
                 signal.signal(signal.SIGINT, lambda signum, frame: silent_control_c(signum, frame, tester))
 
-            tester.run()
+            tester.run_test()
 
         except Exception as e:
             trace = inspect.trace()

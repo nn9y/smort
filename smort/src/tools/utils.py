@@ -70,5 +70,7 @@ def in_list(stdout, stderr, lst):
     stdstream = f"{stdout} {stderr}"
     for err in lst:
         if err in stdstream:
+            print(err)
+            print(stdstream)
             return True 
     return False 
