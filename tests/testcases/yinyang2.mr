@@ -7,7 +7,7 @@
 (notation z :var :gen)
 (notation c :cons)
 
-(subst-template :free ((x (_ BitVec 8)) (y (_ BitVec 8)) (z (_ BitVec 8))) ( (x (bvxor z y)) (y (bvxor z x)) (z (bvxor x y)) ) )
-(subst-template :free ( (x String) (y String) (z String) (c String) ) ( (x (str.substr z 0 (str.len x))) ( y (str.replace (str.replace z x "") c "")) ( z (str.++ (str.++ x c) y)) ) )
+(subst-template :global-free :inwards ((x (_ BitVec 8)) (y (_ BitVec 8)) (z (_ BitVec 8))) ( (x (bvxor z y)) (y (bvxor z x)) (z (bvxor x y)) ) )
+(subst-template :global-free :inwards ( (x String) (y String) (z String) (c String) ) ( (x (str.substr z 0 (str.len x))) ( y (str.replace (str.replace z x "") c "")) ( z (str.++ (str.++ x c) y)) ) )
 
 (fuse (or s1 s2))

@@ -1,7 +1,5 @@
 import copy
-import re
 from inspect import isfunction
-from collections import defaultdict
 
 from smort.src.translate.tools.Term import *
 from smort.src.translate.tools.Sort import *
@@ -9,17 +7,17 @@ from smort.src.translate.theory.utils import *
 
 
 class Fun:
-    def __init__(self, name, input_list, output: Sort, par_list=None, constraints=None, get_output_indices=None):
-        self.name = name    # Identifier or SpecConstantType
-        self.input_list = input_list
+    def __init__(self, name, inputs, output, par_list=None, constraints=None, get_output_indices=None):
+        self.name = name        # Identifier or SpecConstantType
+        self.inputs = inputs    # list or set of Sort
         self.output = output
         self.par_list = par_list
         self.constraints = constraints
         self.get_output_indices = get_output_indices
   
-    def match_term(self, name, input_list, output=None):
+    def match_term(self, name, inputs):
         """
-        check if an term(expr)'s name and input_list (, output) match this fun
+        check if an term's name and inputs match this fun
         """
         name_type = type(self.name)
         if type(name) != name_type:
@@ -28,56 +26,78 @@ class Fun:
             return False
         if (name_type == Identifier) and (self.name != name):
             return False
-        if self.input_list != input_list:
-            return False
-        if output and output != self.output:    # use qual_identifier in grammar
+        if isinstance(self.inputs, set):
+            for inp in inputs:
+                if inp not in self.inputs:
+                    return False
+        elif self.inputs != inputs:
             return False
         return True
  
-    def match_indexed_term(self, name, input_list):
+    def match_indexed_term(self, name, inputs):
         """
-        check if an term(expr)'s name and input_list match this indexed fun
-        output are checked later when qual_identifier exists in grammar
+        check if an term's name and inputs match this indexed fun
         """
         name_type = type(self.name)
         if type(name) != name_type:
             return False
-        if (name_type == SpecConstant) and (self.name.const_type != name.const_type):
-            return False
-        if (name_type == Identifier) and (not self.name.same_indexed_type(name)):
-            return False
-        if len(self.input_list) != len(input_list):
-            return False
-        for i, input_sort in enumerate(self.input_list):
-            if not input_sort.same_indexed_type(input_list[i]):
+        if name_type == SpecConstant:
+            if self.name.const_type != name.const_type:
                 return False
-        return True
-    
-    def get_par_dict(self, name, input_list):
-        if not (isinstance(self.name, Identifier) and self.name.same_indexed_type(name)):
-            return {}
-        par_dict = get_par_dict(self.input_list, input_list) 
-        return par_dict
- 
-    def get_indexed_instance(self, name_indices, input_indices_list):
+            else:
+                name_indices = name.value
+        elif name_type == Identifier:
+            if not self.name.same_indexed_type(name):
+                return False
+            else:
+                name_indices = name.id_indices
+        if isinstance(self.inputs, set):
+            for inp in inputs:
+                valid = False
+                for inp_sort in self.inputs:
+                    if inp_sort.same_indexed_type(inp):
+                        valid = True
+                        break
+                if not valid:
+                    return False
+        else:
+            if len(self.inputs) != len(inputs):
+                return False
+            for i, inp_sort in enumerate(self.inputs):
+                if not inp_sort.same_indexed_type(inputs[i]):
+                    return False
+        input_indices_list = [input_sort.id_.indices for input_sort in inputs]
         if isfunction(self.constraints):
             if not self.constraints(name_indices, input_indices_list):
-                return None
-        if isinstance(self.name, Identifier):
-            name_instance = self.name.get_indexed_instance(name_indices)
-        else:
-            name_instance = SpecConstant(self.name.const_type, name_indices)
-        input_instances = []
-        for i, input_indices in enumerate(input_indices_list):
-            input_instances.append(self.input_list[i].get_indexed_instance(input_indices))
+                return False 
+        return True
+ 
+    def get_indexed_output(self, name_indices, input_indices_list):
         if isfunction(self.get_output_indices):
-            output_instance = self.output.get_indexed_instance(
+            return self.output.get_indexed_instance(
                 self.get_output_indices(name_indices, input_indices_list)
             )
         else:
-            output_instance = self.output.get_indexed_instance([])
-        return Fun(name_instance, input_instances, output_instance, copy.deepcopy(self.par_list)) 
+            return self.output.get_indexed_instance([])
     
+    def get_par_dict(self, name, inputs):
+        """
+        get dict of parameters' instances for a parametric fun by matching inputs
+        """
+        if not (isinstance(self.name, Identifier) and self.name.same_indexed_type(name)):
+            return {}
+        par_dict = get_par_dict(self.inputs, inputs) 
+        return par_dict
+    
+    def get_parametric_inputs(self, par_dict):
+        if isinstance(self.inputs, set):
+            return {_get_repl_sort(inp, par_dict) for inp in self.inputs}
+        else:
+            return [_get_repl_sort(inp, par_dict) for inp in self.inputs]
+
+    def get_parametric_output(self, par_dict):
+        return _get_repl_sort(self.output, par_dict)
+ 
     def __eq__(self, other):
         """
         check if 2 fun instances are equal
@@ -86,7 +106,7 @@ class Fun:
             return False
         if self.name != other.name:
             return False
-        if self.input_list != other.input_list:
+        if self.inputs != other.inputs:
             return False
         if self.output != other.output:
             return False
@@ -100,7 +120,7 @@ class Fun:
         return True
 
     def __str__(self):
-        fun_decl_str = f"({self.name} {list2str(self.input_list)} {self.output})"
+        fun_decl_str = f"({self.name} {list2str(self.inputs)} {self.output})"
         if self.par_list:
             return f"(par ({list2str(self.par_list)}) {fun_decl_str})"
         else:
@@ -111,61 +131,17 @@ class Fun:
 
 
 
-
-def indexed_sort(symbol: str, indices_len, constraint=None):
-    """
-    type(indices) == dict is a marker for indexed sort template 
-    constraint: function that indices of sort should satisfy
-    """
-    if indices_len <= 0:
-        raise TheoryException("'indices_len' should be an positive number")
-    return Sort(Identifier(symbol, {"len": indices_len}), [], constraint)
-
-
-def sort_with_arity(symbol: str, arity: int):
-    """
-    sort with arity >= 0
-    """
-    if arity < 0:
-        raise TheoryException("'arity' should be non-negative integer")
-    if arity == 0:
-        return Sort(Identifier(symbol))
-    def _parametric_sort(par_list: list):
-        """
-        called in construction of parametric functions to fill parameter placeholder (string)
-        """
-        if len(par_list) != arity:
-            raise TheoryException(f"length of 'par_list' should be {arity}")
-        return Sort(Identifier(symbol), par_list)
-    return _parametric_sort
-
-
-# def indexed_sort_with_arity(symbol: str, indices_len, arity, constraint=None):
-#     if indices_len <= 0:
-#         raise TheoryException("'indices_len' should be an positive number")
-#     if arity < 0:
-#         raise TheoryException("'arity' should be non-negative integer")
-#     id_ = Identifier(symbol, {"len": indices_len})
-#     if arity == 0:
-#         return Sort(id_, [], constraint)
-#     def _indexed_parametric_sort(pars: list):
-#         if len(pars) != arity:
-#             raise TheoryException(f"length of 'pars' should be {arity}")
-#         return Sort(id_, pars, constraint)
-#     return _indexed_parametric_sort
-
-
 def indexed_fun(
         name_symbol,    # str or SpecConstType
-        name_indices_len,
-        input_list,
+        name_indices_len: int,
+        inputs,         # set or list
         output: Sort,
         constraints=None,
         get_output_indices=None,
         par_list=None):
     """
-    if any identifier (or SpecConstant) in name or sort list of function is indexed, this is an indexed fun
-        type(name.indices) == dict is a marker for indexed fun, it can be 0
+    If any identifier (or SpecConstant) in name or sort list of function is indexed, this is an indexed fun.
+    type(name.indices) == dict("len": {len(name.indices)}) is a marker for indexed fun, the length should be non-negative int. 
     """
     if name_indices_len < 0:
         raise TheoryException("'name_indices_len' should be an non-negative number")
@@ -175,55 +151,12 @@ def indexed_fun(
         name = SpecConstant(name_symbol, None)
     return Fun(
         name,
-        input_list,
+        inputs,
         output,
         par_list,
         constraints,
         get_output_indices
     )
-
-
-# parametric sort is marked by non-empty parsorts
-# parametric function is marked by non-empty par_list
-
-
-def get_all_instances(funs: dict, repl_dicts: list):
-    """
-    find parametric templates in funs and get all instances of them by repl_dicts
-    """
-    instances = defaultdict(list) 
-    for keyname, fun in funs.items():
-        if not isinstance(fun, list):
-            fun = [fun]
-        for f in fun:
-            if f.par_list:
-            # parametric template
-                for i in range(len(repl_dicts)):
-                    instance = generate_one_instance(
-                        f,
-                        repl_dicts[i],
-                    )
-                    if instance:
-                        instances[keyname].append(instance)
-    return instances
-
-
-def generate_one_instance(template: Fun, repl_dict):
-    """
-    generate fun instance by replacing parameters in template using repl_dict 
-    """
-    repl_input_list = []
-    for sort in template.input_list:
-        repl_sort = _get_repl_sort(sort, repl_dict)
-        if repl_sort:
-            repl_input_list.append(repl_sort)
-        else:
-            return None
-    repl_output = _get_repl_sort(template.output, repl_dict)
-    if not repl_output:
-        return None
-    name = copy.deepcopy(template.name) 
-    return Fun(name, repl_input_list, repl_output)
 
 
 def _get_repl_sort(sort, repl_dict):

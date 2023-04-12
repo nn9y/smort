@@ -1,4 +1,5 @@
 from smort.src.translate.theory.SMTLIBv2Sorts import *
+from smort.src.translate.theory.utils import merge_disjoint_dict 
 
 
 # other sorts 

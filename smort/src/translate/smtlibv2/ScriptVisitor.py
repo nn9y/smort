@@ -1,9 +1,12 @@
 from smort.src.translate.smtlibv2.SMTLIBv2Parser import SMTLIBv2Parser
 from smort.src.translate.smtlibv2.SMTLIBv2Visitor import SMTLIBv2Visitor
-from smort.src.translate.smtlibv2.ADT import create_adt, deal_constructor_dec
+from smort.src.translate.smtlibv2.ADT import declare_datatype, add_functions_of_datatype
+from smort.src.translate.smtlibv2.cnf_conversion import Term2CNFTerm
 from smort.src.translate.smtlibv2.Script import *
-from smort.src.translate.tools.Term import *
 from smort.src.translate.tools.Sort import *
+from smort.src.translate.tools.Term import (
+    TermScopeType, Const, Var, Expr, LetBinding, Quantifier, Match, AnnotatedTerm
+)
 from smort.src.translate.theory.signatures import *
 
 
@@ -23,8 +26,9 @@ class ScriptVisitor(SMTLIBv2Visitor):
                                 # str -> Fun
         self.datatypes = {}     # global self-defines datatypes, or sort declared
                                 # str -> Sort
-        self.synonyms = {}      # global self-defines synonyms 
+        self.synonyms = {}      # global self-defines synonyms of sorts 
                                 # str -> [Sort, list]
+        self.quant_count = 0
 
     def visitStart(self, ctx: SMTLIBv2Parser.StartContext):
         return self.visitScript(ctx.script())
@@ -113,11 +117,11 @@ class ScriptVisitor(SMTLIBv2Visitor):
             return synonym_sort
         # valid sort
         sort = Sort(id_, parsorts)
+        # TODO _valid
         if self._is_valid_sort(symbol, sort):
             return sort
-        # else if:
+        # parameter placeholder
         if len(parsorts) == 0:
-            # parameter placeholder
             return str(id_)
         raise ScriptException("not a valid sort, a synonym of a valid sort, or a placeholder of parameter")
 
@@ -141,7 +145,7 @@ class ScriptVisitor(SMTLIBv2Visitor):
             self.signatures[symbol] = Fun(Identifier(symbol), input_sort_list, sort) 
 
         return FunDecl(symbol, sorted_vars, sort), local_vars
-    
+ 
     def visitFunction_def(self, ctx:SMTLIBv2Parser.Function_defContext, rec=False):
         symbol = self.visitSymbol(ctx.symbol())
         sorted_vars = []
@@ -173,7 +177,11 @@ class ScriptVisitor(SMTLIBv2Visitor):
     def visitScript(self, ctx: SMTLIBv2Parser.ScriptContext):
         cmds = []
         for cmd_ctx in ctx.command():
-            cmds.append(self.visitCommand(cmd_ctx))
+            cmd = self.visitCommand(cmd_ctx)
+            if isinstance(cmd, list):
+                cmds.extend(cmd)
+            else:
+                cmds.append(cmd)
         return Script(cmds)
 
     def handleCommand(self, ctx: SMTLIBv2Parser.CommandContext):
@@ -212,7 +220,7 @@ class ScriptVisitor(SMTLIBv2Visitor):
         id_ = self.visitIdentifier(ctx.identifier())
         sort = self.visitSort(ctx.sort()) if ctx.GRW_As() else None
         return [id_, sort]
-    
+ 
     def visitVar_binding(self, ctx: SMTLIBv2Parser.Var_bindingContext, local_vars):
         var = self.visitSymbol(ctx.symbol())
         term = self.visitTerm(ctx.term(), copy.deepcopy(local_vars))
@@ -221,27 +229,32 @@ class ScriptVisitor(SMTLIBv2Visitor):
     def visitSorted_var(self, ctx: SMTLIBv2Parser.Sorted_varContext):
         return [self.visitSymbol(ctx.symbol()), self.visitSort(ctx.sort())]
 
-    def visitPattern(self, ctx: SMTLIBv2Parser.PatternContext):
+    def visitPattern(self, ctx: SMTLIBv2Parser.PatternContext, output, par_dict):
         name = self.visitSymbol(ctx.symbol(0))
         var_list = []
-        for sym_ctx in ctx.symbol()[1:]:
-            var = self.visitSymbol(sym_ctx)
-            var_list.append(var)
-        return name, var_list
+        if ctx.ParOpen(): 
+            for sym_ctx in ctx.symbol()[1:]:
+                var = self.visitSymbol(sym_ctx)
+                var_list.append(var)
+        var_sort_list = self._valid_pattern(name, len(var_list), output, par_dict)
+        if not var_sort_list:
+            var_list = [name]
+            name = None
+        return Pattern(name, var_list), var_sort_list 
     
     def visitMatch_case(self, ctx: SMTLIBv2Parser.Match_caseContext, output, par_dict, local_vars):
-        name, var_list = self.visitPattern(ctx.pattern())
-        input_list = self._valid_pattern(name, len(var_list), output, par_dict)
+        pattern, var_sort_list = self.visitPattern(ctx.pattern(), output, par_dict)
+        var_list = pattern.var_list
         _local_vars = copy.deepcopy(local_vars)
         for i, var in enumerate(var_list):
-            _local_vars[var] =  input_list[i]
-        if input_list == output:
-            # name is variable
-            _local_vars[name] = output
+            _local_vars[var] =  var_sort_list[i]
+        if not var_sort_list:
+            # a single variable
+            _local_vars[var_list[0]] = output
         bound_vars = copy.deepcopy(_local_vars)
         term = self.visitTerm(ctx.term(), _local_vars)
         term.update_bound_vars(bound_vars)
-        return [[name] + var_list, term]
+        return [pattern, term]
 
     def getString(self, ctx):
         start, stop = ctx.start.start, ctx.stop.stop
@@ -265,15 +278,25 @@ class ScriptVisitor(SMTLIBv2Visitor):
         if ctx.GRW_Par():
             for sym_ctx in ctx.symbol():
                 pars.append(self.visitSymbol(sym_ctx))
-        decs = []
+        cdecs = []
         for cd_ctx in ctx.constructor_dec():
-            decs.append(self.visitConstructor_dec(cd_ctx))
-        return [pars, decs]
+            cdecs.append(self.visitConstructor_dec(cd_ctx))
+        return [pars, cdecs]
 
     def visitCmd_assert(self, ctx:SMTLIBv2Parser.Cmd_assertContext):
         local_vars = {}
         term = self.visitTerm(ctx.term(), local_vars)
-        return Assert(term)
+        # convert from Term to CNFTerm
+        new_declfuns, cnf_term = Term2CNFTerm(term)
+
+        for fun_decl in new_declfuns:
+            symbol, input_sort_list, output_sort = fun_decl.symbol, fun_decl.input_sort_list, fun_decl.output_sort
+            if len(input_sort_list) == 0:
+                self.global_vars[symbol] = output_sort 
+            else:
+                self.signatures[symbol] = Fun(Identifier(symbol), input_sort_list, output_sort) 
+
+        return [new_declfuns, Assert(cnf_term)]
     
     def visitCmd_declareConst(self, ctx:SMTLIBv2Parser.Cmd_declareConstContext):
         var = self.visitSymbol(ctx.symbol())
@@ -285,18 +308,18 @@ class ScriptVisitor(SMTLIBv2Visitor):
  
     def visitCmd_declareDatatype(self, ctx:SMTLIBv2Parser.Cmd_declareDatatypeContext):
         adt_name = self.visitSymbol(ctx.symbol())
-        pars, constructor_decs = self.visitDatatype_dec(ctx.datatype_dec())
-        adt = create_adt(adt_name, len(pars))
-
-        self.datatypes[str(adt_name)] = adt 
-
-        for dec in constructor_decs:
-            funs_list = deal_constructor_dec(dec, adt, pars)
-
+        pars, cdecs = self.visitDatatype_dec(ctx.datatype_dec())
+        adt = declare_datatype(adt_name, len(pars))
+        if len(pars) > 0:
+            self.datatypes[str(adt_name)] = adt(pars) 
+        else:
+            self.datatypes[str(adt_name)] = adt
+        for cdec in cdecs:
+            funs_list = add_functions_of_datatype(cdec, adt, pars)
             for fun in funs_list:
                 self.signatures[str(fun.name)] = fun
 
-        return DeclareDataType(adt_name, DataTypeDec(pars, constructor_decs)) 
+        return DeclareDataType(adt_name, DataTypeDec(pars, cdecs)) 
 
     def visitCmd_declareDatatypes(self, ctx:SMTLIBv2Parser.Cmd_declareDatatypesContext):
         adts = []
@@ -304,19 +327,22 @@ class ScriptVisitor(SMTLIBv2Visitor):
         for sd_ctx in ctx.sort_dec():
             adt_name, arity = self.visitSort_dec(sd_ctx)
             sort_decs.append([adt_name, arity])
-            adt = create_adt(adt_name, arity)
- 
+            adt = declare_datatype(adt_name, arity)
+            # adt with arity > 0 is a function now
+            # ** instantiate later **
             self.datatypes[str(adt_name)] = adt 
-
             adts.append(adt)
 
         datatype_decs = []
         for i, dtd_ctx in enumerate(ctx.datatype_dec()):
-            pars, decs = self.visitDatatype_dec(dtd_ctx)
-            datatype_decs.append(DataTypeDec(pars, decs))
-            for dec in decs:
-                funs_list = deal_constructor_dec(dec, adts[i], pars)
-
+            pars, cdecs = self.visitDatatype_dec(dtd_ctx)
+            if len(pars) > 0:
+                # ** instantiate adt **
+                # before add functions related to it
+                self.datatypes[str(adt_name)] = adts[i](pars) 
+            datatype_decs.append(DataTypeDec(pars, cdecs))
+            for cdec in cdecs:
+                funs_list = add_functions_of_datatype(cdec, adts[i], pars)
                 for fun in funs_list:
                     self.signatures[str(fun.name)] = fun
 
@@ -399,10 +425,8 @@ class ScriptVisitor(SMTLIBv2Visitor):
     def visitTerm(self, ctx: SMTLIBv2Parser.TermContext, local_vars):
         if ctx.spec_constant():
             spec_constant = self.visitSpec_constant(ctx.spec_constant())
-            ret_sort, flag = self._well_sorted_term(spec_constant, [], None, local_vars)
-            if flag == 0:
-                raise ScriptException('variable name overrides signature in theories')
-            return Const(name=spec_constant, sort=ret_sort)
+            sort, _ = self._well_sorted_term(spec_constant, [], local_vars)
+            return Const(name=spec_constant, sort=sort)
         elif ctx.qual_identifier():
             id_, sort = self.visitQual_identifier(ctx.qual_identifier())
             qual_id = True if sort else False
@@ -417,23 +441,26 @@ class ScriptVisitor(SMTLIBv2Visitor):
                     subterms.append(subterm)
                     input_list.append(subterm.sort)
                     local_free_vars.update(subterm.local_free_vars)
-                ret_sort, flag = self._well_sorted_term(id_, input_list, sort, local_vars)
-                if flag == 0:
-                    raise ScriptException('variable name overrides signature in theories')
+                    # bound vars will be updated by binders
+                if not sort:
+                    sort, _ = self._well_sorted_term(id_, input_list, local_vars)
                 return Expr(
                             name=id_,
                             subterms=subterms,
-                            sort=ret_sort,
+                            sort=sort,
                             local_free_vars=local_free_vars,
                             qual_id=qual_id,
                         )
             else:
-                ret_sort, flag = self._well_sorted_term(id_, [], sort, local_vars)
-                match flag:
-                    case 0:
-                        return Var(name=id_, sort=ret_sort, qual_id=qual_id)
-                    case 1:
-                        return Expr(name=id_, subterms=[], sort=ret_sort, qual_id=qual_id)
+                rsort, scope_type = self._well_sorted_term(id_, [], local_vars)
+                if not sort:
+                    sort = rsort
+                if scope_type == TermScopeType.LOCAL_VAR:
+                    return Var(name=id_, sort=sort, qual_id=qual_id, global_free=False)
+                if scope_type == TermScopeType.GLOBAL_VAR:
+                    return Var(name=id_, sort=sort, qual_id=qual_id, global_free=True)
+                else:
+                    return Expr(name=id_, subterms=[], sort=sort, qual_id=qual_id)
         elif ctx.GRW_Let():
             var_bindings = []
             var_list = []
@@ -497,14 +524,16 @@ class ScriptVisitor(SMTLIBv2Visitor):
                 match_cases.append([p, t])
                 # update local_free_vars for entire match term
                 for var, sort in t.local_free_vars.items():
-                    if var not in p:
+                    if var not in p.var_list:
                         local_free_vars[var] = sort
+                
             return Match(
                 term=term,
                 match_cases=match_cases,
                 sort=match_cases[0][1].sort, # t.sort
                 local_free_vars=local_free_vars,
             )
+
         elif ctx.GRW_Exclamation():
             term = self.visitTerm(ctx.term(0), local_vars)
             annotations = []
@@ -538,7 +567,9 @@ class ScriptVisitor(SMTLIBv2Visitor):
         for var, _ in quanted_vars:
             if var in local_free_vars:
                 del local_free_vars[var]
+        self.quant_count += 1 
         return Quantifier(
+                name=f'Q{self.quant_count}',
                 quantifier=quant,
                 sorted_vars=quanted_vars,
                 quantified_term=quant_term,
@@ -556,8 +587,11 @@ class ScriptVisitor(SMTLIBv2Visitor):
         return None 
  
     def _get_par_dict_from_sort(self, sort):
+        """
+        get dict of parameters from an adt instance
+        """
         parsorts = sort.parsorts
-        if isinstance(parsorts, list) and len(parsorts) > 0:
+        if isinstance(parsorts, list) and (len(parsorts) > 0):
             par_dict = {}
             name = sort.id_
             if str(name) in self.datatypes:
@@ -566,7 +600,7 @@ class ScriptVisitor(SMTLIBv2Visitor):
                     for i, par in enumerate(sort_template.parsorts):
                         par_dict[par] = parsorts[i]
                     return par_dict
-            raise ScriptException("datatype not found")
+            raise ScriptException(f"datatype '{sort}' not found")
         else:
             # not a parametric sort
             return {}
@@ -580,43 +614,46 @@ class ScriptVisitor(SMTLIBv2Visitor):
                 return True
         return False
 
-    def _valid_pattern(self, name, input_list_len, output: Sort, par_dict):
+    def _valid_pattern(self, name, inputs_len, output, par_dict):
         """
         A pttern p in turn is either:
         - a variable x of sort (output)
         - a nullary constructor c of sort (output)
         - a term of the form (c x_1 ... x_k) where c is a constructor of sort (output)
-        assuming no signatures have same name
+
+        :returns: input sort list if p is a constructor else None 
         """
-        if str(name) in self.signatures:
+        adt_name = str(output.id_)
+        if adt_name in self.datatypes:
+            adt = self.datatypes[adt_name]
+            if name in adt.constructors:
             # constructor
-            fun = self.signatures[str(name)]
-            fun = generate_one_instance(fun, par_dict)
-            if (len(fun.input_list) == input_list_len) and (fun.output == output):
-                return fun.input_list
-        if input_list_len == 0:
+                constructor = adt.constructors[name]
+                return constructor.get_parametric_inputs(par_dict)
+        elif inputs_len == 0:
             # variable
-            return output 
+            return None 
         else:
             raise ScriptException("pattern is neither a variable nor a valid constructor")
 
-    def _well_sorted_term(self, name, input_list=None, output=None, local_vars=None):
+    def _well_sorted_term(self, name, input_list=None, local_vars=None):
+        """
+        :returns: sort, scope type of this term
+        """
         # scope
         # local vars
         if (str(name) in local_vars) and (input_list == []):
-            return local_vars[str(name)], 0
+            return local_vars[str(name)], TermScopeType.LOCAL_VAR 
         # global vars
         if (str(name) in self.global_vars) and (input_list == []):
-            return self.global_vars[str(name)], 0
+            return self.global_vars[str(name)], TermScopeType.GLOBAL_VAR 
         # global signatures
-        fun = match_fun_in_signatures(name, input_list, output, self.signatures)
-        if fun:
-            return fun.output, 1
+        fun_output = match_fun_in_signatures(name, input_list, self.signatures)
+        if fun_output:
+            return fun_output, TermScopeType.GLOBAL_SIG 
         # predefined signatures
-        fun = match_fun_in_signatures(name, input_list, output, all_funs)
-        if fun:
-            return fun.output, 1
-        else:
-            # support more functions
-            return output, 1
-            #raise ScriptException(f"function ({name} {list2str(input_list)} {output}) is not declared")
+        fun_output = match_fun_in_signatures(name, input_list, all_funs)
+        if fun_output:
+            return fun_output, TermScopeType.PREDEF_SIG 
+        # support more functions
+        return UNKNOWN, TermScopeType.PREDEF_SIG 

@@ -1,3 +1,4 @@
+import copy
 from math import sqrt
 from collections import defaultdict
 
@@ -39,25 +40,24 @@ def merge_multi_dict(dict_list):
     return merged_dict
 
 
-def get_par_dict(input_list_containing_par, sort_list):
+def get_par_dict(inputs_containing_par, sort_list):
     """
     return a dict mapping parsort symbol to sort instance, return {} if cannot get mapping
     """
-    if len(input_list_containing_par) != len(sort_list):
+    if isinstance(inputs_containing_par, set):
+        return {par: sort_list[0] for par in inputs_containing_par}
+    elif len(inputs_containing_par) != len(sort_list):
         return {}
-        # raise TheoryException("sort_list should match input_list")
     par_dict = {}
-    for i, input_sort in enumerate(input_list_containing_par):
+    for i, input_sort in enumerate(inputs_containing_par):
         sort = sort_list[i]
         if not isinstance(sort, Sort):
             return {}
-            # raise TheoryException("each sort in sort_list should be an Sort instance")
         if isinstance(input_sort, str):
             # single parameter placeholder
             if input_sort in par_dict:
                 if par_dict[input_sort] !=  sort:
                     return {}
-                    # raise TheoryException("Inconsistency found in parameter assignment")
             else:
                 par_dict[input_sort] = sort 
         elif isinstance(input_sort, Sort):
@@ -74,23 +74,18 @@ def get_par_dict(input_list_containing_par, sort_list):
                                 if par in par_dict:
                                     if par_dict[par] != parsort:
                                         return {}
-                                        # raise TheoryException("inconsistency found in parameter assignment")
                                 else:
                                     par_dict[par] = parsort
                             else:
                                 return {}
-                                # raise TheoryException("sort_list should match input_list")
                         else:
                             return {}
-                            # raise TheoryException("each element of input_list.parsort should be an Sort instance")
             elif input_sort == sort:
                 continue
             else:
                 return {}
-                # raise TheoryException("sort_list should match input_list")
         else:
             return {}
-            # raise TheoryException("each element of input_list should be object of Sort or string")
 
     return par_dict
 
@@ -125,8 +120,8 @@ def numeral_greater_than_x(x, count):
     def _numeral_greater_than_x(*indices_list):
         """
         indices_list: in order to match:
-            op_indices
-            op_indices, input_indices_list
+            name_indices
+            name_indices, input_indices_list
         """
         indices = indices_list[0]
         if len(indices) != count:
@@ -138,7 +133,7 @@ def numeral_greater_than_x(x, count):
     return _numeral_greater_than_x 
 
 
-def extract_bound_of_bitvec(op_indices, input_indices_list):
+def extract_bound_of_bitvec(name_indices, input_indices_list):
     """
     check for ((_ extract i j) (_ BitVec m) (_ BitVec n))
     extract [i, j] range of (_ BitVec m) to get (_ BitVec n)
@@ -146,11 +141,11 @@ def extract_bound_of_bitvec(op_indices, input_indices_list):
     - m > i ≥ j ≥ 0,
     - n = i - j + 1
     """
-    if len(op_indices) != 2:
+    if len(name_indices) != 2:
         return False
     if len(input_indices_list) != 1 or len(input_indices_list[0]) != 1:
         return False
-    i, j = op_indices
+    i, j = name_indices
     m = input_indices_list[0][0]
     if not (is_numeral(i) and is_numeral(j) and is_numeral(m)):
         return False
@@ -162,15 +157,15 @@ def extract_bound_of_bitvec(op_indices, input_indices_list):
 def eq_input_indices(a, b, c):
     """
     check input_indices in [a, b) of list are equal,
-        and op_indices should be empty
+        and name_indices should be empty
     c is excepted length of input_indices_list
     assuming each input_indices itself are checked by Sort before
     - a < b <= c
     """
     if not (is_numeral(a) and is_numeral(b)) or (a < 0) or (a >= b) or (b > c):
         raise TheoryException("a, b, c must be an non-negative integer, and a < b <= c") 
-    def _eq_input_indices(op_indices, input_indices_list):
-        if len(op_indices) != 0:
+    def _eq_input_indices(name_indices, input_indices_list):
+        if len(name_indices) != 0:
             return False
         if len(input_indices_list) != c:
             return False
@@ -183,7 +178,7 @@ def eq_input_indices(a, b, c):
     return _eq_input_indices
 
 
-def bitvec_bound_of_fp(op_indices, input_indices_list):
+def bitvec_bound_of_fp(name_indices, input_indices_list):
     """
     check for (fp (_ BitVec 1) (_ BitVec eb) (_ BitVec i) (_ FloatingPoint eb sb))
 
@@ -192,7 +187,7 @@ def bitvec_bound_of_fp(op_indices, input_indices_list):
         - eb > 1
         - i > 0
     """
-    if len(op_indices) != 0:
+    if len(name_indices) != 0:
         return False
     if len(input_indices_list) != 3:
         return False
@@ -206,24 +201,24 @@ def bitvec_bound_of_fp(op_indices, input_indices_list):
     return True 
 
 
-def eb_plus_sb_eq_m(op_indices, input_indices_list):
+def eb_plus_sb_eq_m(name_indices, input_indices_list):
     """
     check for ((_ to_fp eb sb) (_ BitVec m) (_ FloatingPoint eb sb))
     from single bitstring representation in IEEE 754-2008 interchange format,
     - m = eb + sb
     """
-    if len(op_indices) != 2:
+    if len(name_indices) != 2:
         return False
     if (len(input_indices_list) != 1) or (len(input_indices_list[0]) != 1):
         return False
-    eb, sb = op_indices
+    eb, sb = name_indices
     m = input_indices_list[0][0]
     if not (is_numeral(eb) and is_numeral(sb) and is_numeral(m)):
         return False
     return eb + sb == m
 
 
-def hex_is_char(op_indices, input_indices_list):
+def hex_is_char(name_indices, input_indices_list):
     """
     check for (_ char ⟨H⟩) 
    
@@ -235,9 +230,9 @@ def hex_is_char(op_indices, input_indices_list):
             | a | b | b | d | e | f
             | A | B | C | D | E | F
     """
-    if (len(op_indices) != 1) or (len(input_indices_list) != 0):
+    if (len(name_indices) != 1) or (len(input_indices_list) != 0):
         return False
-    hex_str = op_indices[0]
+    hex_str = name_indices[0]
     if (not is_string(hex_str)) or (len(hex_str) < 3):
         return False
     if hex_str[0:2] != '#x':
@@ -270,7 +265,7 @@ def get_number_of_binary_digits(carry: int):
         raise TheoryException("'carry' should be divisible by 2")
     def _get_number_of_binary_digits(spec_const_value: str, input_indices_list):
         # spec_const_value is original text of a binary or hexadecimal 
-        #   compare to op_indices, spec_const_value is just value, not list of values
+        #   compare to name_indices, spec_const_value is just value, not list of values
         # assuming text format has been checked by parser already
         # ⚠️ The correspondence between spec_const_value and carry
         #   is guaranteed by the caller 
@@ -281,7 +276,7 @@ def get_number_of_binary_digits(carry: int):
     return _get_number_of_binary_digits 
 
 
-def add_bitvecs_indices(op_indices, input_indices_list):
+def add_bitvecs_indices(name_indices, input_indices_list):
     """
     get output indices of (concat (_ BitVec i) (_ BitVec j) (_ BitVec m))
     - i, j, m are numerals
@@ -292,7 +287,7 @@ def add_bitvecs_indices(op_indices, input_indices_list):
     return [i + j]
 
 
-def get_extract_length_of_bitvec(op_indices, input_indices_list):
+def get_extract_length_of_bitvec(name_indices, input_indices_list):
     """
     get output indices of ((_ extract i j) (_ BitVec m) (_ BitVec n))
     extract [i, j] range of (_ BitVec m) to get (_ BitVec n)
@@ -300,18 +295,18 @@ def get_extract_length_of_bitvec(op_indices, input_indices_list):
     - m > i ≥ j ≥ 0,
     - n = i - j + 1
     """
-    i, j = op_indices
+    i, j = name_indices
     return [i - j + 1]
 
 
-def get_indices_of_first_indexed_input(op_indices, input_indices_list):
+def get_indices_of_first_indexed_input(name_indices, input_indices_list):
     for input_indices in input_indices_list:
         if input_indices != []:
             return input_indices
     return []
 
 
-def get_eb_sb_from_bitvec(op_indices, input_indices_list):
+def get_eb_sb_from_bitvec(name_indices, input_indices_list):
     """
     get output indices of (fp (_ BitVec 1) (_ BitVec eb) (_ BitVec i) (_ FloatingPoint eb sb))
     - eb and sb are numerals greater than 1
@@ -322,6 +317,17 @@ def get_eb_sb_from_bitvec(op_indices, input_indices_list):
     return [eb, sb]
 
 
-def get_indices_from_op(op_indices, input_indices_list):
-    return op_indices
+def get_indices_from_op(name_indices, input_indices_list):
+    return name_indices
 
+
+def multiply_bits(name_indices, input_indices_list):
+    m = name_indices[0]
+    n = input_indices_list[0][0]
+    return m * n
+
+
+def plus_bits(name_indices, input_indices_list):
+    m = name_indices[0]
+    n = input_indices_list[0][0]
+    return m + n

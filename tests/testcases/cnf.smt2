@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-const x Bool)
+(declare-const y Bool)
+(assert (=> x y))
+(check-sat)

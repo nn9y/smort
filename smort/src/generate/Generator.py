@@ -30,10 +30,9 @@ class Generator:
         self.acc_formulas = []
         self.acc_snpts = []
         self.acc_decls = []
-        self.acc_defs = []
         self.acc_asserts = []
     
-    def metamorphose(self, formulas, decls, defs, asserts):
+    def metamorphose(self, formulas, decls, asserts):
         if self.args.incremental:
             if len(self.substs_list) == 0:
                 self.end_increment = True
@@ -43,12 +42,12 @@ class Generator:
             while len(self.substs_list[m][1]) == 0:
                 self.substs_list.pop(m)
                 m = random.randrange(len(self.substs_list))
-            k, term_tups, var_name_maps = self.substs_list[m]
+            k, term_tups, notation2terms = self.substs_list[m]
             template = self.mr.subst_templates[k]
             i = random.randrange(len(self.substs_list[m][1]))
-            term_tup, var_name_map = term_tups[i], var_name_maps[i] 
-            generate_additions(template, self.mr.notations, var_name_map, decls, defs, asserts)
-            replace(template, term_tup, var_name_map, formulas)
+            term_tup, notation2term = term_tups[i], notation2terms[i] 
+            generate_additions(template, self.mr.notations, notation2term, decls, asserts)
+            replace(template, term_tup, notation2term, formulas)
             self.substs_list[m][1].pop(i)
             self.substs_list[m][2].pop(i)
             if len(self.substs_list[m][1]) == 0:
@@ -56,12 +55,12 @@ class Generator:
             if len(self.substs_list) == 0:
                 self.end_increment = True
         else:
-            for k, term_tups, var_name_maps in self.substs_list:
+            for k, term_tups, notation2terms in self.substs_list:
                 template = self.mr.subst_templates[k]
                 for i, term_tup in enumerate(term_tups):
-                    var_name_map = var_name_maps[i] 
-                    generate_additions(template, self.mr.notations, var_name_map, decls, defs, asserts)
-                    replace(template, term_tup, var_name_map, formulas)
+                    notation2term = notation2terms[i] 
+                    generate_additions(template, self.mr.notations, notation2term, decls, asserts)
+                    replace(template, term_tup, notation2term, formulas)
 
     def call_extended_methods(self, formulas, snpts):
         processed_formulas = {}
@@ -82,9 +81,9 @@ class Generator:
         fused = copy.deepcopy(self.mr.fuse_term)
         repl_dict = {}
         for i, formula in enumerate(formulas):
-            repl_dict[self.mr.seed_on_index[i]] = formula.assert_cmds[0].term
+            repl_dict[self.mr.seed_on_index[i]] = formula.assert_merged.term
         repl_dict = dict(repl_dict, **processed_formulas)
-        fused.replace_symbols_by_terms(repl_dict)
+        fused.replace_notation_by_term(repl_dict)
         return fused 
  
     def generate(self):
@@ -104,31 +103,32 @@ class Generator:
             for i, formula in enumerate(formulas):
                 formula.prefix_vars(f"seed{i}_")
             self.substs_list = random_term_tuples(
-                formulas, self.mr.subst_templates, self.args.multiple_substs, index_list
+                formulas,
+                self.mr.subst_templates,
+                self.args.multiple_substs,
+                index_list,
+                self.mr.notations
             )
             decls = []
-            defs = []
             asserts = []
             snpts = []
         else:
             # incremental, in process
             formulas = self.acc_formulas
             decls = self.acc_decls
-            defs = self.acc_defs
             asserts = self.acc_asserts
             snpts = self.acc_snpts
 
-        self.metamorphose(formulas, decls, defs, asserts)
+        self.metamorphose(formulas, decls, asserts)
         processed_formulas = self.call_extended_methods(formulas, snpts)
         # get fused assert term in morph
         fused = self.fuse(formulas, processed_formulas)
         # generate whole morph
-        morph = merge(formulas, fused, decls, defs, asserts, snpts)
+        morph = merge(formulas, fused, decls, asserts, snpts)
 
         if self.args.incremental:
             self.acc_formulas = formulas
             self.acc_decls = decls
-            self.acc_defs = defs
             self.acc_asserts = asserts 
             self.acc_snpts = snpts
 

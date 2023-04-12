@@ -223,6 +223,9 @@ PK_Gen
 PK_Var
     : ':var'
     ;
+PK_Fun
+    : ':fun'
+    ;
 PK_Cons
     : ':cons'
     ;
@@ -232,11 +235,11 @@ PK_Snippet
 PK_Seed
     : ':seed'
     ;
-PK_Free
-    : ':free'
+PK_GlobalFree
+    : ':global-free'
     ;
-PK_Bound
-    : ':bound'
+PK_Inwards
+    : ':inwards'
     ;
 
 UndefinedSymbol:
@@ -269,11 +272,12 @@ predefSymbol
 predefKeyword
     : PK_Gen
     | PK_Var
+    | PK_Fun
     | PK_Cons
     | PK_Snippet
     | PK_Seed
-    | PK_Free
-    | PK_Bound
+    | PK_GlobalFree
+    | PK_Inwards
     ;
 
 undefinedKeyword

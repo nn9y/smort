@@ -11,7 +11,7 @@ def test_freevars(f):
     file = '/home/yang/Projects/smort/tests/testcases/testnia/sat/1.smt2'
     script = translate_script_file(file, 10000000)
     script.merge_asserts()
-    print_term_free_vars(script.assert_cmds[0].term, f) 
+    print_term_free_vars(script.assert_merged.term, f) 
 
 
 if __name__ == '__main__':

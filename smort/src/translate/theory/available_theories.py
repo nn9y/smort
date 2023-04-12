@@ -8,14 +8,14 @@ from smort.src.translate.theory.available_sorts import *
 # get sorts and funs
 # add sorts and funs above 
 
-core_sorts, core_funs = core_theory()
-ints_sorts, ints_funs = ints_theory()
-reals_sorts, reals_funs = reals_theory()
-reals_ints_sorts, reals_ints_funs = reals_ints_theory()
-bitvecs_sorts, bitvecs_funs = fixedSizeBitVectors_theory()
-fps_sorts, fps_funs = floatingPoints_theory()
-strs_sorts, strs_funs = strings_theory()
-ax_sorts, ax_funs = arraysEX_theory()
+core_sorts, core_funs = Core_theory()
+ints_sorts, ints_funs = Ints_theory()
+reals_sorts, reals_funs = Reals_theory()
+reals_ints_sorts, reals_ints_funs = Reals_Ints_theory()
+bitvecs_sorts, bitvecs_funs = FixedSizeBitVectors_theory()
+fps_sorts, fps_funs = FloatingPoint_theory()
+strs_sorts, strs_funs = Strings_theory()
+ax_sorts, ax_funs = ArraysEX_theory()
 
 _sorts_dicts = [ints_sorts, reals_sorts, reals_ints_sorts,
     bitvecs_sorts, fps_sorts, strs_sorts, ax_sorts]

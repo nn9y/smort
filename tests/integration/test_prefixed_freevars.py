@@ -12,7 +12,7 @@ def test_prefixed_freevars(f):
     script = translate_script_file(file, 10000000)
     script.merge_asserts()
     script.prefix_vars('seed_')
-    print_term_free_vars(script.assert_cmds[0].term, f) 
+    print_term_free_vars(script.assert_merged.term, f) 
 
 
 

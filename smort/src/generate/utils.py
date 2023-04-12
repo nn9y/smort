@@ -1,18 +1,41 @@
+import copy
 import random
 import importlib
 
-from smort.src.tools.utils import cartesian_product, random_string
-from smort.src.translate.theory.available_sorts import random_constant_value 
-from smort.src.translate.smtmr.MetamorphicRelation import SMTMRKeyword
-from smort.src.translate.smtlibv2.Script import * 
+from smort.src.tools.utils import cartesian_product
+from smort.src.translate.tools.Sort import Identifier
+from smort.src.translate.tools.Term import (
+    TermType,
+    Const,
+    Var,
+    Expr,
+    substitute
+)
+from smort.src.translate.theory.SMTLIBv2Sorts import BOOL
+from smort.src.translate.theory.SMTLIBv2Theories import BOOLEAN_EQUAL
+from smort.src.translate.theory.constants import random_constant_value 
+from smort.src.translate.smtlibv2.Script import (
+    Script,
+    SMTLIBCommand,
+    DeclareConst,
+    DeclareDataType,
+    DeclareDataTypes,
+    DeclareFun,
+    DeclareSort,
+    DefineFun,
+    DefineFunRec,
+    DefineFunsRec,
+    DefineSort,
+    Assert,
+) 
 
 
-def merge(scripts, fused, decls, defs, asserts, snpts):
+def merge(scripts, fused, decls, asserts, snpts):
     merged_cmds = []
     # set-logic ALL 
     merged_cmds.append(SMTLIBCommand('(set-logic ALL)'))
-    # add new decls and defs
-    merged_cmds += decls + defs 
+    # add new decls
+    merged_cmds += decls
     # merge decls and defs
     for script in scripts:
         for cmd in script.commands:
@@ -41,7 +64,7 @@ def merge(scripts, fused, decls, defs, asserts, snpts):
         merged_cmds.append(Assert(snpt)) 
 
     # check-sat
-    merged_cmds.append(SMTLIBCommand('(check-sat)'))
+    merged_cmds.append(SMTLIBCommand("(check-sat)"))
  
     return Script(merged_cmds)
 
@@ -75,12 +98,12 @@ def random_tuple_list(lsts, dups, multiple_substs=False):
     return new_tups
 
 
-def random_term_tuples(formulas, templates, multiple_substs, index_list):
+def random_term_tuples(formulas, templates, multiple_substs, index_list, notations):
     """
-    :return: a list of 3-tuples:
+    :returns: a list of 3-tuples:
         [0]: index of mr.subst_templates
         [1]: a list of random term (to be replaced) tuples
-        [2]: a dict mapping from var name in the template to var name in actual formulas
+        [2]: a dict mapping from var name in the template to the corresponding term in actual formulas
     """
     lst = []
     # make sure no term will be replaced more than once in each generation, which may cause invalid formula
@@ -91,25 +114,45 @@ def random_term_tuples(formulas, templates, multiple_substs, index_list):
         for i, formula in enumerate(formulas):
             term_occs = []
             term, _ = template.repl_pairs[i]
-            # assuming assertions have been merged into single one in each formula
-            formula.assert_cmds[0].term.find_all_terms(term, term_occs, template.free)
-            # here occs list are already "deepcopied"
-            # term_occs = formula.assert_cmds[0].term.pointers_map[k]
+            # assume assertions have been merged into single one (CNFTerm) in each formula
+            formula.assert_merged.term.find_terms(term, term_occs, template.global_free, template.inwards)
+            # xxx here occs list are already "deepcopied"
+            # xxx term_occs = formula.assert_merged.term.pointers_map[k]
             term_occs_list.append(term_occs)
         rnd_tuples = random_tuple_list(term_occs_list, dups, multiple_substs)
-        var_name_maps = []
+        notation2terms = []
         for i, tup in enumerate(rnd_tuples):
-            var_name_map = {}
+            notation2term = {}
             for j, t in enumerate(tup):
                 term, _ = template.repl_pairs[j]
-                t.update_var_name_mapping(term, var_name_map)
-            # new vars and cons
-            for var, _ in template.sorted_vars:
-                if not var in var_name_map:
-                    var_name_map[var] = f"{var}_random{k}_{i}"
-            var_name_maps.append(var_name_map)
-        lst.append((k, rnd_tuples, var_name_maps))
-    return lst 
+                t.update_notation2term(term, notation2term)
+            # generate term of new functions, variables and contants
+            for var, sort in template.sorted_vars:
+                if not var in notation2term:
+                    info = notations[var]
+                    mapped_id = Identifier(f"{var}_random{k}_{i}")
+                    if info.is_cons:
+                        value = random_constant_value(sort)
+                        const = Const(name=value, sort=sort)
+                        notation2term[var] = const 
+                    if info.is_var:
+                        notation2term[var] = Var(
+                            name=mapped_id,
+                            sort=sort,
+                            global_free=True
+                        ) 
+                    if info.is_fun:
+                        subterms = []
+                        for inp in info.input_notations:
+                            subterms.append(notation2term[inp])
+                        notation2term[var] = Expr(
+                            name=mapped_id,
+                            subterms=subterms,
+                            sort=sort
+                        ) 
+            notation2terms.append(notation2term)
+        lst.append((k, rnd_tuples, notation2terms))
+    return lst
 
 
 def find_valid_templates(formulas, templates):
@@ -119,16 +162,16 @@ def find_valid_templates(formulas, templates):
         for i, formula in enumerate(formulas):
             term, _ = template.repl_pairs[i]
             term_occs = []
-            # assuming assertions have been merged into single one in each formula
-            # assert_term = formula.assert_cmds[0].term
-            # if k in assert_term.pointers_map:
-            #     term_occs = assert_term.pointers_map[k]
-            # else:
-            #     formula.assert_cmds[0].term.find_all_terms(term, term_occs, template.free)
-            #     # save occs list
-            #     formula.assert_cmds[0].term.pointers_map[k] = term_occs
-            formula.assert_cmds[0].term.find_all_terms(term, term_occs, template.free)
-            # formula.assert_cmds[0].term.pointers_map[k] = term_occs
+            # xxx assert_term = formula.assert_merged.term
+            # xxx if k in assert_term.pointers_map:
+            # xxx    term_occs = assert_term.pointers_map[k]
+            # xxx else:
+            # xxx    formula.assert_merged.term.find_terms(term, term_occs, template.global_free, template.inwards)
+            # xxx    save occs list
+            # xxx    formula.assert_merged.term.pointers_map[k] = term_occs
+            # assume assertions have been merged into single one (CNFTerm) in each formula
+            formula.assert_merged.term.find_terms(term, term_occs, template.global_free, template.inwards)
+            # xxx formula.assert_merged.term.pointers_map[k] = term_occs
             # invalid template
             if len(term_occs) == 0:
                 matched = False
@@ -144,33 +187,40 @@ def call_function_from_module(path, function_name, *args):
     return function(*args)
 
 
-def generate_additions(template, notations, var_name_map, decls, defs, asserts):
+def generate_additions(template, notations, notation2term, decls, asserts):
     # generate new variables and constants
     for var, sort in template.sorted_vars:
-        attrs = notations[var].attributes 
-        if attrs and (var in var_name_map):
-            mapped_name = var_name_map[var]
-            for attr in attrs:
-                if attr.keyword == SMTMRKeyword.VAR:
-                    decls.append(DeclareConst(mapped_name, sort))
-                if attr.keyword == SMTMRKeyword.CONS:
-                    value = random_constant_value(sort)
-                    term = Const(name=value, sort=sort)
-                    defs.append(DefineFun(mapped_name, [], sort, term))
-                if attr.keyword == SMTMRKeyword.GEN:
-                    # operator = Identifier(attr.value)
-                    for t, r in template.repl_pairs:
-                        if t.term_type == TermType.VAR and str(t.name) == var:
-                            repl = copy.deepcopy(r)
-                            repl.replace_var_name(var_name_map)
-                            break
-                    # asserts.append(Assert(term=Expr(name=Identifier("="), subterms=[Var(var), repl])))
-                    asserts.append(Assert(term=Expr(name="=", subterms=[Var(mapped_name), repl])))
+        if var in notation2term:
+            info = notations[var]
+            mapped_term = notation2term[var]
+            if info.is_var:
+                symbol = str(mapped_term.name)
+                decls.append(DeclareConst(symbol, sort))
+            if info.is_fun:
+                input_sort_list = [s.sort for s in mapped_term.subterms]
+                decls.append(DeclareFun(str(mapped_term.name), input_sort_list, sort))
+            if info.gen_assert:
+                for t, r in template.repl_pairs:
+                    if (t.term_type == TermType.VAR) and (str(t.name) == var):
+                        repl = copy.deepcopy(r)
+                        repl.replace_notation_by_term(notation2term)
+                        break
+                asserts.append(
+                    Assert(
+                        term=Expr(
+                            name=BOOLEAN_EQUAL,
+                            subterms=[mapped_term, repl],
+                            sort=BOOL,
+                        )
+                    )
+                )
 
 
-def replace(template, term_tup, var_name_map, formulas):
+def replace(template, term_tup, notation2term, formulas):
     # replace terms in seed formulas
-    for i, formula in enumerate(formulas):
+    # for i, formula in enumerate(formulas):
+    for i in range(len(formulas)):
         _, repl = template.repl_pairs[i]
-        formula.assert_cmds[0].term.substitute([term_tup[i]], repl, var_name_map)
+        # formula.assert_merged.term.substitute([term_tup[i]], repl, notation2term)
+        substitute([term_tup[i]], repl, notation2term)
 

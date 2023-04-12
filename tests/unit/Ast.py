@@ -269,7 +269,7 @@ def test_term():
     e3 = Expr(name=Identifier('e3'), subterms=[e2, e1], sort=BOOL)
     _e3 = Expr(name=Identifier('e3'), subterms=[_e2, e1], sort=BOOL)
     assert e3.equals(_e3, free=True)
-    e3.update_var_name_map(_e3, vn_map)
+    e3.update_notation2term(_e3, vn_map)
     assert vn_map == {'x3': v2.name, 'v1': v1.name}
     ex = Expr(name=Identifier('ex'), subterms=[e2, e1, e2, e2, e1, c2], sort=BOOL)
     vn_map = {}

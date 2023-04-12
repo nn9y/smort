@@ -10,7 +10,7 @@ else:
 
 def serializedATN():
     return [
-        4,1,48,277,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
+        4,1,49,277,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
         6,2,7,7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,
         2,14,7,14,2,15,7,15,2,16,7,16,2,17,7,17,2,18,7,18,2,19,7,19,2,20,
         7,20,2,21,7,21,2,22,7,22,2,23,7,23,2,24,7,24,2,25,7,25,2,26,7,26,
@@ -34,7 +34,7 @@ def serializedATN():
         253,8,25,11,25,12,25,254,1,25,1,25,1,25,1,26,1,26,1,26,1,26,1,26,
         1,27,1,27,1,27,1,27,1,27,5,27,270,8,27,10,27,12,27,273,9,27,1,27,
         1,27,1,27,0,0,28,0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,
-        36,38,40,42,44,46,48,50,52,54,0,4,1,0,7,15,1,0,40,46,1,0,13,15,2,
+        36,38,40,42,44,46,48,50,52,54,0,4,1,0,7,15,1,0,40,47,1,0,13,15,2,
         0,9,9,12,12,285,0,57,1,0,0,0,2,75,1,0,0,0,4,77,1,0,0,0,6,79,1,0,
         0,0,8,81,1,0,0,0,10,86,1,0,0,0,12,90,1,0,0,0,14,92,1,0,0,0,16,94,
         1,0,0,0,18,102,1,0,0,0,20,115,1,0,0,0,22,119,1,0,0,0,24,132,1,0,
@@ -46,7 +46,7 @@ def serializedATN():
         46,23,0,62,66,3,48,24,0,63,66,3,50,25,0,64,66,3,54,27,0,65,62,1,
         0,0,0,65,63,1,0,0,0,65,64,1,0,0,0,66,69,1,0,0,0,67,65,1,0,0,0,67,
         68,1,0,0,0,68,70,1,0,0,0,69,67,1,0,0,0,70,71,3,52,26,0,71,72,5,0,
-        0,1,72,1,1,0,0,0,73,76,3,4,2,0,74,76,5,47,0,0,75,73,1,0,0,0,75,74,
+        0,1,72,1,1,0,0,0,73,76,3,4,2,0,74,76,5,48,0,0,75,73,1,0,0,0,75,74,
         1,0,0,0,76,3,1,0,0,0,77,78,7,0,0,0,78,5,1,0,0,0,79,80,7,1,0,0,80,
         7,1,0,0,0,81,82,5,39,0,0,82,83,3,2,1,0,83,9,1,0,0,0,84,87,3,2,1,
         0,85,87,5,6,0,0,86,84,1,0,0,0,86,85,1,0,0,0,87,11,1,0,0,0,88,91,
@@ -127,8 +127,8 @@ class SMTMRParser ( Parser ):
                      "'par'", "'string'", "'seed'", "'morph'", "'notation'", 
                      "'subst-template'", "'method'", "'fuse'", "<INVALID>", 
                      "<INVALID>", "<INVALID>", "<INVALID>", "':'", "':gen'", 
-                     "':var'", "':cons'", "':snippet'", "':seed'", "':free'", 
-                     "':bound'" ]
+                     "':var'", "':fun'", "':cons'", "':snippet'", "':seed'", 
+                     "':global-free'", "':inwards'" ]
 
     symbolicNames = [ "<INVALID>", "Comment", "ParOpen", "ParClose", "Semicolon", 
                       "String", "QuotedSymbol", "PS_Not", "PS_Bool", "PS_False", 
@@ -139,9 +139,9 @@ class SMTMRParser ( Parser ):
                       "GRW_Numeral", "GRW_Par", "GRW_String", "GRW_Seed", 
                       "GRW_Morph", "GRW_Notation", "GRW_SubstTemplate", 
                       "GRW_Method", "GRW_Fuse", "Numeral", "Binary", "HexDecimal", 
-                      "Decimal", "Colon", "PK_Gen", "PK_Var", "PK_Cons", 
-                      "PK_Snippet", "PK_Seed", "PK_Free", "PK_Bound", "UndefinedSymbol", 
-                      "WS" ]
+                      "Decimal", "Colon", "PK_Gen", "PK_Var", "PK_Fun", 
+                      "PK_Cons", "PK_Snippet", "PK_Seed", "PK_GlobalFree", 
+                      "PK_Inwards", "UndefinedSymbol", "WS" ]
 
     RULE_start = 0
     RULE_simpleSymbol = 1
@@ -222,13 +222,14 @@ class SMTMRParser ( Parser ):
     Colon=39
     PK_Gen=40
     PK_Var=41
-    PK_Cons=42
-    PK_Snippet=43
-    PK_Seed=44
-    PK_Free=45
-    PK_Bound=46
-    UndefinedSymbol=47
-    WS=48
+    PK_Fun=42
+    PK_Cons=43
+    PK_Snippet=44
+    PK_Seed=45
+    PK_GlobalFree=46
+    PK_Inwards=47
+    UndefinedSymbol=48
+    WS=49
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
@@ -415,7 +416,7 @@ class SMTMRParser ( Parser ):
                 self.state = 73
                 self.predefSymbol()
                 pass
-            elif token in [47]:
+            elif token in [48]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 74
                 self.match(SMTMRParser.UndefinedSymbol)
@@ -522,6 +523,9 @@ class SMTMRParser ( Parser ):
         def PK_Var(self):
             return self.getToken(SMTMRParser.PK_Var, 0)
 
+        def PK_Fun(self):
+            return self.getToken(SMTMRParser.PK_Fun, 0)
+
         def PK_Cons(self):
             return self.getToken(SMTMRParser.PK_Cons, 0)
 
@@ -531,11 +535,11 @@ class SMTMRParser ( Parser ):
         def PK_Seed(self):
             return self.getToken(SMTMRParser.PK_Seed, 0)
 
-        def PK_Free(self):
-            return self.getToken(SMTMRParser.PK_Free, 0)
+        def PK_GlobalFree(self):
+            return self.getToken(SMTMRParser.PK_GlobalFree, 0)
 
-        def PK_Bound(self):
-            return self.getToken(SMTMRParser.PK_Bound, 0)
+        def PK_Inwards(self):
+            return self.getToken(SMTMRParser.PK_Inwards, 0)
 
         def getRuleIndex(self):
             return SMTMRParser.RULE_predefKeyword
@@ -566,7 +570,7 @@ class SMTMRParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 79
             _la = self._input.LA(1)
-            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 139637976727552) != 0)):
+            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 280375465082880) != 0)):
                 self._errHandler.recoverInline(self)
             else:
                 self._errHandler.reportMatch(self)
@@ -675,7 +679,7 @@ class SMTMRParser ( Parser ):
             self.state = 86
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [7, 8, 9, 10, 11, 12, 13, 14, 15, 47]:
+            if token in [7, 8, 9, 10, 11, 12, 13, 14, 15, 48]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 84
                 self.simpleSymbol()
@@ -740,7 +744,7 @@ class SMTMRParser ( Parser ):
             self.state = 90
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [40, 41, 42, 43, 44, 45, 46]:
+            if token in [40, 41, 42, 43, 44, 45, 46, 47]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 88
                 self.predefKeyword()
@@ -1059,7 +1063,7 @@ class SMTMRParser ( Parser ):
                 self.state = 111
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                while (((_la) & ~0x3f) == 0 and ((1 << _la) & 281440617037796) != 0):
+                while (((_la) & ~0x3f) == 0 and ((1 << _la) & 562915593748452) != 0):
                     self.state = 108
                     self.s_expr()
                     self.state = 113
@@ -1127,7 +1131,7 @@ class SMTMRParser ( Parser ):
                 self.state = 117
                 self.match(SMTMRParser.Numeral)
                 pass
-            elif token in [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 47]:
+            elif token in [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 48]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 118
                 self.symbol()
@@ -1200,7 +1204,7 @@ class SMTMRParser ( Parser ):
             self.state = 132
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 47]:
+            if token in [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 48]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 121
                 self.symbol()
@@ -1222,7 +1226,7 @@ class SMTMRParser ( Parser ):
                     self.state = 128 
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
-                    if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & 140771848159168) != 0)):
+                    if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & 281509336514496) != 0)):
                         break
 
                 self.state = 130
@@ -1316,7 +1320,7 @@ class SMTMRParser ( Parser ):
                 self.state = 140
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                while (((_la) & ~0x3f) == 0 and ((1 << _la) & 281440617037796) != 0):
+                while (((_la) & ~0x3f) == 0 and ((1 << _la) & 562915593748452) != 0):
                     self.state = 137
                     self.s_expr()
                     self.state = 142
@@ -1478,7 +1482,7 @@ class SMTMRParser ( Parser ):
                     self.state = 158 
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
-                    if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & 140737488420804) != 0)):
+                    if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & 281474976776132) != 0)):
                         break
 
                 self.state = 160
@@ -1725,7 +1729,7 @@ class SMTMRParser ( Parser ):
                     self.state = 185 
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
-                    if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & 141252884496356) != 0)):
+                    if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & 281990372851684) != 0)):
                         break
 
                 self.state = 187
@@ -1795,7 +1799,7 @@ class SMTMRParser ( Parser ):
             self.state = 201
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 47]:
+            if token in [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 48]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 191
                 self.symbol()
@@ -1815,7 +1819,7 @@ class SMTMRParser ( Parser ):
                     self.state = 197 
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
-                    if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & 140737488420804) != 0)):
+                    if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & 281474976776132) != 0)):
                         break
 
                 self.state = 199
@@ -2142,15 +2146,15 @@ class SMTMRParser ( Parser ):
             self.state = 231
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 47]:
+            if token in [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 48]:
                 self.state = 224
                 self.symbol()
                 pass
-            elif token in [3, 39, 40, 41, 42, 43, 44, 45, 46]:
+            elif token in [3, 39, 40, 41, 42, 43, 44, 45, 46, 47]:
                 self.state = 228
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                while (((_la) & ~0x3f) == 0 and ((1 << _la) & 140187732541440) != 0):
+                while (((_la) & ~0x3f) == 0 and ((1 << _la) & 280925220896768) != 0):
                     self.state = 225
                     self.attribute()
                     self.state = 230
@@ -2249,7 +2253,7 @@ class SMTMRParser ( Parser ):
             self.state = 240
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 140187732541440) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 280925220896768) != 0):
                 self.state = 237
                 self.attribute()
                 self.state = 242
@@ -2430,7 +2434,7 @@ class SMTMRParser ( Parser ):
             self.state = 271
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 140187732541440) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 280925220896768) != 0):
                 self.state = 268
                 self.attribute()
                 self.state = 273

@@ -1,9 +1,11 @@
 import copy
 from enum import Enum
-from collections import defaultdict
+import random
 
 from smort.src.tools.utils import list2str
 from smort.src.translate.tools.utils import *
+from smort.src.translate.theory.available_sorts import *
+from smort.src.translate.theory.SMTLIBv2Sorts import *
 
 
 class TermType(Enum):
@@ -15,22 +17,37 @@ class TermType(Enum):
     MATCH   = 5
     ANNOT   = 6
 
+QUANT_FORALL = 'forall'
+QUANT_EXISTS = 'exists'
+
+
+class TermScopeType(Enum):
+    LOCAL_VAR   = 0
+    GLOBAL_VAR  = 1
+    GLOBAL_SIG  = 2
+    PREDEF_SIG  = 3
+
 
 def Const(name, sort=None):
-    return Term(name=name, sort=sort, local_free_vars={}, term_type=TermType.CONST)
+    return Term(name=name, sort=sort, local_free_vars={}, term_type=TermType.CONST, global_free=True)
 
-def Var(name, sort=None, qual_id=False):
+def Var(name, sort=None, qual_id=False, global_free=False):
     return Term(
         name=name,
         sort=sort,
         term_type=TermType.VAR,
         local_free_vars={str(name): sort},
         qual_id=qual_id,
+        global_free=global_free,
     )
 
 def Expr(name, subterms, sort=None, local_free_vars=None, qual_id=False):
     if not local_free_vars:
         local_free_vars = {} 
+    global_free = True
+    for s in subterms:
+        if not s.global_free:
+            global_free = False
     return Term(
         name=name,
         subterms=subterms,
@@ -38,6 +55,7 @@ def Expr(name, subterms, sort=None, local_free_vars=None, qual_id=False):
         local_free_vars=local_free_vars,
         qual_id=qual_id,
         term_type=TermType.EXPR,
+        global_free=global_free,
     )
 
 def LetBinding(var_bindings, let_term, sort=None, local_free_vars=None):
@@ -49,22 +67,28 @@ def LetBinding(var_bindings, let_term, sort=None, local_free_vars=None):
         sort=sort,
         local_free_vars=local_free_vars,
         term_type=TermType.LET,
+        global_free=let_term.global_free,
     )
 
-def Quantifier(quantifier,
-               sorted_vars,
-               quantified_term,
-               sort=None,
-               local_free_vars=None):
+def Quantifier(
+        name,
+        quantifier,
+        sorted_vars,
+        quantified_term,
+        sort=None,
+        local_free_vars=None
+    ):
     if not local_free_vars:
         local_free_vars = {}
     return Term(
+        name=name,
         quantifier=quantifier,
         sorted_vars=sorted_vars,
         subterms=[quantified_term],
         sort=sort,
         local_free_vars=local_free_vars,
         term_type=TermType.QUANT,
+        global_free=quantified_term.global_free,
     )
 
 def Match(term, match_cases, sort=None, local_free_vars=None):
@@ -76,6 +100,7 @@ def Match(term, match_cases, sort=None, local_free_vars=None):
         sort=sort,
         local_free_vars=local_free_vars,
         term_type=TermType.MATCH,
+        global_free=term.global_free,
     )
 
 def AnnotatedTerm(term, annotations, sort=None):
@@ -85,6 +110,7 @@ def AnnotatedTerm(term, annotations, sort=None):
         sort=sort,
         local_free_vars=term.local_free_vars,
         term_type=TermType.ANNOT,
+        global_free=term.global_free,
     )
 
 
@@ -103,39 +129,8 @@ class Term:
         annotations=[],
         local_free_vars={},
         qual_id=False,
+        global_free=False,
         # pointers_map={},
-    ):
-        self._set(
-            name=name,
-            sort=sort,
-            term_type=term_type,
-            var_bindings=var_bindings,
-            quantifier=quantifier,
-            sorted_vars=sorted_vars,
-            match_cases=match_cases,
-            bound_vars=bound_vars,
-            subterms=subterms,
-            annotations=annotations,
-            local_free_vars=local_free_vars,
-            qual_id=qual_id,
-            # pointers_map=pointers_map,
-        )
- 
-    def _set(
-        self,
-        name=None,
-        sort=None,
-        term_type=None,
-        quantifier=None,
-        sorted_vars=None,
-        var_bindings=None,
-        match_cases=None,
-        bound_vars=None,
-        subterms=None,
-        annotations=None,
-        local_free_vars=None,
-        qual_id=False,
-        # pointers_map=None,
     ):
         self.name = name
         self.sort = sort
@@ -149,48 +144,120 @@ class Term:
         self.annotations = annotations
         self.local_free_vars = local_free_vars
         self.qual_id = qual_id
+        self.global_free = global_free
         # self.pointers_map = pointers_map
-
-    def equals(self, other, free=False):
+    
+    def prefix_vars(self, prefix):
         """
-        check if this term match other, the template term to be replaced
+        add prefix to variable names in self recursively
+        """
+        self.bound_vars = {prefix + key: value for key, value in self.bound_vars.items()}
+        self.local_free_vars = {prefix + key: value for key, value in self.local_free_vars.items()}
+        match self.term_type:
+            case TermType.CONST:
+                return
+            case TermType.VAR:
+                self.name = Identifier(prefix + self.name.symbol, self.name.indices)
+                return
+            case TermType.EXPR:
+                for subterm in self.subterms:
+                    subterm.prefix_vars(prefix)
+            case TermType.LET:
+                for i, vb in enumerate(self.var_bindings):
+                    var, term = vb
+                    # set
+                    self.var_bindings[i][0] = prefix + var
+                    term.prefix_vars(prefix)
+                self.subterms[0].prefix_vars(prefix)
+                return
+            case TermType.QUANT:
+                for i, sv in enumerate(self.sorted_vars):
+                    var, _ = sv
+                    # set
+                    self.sorted_vars[i][0] = prefix + var
+                self.subterms[0].prefix_vars(prefix)
+                return
+            case TermType.MATCH:
+                self.subterms[0].prefix_vars(prefix)
+                for i, mc in enumerate(self.match_cases):
+                    pat, term = mc
+                    if len(pat) > 1:
+                        for j in range(1, len(pat)):
+                            # set
+                            self.match_cases[i][0][j] = prefix + pat[j]
+                    else:
+                        if pat[0] in term.bound_vars:
+                            # set
+                            # not nullary constructor
+                            self.match_cases[i][0][0] = prefix + pat[0]
+                    term.prefix_vars(prefix)
+                return
+            case TermType.ANNOT:
+                self.subterms[0].prefix_vars(prefix)
+    
+    def find_terms(self, t, occs, global_free=False, inwards=False):
+        """
+        find terms match template t in self and add them to the list occs.
+
+        global_free: if variables in the terms matched should be all global free
+        inwards:     if could continue matching into a literal
+        """
+        if self.equals(t, global_free):
+            if inwards:
+                # 0.5 probability to step into subterms
+                find_subterms = random.choice(['true', 'false'])
+                if find_subterms:
+                    occs_subterms = []
+                    for subterm in self.subterms:
+                        subterm.find_terms(t, occs_subterms, global_free, inwards)
+                    # terms cannot intersect
+                    if len(occs_subterms) > 0:
+                        occs.extend(occs_subterms)
+                        return
+            # no subterms matched, use self
+            occs.append(self)
+        elif inwards:
+            for subterm in self.subterms:
+                subterm.find_terms(t, occs, global_free, inwards)
+
+    def equals(self, other, global_free=False):
+        """
+        check if this term match other, which is the template term to be replaced
         """
         if not isinstance(other, Term):
             return False
-        if self.term_type != other.term_type:
+        # special check for forall, match (find) the inner term recursively
+        if (self.term_type == TermType.QUANT) and (self.quantifier == QUANT_FORALL):
+            return self.subterms[0].equals(other, global_free) 
+        if global_free and not self.global_free:
             return False
-        # sort of function could be None (Unknown)
-        if ((self.term_type == TermType.CONST) or (self.term_type == TermType.VAR)):
-            if self.sort != other.sort:
+        # sort should be the same 
+        if self.sort != other.sort:
+            return False
+        # term can be considered as a 'variable' in other
+        # when other is an variable, or a constant and self is the same constant,
+        # match successfully
+        if len(other.subterms) == 0:
+            if (self.term_type == TermType.CONST) and (self.name != other.name):
                 return False
-            if free:
-                if str(self.name) in self.bound_vars:
-                    return False
-        # if self.sort != other.sort:
-        #     return False
-        # name of cons, exprs should be the same
+            return True
+        # if other is an experssion:
+        # constant value, operator of expr should be the same when other is the same type
         if ((self.term_type == TermType.CONST) or (self.term_type == TermType.EXPR)):
-            if self.name != other.name:
+            if (self.term_type == other.term_type) and (self.name != other.name):
                 return False
-        # only deal with cons, vars, exprs in current implementation
-        # other.term_type won't be following types
-        # if (
-        #     (self.term_type == TermType.QUANT)
-        #     or (self.term_type == TermType.LET)
-        #     or (self.term_type == TermType.MATCH)
-        #     or (self.term_type == TermType.ANNOT)
-        # ):
-        #     return False
+        # subterms should also match
         if len(self.subterms) != len(other.subterms):
             return False
-        for i, t in enumerate(self.subterms):
-            if not t.equals(other.subterms[i], free):
+        for i, subterm in enumerate(self.subterms):
+            if not subterm.equals(other.subterms[i], global_free):
                 return False
         return True
-    
+   
     def update_bound_vars(self, bound_vars):
         """
-        update bound vars of this term and its subterms recursively
+        Update bound vars of this term and its subterms recursively,
+            until encounters let, quant, match which has been updated already
         """
         self.bound_vars = bound_vars
         match self.term_type:
@@ -202,87 +269,37 @@ class Term:
         for t in self.subterms:
             t.update_bound_vars(bound_vars)
  
-    def update_var_name_mapping(self, other, var_name_map):
+    def update_notation2term(self, other, notation2term: dict):
         """
-        update var_name_map of a tuple of terms (to be replaced)
-            except for new variables and constants
+        notation2term: dict, mapping from notations in term templates (others)
+                        to actual terms (selfs) to be replaced, 
+                        except for new functions, variables and constants in templates
         """
-        if self.term_type == TermType.VAR:
-            var_name_map[str(other.name)] = self.name
+        if other.term_type in {TermType.CONST, TermType.VAR}:
+            if (self.term_type == TermType.QUANT) and (self.quantifier == QUANT_FORALL):
+                # special check for forall, replace inner term
+                self.subterms[0].update_notation2term(other, notation2term)
+            else:
+                notation2term[str(other.name)] = self
+            return
+        # other is an experssion
         for i, t in enumerate(self.subterms):
-            t.update_var_name_mapping(other.subterms[i], var_name_map)
+            t.update_notation2term(other.subterms[i], notation2term)
  
-    def find_all_terms(self, t, occs, free=False):
+    def replace_notation_by_term(self, repl_dict):
         """
-        find all terms t in self and add them to the list occs.
+        Replace notations in an template (self) by corresponding actual terms.
+
+        This template could be repl template or fuse formula.
         """
-        if self.equals(t, free):
-            return occs.append(self)
-        if self.subterms:
-            for subterm in self.subterms:
-                subterm.find_all_terms(t, occs, free)
-    
-    def replace_var_name(self, var_name_map):
-        if self.term_type == TermType.VAR:
-            # exists in seed 
+        if self.term_type in {TermType.CONST, TermType.VAR}:
+            # notation (variables) in template
             symbol = str(self.name)
-            if symbol in var_name_map:
-                self.name = var_name_map[symbol]
+            if symbol in repl_dict:
+                self.__dict__ = copy.deepcopy(repl_dict[symbol].__dict__)
         else:
             for s in self.subterms:
-                s.replace_var_name(var_name_map)
-
-    # def substitute(self, t, repl, var_name_map, free=False):
-    def substitute(self, occs, repl, var_name_map):
-        """
-        substitute all terms in occs by repl.
-        """
-        # occs = []
-        # self.find_all_terms(t, occs, var_name_map, free)
-        for occ in occs:
-            r = copy.deepcopy(repl)
-            r.replace_var_name(var_name_map)
-            occ._set(
-                name=copy.deepcopy(r.name),
-                sort=copy.deepcopy(r.sort),
-                term_type=copy.deepcopy(r.term_type),
-                var_bindings=copy.deepcopy(r.var_bindings),
-                quantifier=copy.deepcopy(r.quantifier),
-                sorted_vars=copy.deepcopy(r.sorted_vars),
-                match_cases=copy.deepcopy(r.match_cases),
-                bound_vars=copy.deepcopy(r.bound_vars),
-                subterms=copy.deepcopy(r.subterms),
-                annotations=copy.deepcopy(r.annotations),
-                local_free_vars=occ.local_free_vars,
-                qual_id=occ.qual_id,
-                # pointers_map=occ.pointers_map,
-            )
-
-    def replace_symbols_by_terms(self, repl_dict):
-        """
-        replace formula symbols by formula (merged assertion term) instances
-        """
-        if self.term_type == TermType.VAR:
-            # formula symbol
-            repl = repl_dict[str(self.name)]
-            self._set(
-                name=copy.deepcopy(repl.name),
-                sort=copy.deepcopy(repl.sort),
-                term_type=copy.deepcopy(repl.term_type),
-                var_bindings=copy.deepcopy(repl.var_bindings),
-                quantifier=copy.deepcopy(repl.quantifier),
-                sorted_vars=copy.deepcopy(repl.sorted_vars),
-                match_cases=copy.deepcopy(repl.match_cases),
-                bound_vars=copy.deepcopy(repl.bound_vars),
-                subterms=copy.deepcopy(repl.subterms),
-                annotations=copy.deepcopy(repl.annotations),
-                local_free_vars=copy.deepcopy(repl.local_free_vars),
-                qual_id=copy.deepcopy(repl.qual_id),
-                # pointers_map=copy.deepcopy(repl.pointers_map),
-            )
-            return
-        for t in self.subterms:
-            t.replace_symbols_by_terms(repl_dict)
+                s.replace_notation_by_term(repl_dict)
 
     def __eq__(self, other):
         if not isinstance(other, Term):
@@ -374,4 +391,13 @@ class Term:
     #             term_copied.pointers_map[k].extend(pointers)
     #         term_copied.subterms.append(t_copied)
     #     return term_copied 
+
+
+def substitute(occs, repl, notation2term):
+    """
+    Substitute all terms in occs by repl template with notation2term dict.
+    """
+    for occ in occs:
+        occ = copy.deepcopy(repl)
+        occ.replace_notation_by_term(notation2term)
 

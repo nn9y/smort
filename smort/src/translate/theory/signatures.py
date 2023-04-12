@@ -16,7 +16,10 @@ def get_sort_in_synonym(symbol: str, pars: list, synonyms: dict):
     return None
 
 
-def match_fun_in_signatures(name, input_list, output, signatures: dict):
+def match_fun_in_signatures(name, input_list, signatures: dict):
+    """
+    :return: Sort of output if matched or None else
+    """
     name_type = type(name)
     if name_type == SpecConstant:
         symbol = name.const_type
@@ -26,33 +29,36 @@ def match_fun_in_signatures(name, input_list, output, signatures: dict):
         indices = name.indices
     else:
         return None
+    
+    input_indices_list = [input_sort.id_.indices for input_sort in input_list]
 
     if str(symbol) in signatures:
         fun_list = signatures[str(symbol)]
         for fun in fun_list:
             if isinstance(fun.name, name_type):
-                instance = None
+                fun_output = None
                 if (name_type == SpecConstant) or (isinstance(fun.name.indices, dict)):
                     # SpecConstant or Indexed Fun (name is an Identifier) 
                     if fun.match_indexed_term(name, input_list):
-                        instance = fun.get_indexed_instance(
-                                    indices, 
-                                    [inp.id_.indices for inp in input_list]
+                        fun_output = fun.get_indexed_output(
+                                    indices,
+                                    input_indices_list
                                 )
                 elif fun.par_list:
                     # parametric Fun
                     par_dict = fun.get_par_dict(name, input_list)
-                    instance = generate_one_instance(fun, par_dict)
+                    fun_output = fun.get_parametric_output(par_dict)
                 else:
-                    if fun.match_term(name, input_list, output):
-                        return fun
-                
-                if (instance
-                    and (
-                        (output and output == instance.output)
-                        or (not output)
-                        )
-                    ):
-                    return instance
+                    if fun.match_term(name, input_list):
+                        fun_output = fun.output
+ 
+                if fun_output:
+                    return fun_output 
+    
+    # special check for (_ bvX n)
+    if name_type == Identifier and len(name.id_.indices) == 1:
+        if name.id_.symbol[0:2] == 'bv':
+            # return (_ BitVec n)
+            return BIT_VECTOR.get_indexed_instance([name.id_.indices])
 
     return None

@@ -1,56 +1,58 @@
-import sys
-
 from smort.src.translate.theory.Fun import *
 from smort.src.translate.theory.utils import *
 from smort.src.translate.theory.SMTLIBv2Sorts import *
 
 
-def core_theory():
+# accroding to http://smtlib.cs.uiowa.edu/papers/smt-lib-reference-v2.6-r2017-07-18.pdf:
+#   input sorts in funs with :right-assoc, :left-assoc, :chainable and :pairwise attributes are
+#   stored in a set, which means sort of each valid input must be one of them
+BOOLEAN_NOT = Identifier("not")
+BOOLEAN_IMPLIES = Identifier("=>")
+BOOLEAN_AND = Identifier("and")
+BOOLEAN_OR = Identifier("or")
+BOOLEAN_EQUAL = Identifier("=")
+BOOLEAN_IF_THEN_ELSE = Identifier("ite")
+
+
+def Core_theory():
     sorts = {
         BOOL_NAME: BOOL
     }
     funs = {
-        str(SpecConstType.B_VALUE): [Fun(SpecConstant(SpecConstType.B_VALUE, None), [], BOOL)],
-        "not": [Fun(Identifier("not"), [BOOL], BOOL)],
-        "=>": [Fun(Identifier("=>"), [BOOL, BOOL], BOOL)],
-        "and": [Fun(Identifier("and"), [BOOL, BOOL], BOOL)],
-        "or": [Fun(Identifier("or"), [BOOL, BOOL], BOOL)],
-        "xor": [Fun(Identifier("xor"), [BOOL, BOOL], BOOL)],
-        # parametric functions
-        "=": [Fun(Identifier("="), [A, A], BOOL, [A])],
-        "distinct": [Fun(Identifier("distinct"), [A, A], BOOL, [A])],
-        "ite": [Fun(Identifier("ite"), [BOOL, A, A], A, [A])],
+        str(SpecConstType.B_VALUE): Fun(SpecConstant(SpecConstType.B_VALUE, None), [], BOOL),
+        "not": Fun(BOOLEAN_NOT, [BOOL], BOOL),
+        "=>": Fun(BOOLEAN_IMPLIES, {BOOL}, BOOL),
+        "and": Fun(BOOLEAN_AND, {BOOL}, BOOL),
+        "or": Fun(BOOLEAN_OR, {BOOL}, BOOL),
+        "xor": Fun(Identifier("xor"), {BOOL}, BOOL),
+        "=": Fun(BOOLEAN_EQUAL, {A}, BOOL, [A]),
+        "distinct": Fun(Identifier("distinct"), {A}, BOOL, [A]),
+        "ite": Fun(BOOLEAN_IF_THEN_ELSE, [BOOL, A, A], A, [A]),
     }
-
-    # repl_dicts = [{A: sort} for sort in sorts]
-    # funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
- 
     return [sorts, funs]
 
-def ints_theory(): 
-    core_sorts, core_funs = core_theory()
-    # :sorts
+
+def Ints_theory(): 
+    core_sorts, core_funs = Core_theory()
     sorts = {
         INT_NAME: INT,
     }
     sorts = merge_disjoint_dict([sorts, core_sorts])
     funs = {
-        # :funs
         str(SpecConstType.NUMERAL): Fun(SpecConstant(SpecConstType.NUMERAL, None), [], INT),
         "-": [
             Fun(Identifier("-"), [INT], INT),
-            Fun(Identifier("-"), [INT, INT], INT)
+            Fun(Identifier("-"), {INT}, INT)
         ],
-        "+": Fun(Identifier("+"), [INT, INT], INT),
-        "*": Fun(Identifier("*"), [INT, INT], INT),
-        "div": Fun(Identifier("div"), [INT, INT], INT),
+        "+": Fun(Identifier("+"), {INT}, INT),
+        "*": Fun(Identifier("*"), {INT}, INT),
+        "div": Fun(Identifier("div"), {INT}, INT),
         "mod": Fun(Identifier("mod"), [INT, INT], INT),
         "abs": Fun(Identifier("abs"), [INT], INT),
-        "<=": Fun(Identifier("<="), [INT, INT], BOOL),
-        "<": Fun(Identifier("<"), [INT, INT], BOOL),
-        ">=": Fun(Identifier(">="), [INT, INT], BOOL),
-        ">": Fun(Identifier(">"), [INT, INT], BOOL),
-        # :fun-description
+        "<=": Fun(Identifier("<="), {INT}, BOOL),
+        "<": Fun(Identifier("<"), {INT}, BOOL),
+        ">=": Fun(Identifier(">="), {INT}, BOOL),
+        ">": Fun(Identifier(">"), {INT}, BOOL),
         "divisible": indexed_fun(
                         "divisible",
                         1,
@@ -59,72 +61,64 @@ def ints_theory():
                         numeral_greater_than_x(0, 1),
                     ),
     }
-
     funs = merge_multi_dict([funs, core_funs])
-
-    # repl_dicts = [{A: sort} for sort in sorts]
-    # funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
-
     return [sorts, funs]
 
-def reals_theory():
-    core_sorts, core_funs = core_theory()
-    # :sorts
+
+def Reals_theory():
+    core_sorts, core_funs = Core_theory()
     sorts = {
         REAL_NAME: REAL,
     }
     sorts = merge_disjoint_dict([sorts, core_sorts])
-    # :funs
     funs = {
         str(SpecConstType.NUMERAL): Fun(SpecConstant(SpecConstType.NUMERAL, None), [], REAL),
         str(SpecConstType.DECIMAL): Fun(SpecConstant(SpecConstType.DECIMAL, None), [], REAL),
         "-": [
             Fun(Identifier("-"), [REAL], REAL),
-            Fun(Identifier("-"), [REAL, REAL], REAL)
+            Fun(Identifier("-"), {REAL}, REAL)
         ],
-        "+": Fun(Identifier("+"), [REAL, REAL], REAL),
-        "*": Fun(Identifier("*"), [REAL, REAL], REAL),
-        "/": Fun(Identifier("/"), [REAL, REAL], REAL),
-        "<=": Fun(Identifier("<="), [REAL, REAL], BOOL),
-        "<": Fun(Identifier("<"), [REAL, REAL], BOOL),
-        ">=": Fun(Identifier(">="), [REAL, REAL], BOOL),
-        ">": Fun(Identifier(">"), [REAL, REAL], BOOL),
+        "+": Fun(Identifier("+"), {REAL}, REAL),
+        "*": Fun(Identifier("*"), {REAL}, REAL),
+        "/": Fun(Identifier("/"), {REAL}, REAL),
+        "<=": Fun(Identifier("<="), {REAL}, BOOL),
+        "<": Fun(Identifier("<"), {REAL}, BOOL),
+        ">=": Fun(Identifier(">="), {REAL}, BOOL),
+        ">": Fun(Identifier(">"), {REAL}, BOOL),
     }
-
     funs = merge_multi_dict([funs, core_funs])
-
-    # repl_dicts = [{A: sort} for sort in sorts]
-    # funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
-
     return sorts, funs
 
-def reals_ints_theory():
-    ints_sorts, ints_funs = ints_theory()
-    reals_sorts, reals_funs = reals_theory()
+
+def Reals_Ints_theory():
+    ints_sorts, ints_funs = Ints_theory()
+    reals_sorts, reals_funs = Reals_theory()
     del reals_funs[str(SpecConstType.NUMERAL)]
-    # :sorts
     sorts = merge_disjoint_dict([ints_sorts, reals_sorts])
-    # :funs
     funs = merge_multi_dict([ints_funs, reals_funs])
     funs["to_real"] = Fun(Identifier("to_real"), [INT], REAL)
     funs["to_int"] = Fun(Identifier("to_int"), [REAL], INT)
     funs["is_int"] = Fun(Identifier("is_int"), [REAL], BOOL)
-
-    # repl_dicts = [{A: sort} for sort in sorts]
-    # funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
-
+    funs["-"].append(Fun(Identifier("-"), {REAL, INT}, REAL))
+    funs["+"].append(Fun(Identifier("+"), {REAL, INT}, REAL))
+    funs["*"].append(Fun(Identifier("*"), {REAL, INT}, REAL))
+    funs["/"].append(Fun(Identifier("/"), {REAL, INT}, REAL))
+    funs["<="].append(Fun(Identifier("<="), {REAL, INT}, REAL))
+    funs["<"].append(Fun(Identifier("<"), {REAL, INT}, REAL))
+    funs[">="].append(Fun(Identifier(">="), {REAL, INT}, REAL))
+    funs[">"].append(Fun(Identifier(">"), {REAL, INT}, REAL))
+    funs["="].append(Fun(Identifier("="), {REAL, INT}, BOOL))
+    funs["distinct"].append(Fun(Identifier("distinct"), {REAL, INT}, BOOL))
     return sorts, funs
 
-def fixedSizeBitVectors_theory():
-    core_sorts, core_funs = core_theory()
-    # :sorts
+
+def FixedSizeBitVectors_theory():
+    core_sorts, core_funs = Core_theory()
     sorts = {
         BIT_VECTOR_NAME: BIT_VECTOR,
     }
     sorts = merge_disjoint_dict([sorts, core_sorts])
-    # :funs_description
     funs = {
-        # Bitvector literals
         str(SpecConstType.BINARY): 
                     indexed_fun(
                         SpecConstType.BINARY,
@@ -178,7 +172,7 @@ def fixedSizeBitVectors_theory():
         "bvand":    indexed_fun(
                         "bvand", 
                         0,
-                        [BIT_VECTOR, BIT_VECTOR],
+                        {BIT_VECTOR},
                         BIT_VECTOR,
                         eq_input_indices(0, 2, 2),
                         get_indices_of_first_indexed_input
@@ -186,7 +180,7 @@ def fixedSizeBitVectors_theory():
         "bvor":    indexed_fun(
                         "bvor", 
                         0,
-                        [BIT_VECTOR, BIT_VECTOR],
+                        {BIT_VECTOR},
                         BIT_VECTOR,
                         eq_input_indices(0, 2, 2),
                         get_indices_of_first_indexed_input
@@ -194,7 +188,7 @@ def fixedSizeBitVectors_theory():
         "bvadd":    indexed_fun(
                         "bvadd",
                         0,
-                        [BIT_VECTOR, BIT_VECTOR],
+                        {BIT_VECTOR},
                         BIT_VECTOR,
                         eq_input_indices(0, 2, 2),
                         get_indices_of_first_indexed_input
@@ -202,7 +196,7 @@ def fixedSizeBitVectors_theory():
         "bvmul":    indexed_fun(
                         "bvmul", 
                         0,
-                        [BIT_VECTOR, BIT_VECTOR],
+                        {BIT_VECTOR},
                         BIT_VECTOR,
                         eq_input_indices(0, 2, 2),
                         get_indices_of_first_indexed_input
@@ -246,18 +240,183 @@ def fixedSizeBitVectors_theory():
                         BOOL,
                         eq_input_indices(0, 2, 2),
                     ),
+        # _ rem _
+        "bv2nat":   indexed_fun(
+                        'bv2nat',
+                        1,
+                        [BIT_VECTOR],
+                        INT,
+                    ),
+        # nat2bv
+        "bvnand":    indexed_fun(
+                        "bvnand", 
+                        0,
+                        [BIT_VECTOR, BIT_VECTOR],
+                        BIT_VECTOR,
+                        eq_input_indices(0, 2, 2),
+                        get_indices_of_first_indexed_input
+                    ), 
+        "bvnor":    indexed_fun(
+                        "bvnor", 
+                        0,
+                        [BIT_VECTOR, BIT_VECTOR],
+                        BIT_VECTOR,
+                        eq_input_indices(0, 2, 2),
+                        get_indices_of_first_indexed_input
+                    ), 
+        "bvxor":    indexed_fun(
+                        "bvxor", 
+                        0,
+                        {BIT_VECTOR},
+                        BIT_VECTOR,
+                        eq_input_indices(0, 2, 2),
+                        get_indices_of_first_indexed_input
+                    ), 
+        "bvxnor":    indexed_fun(
+                        "bvxnor", 
+                        0,
+                        [BIT_VECTOR, BIT_VECTOR],
+                        BIT_VECTOR,
+                        eq_input_indices(0, 2, 2),
+                        get_indices_of_first_indexed_input
+                    ), 
+        "bvcomp":    indexed_fun(
+                        "bvcomp", 
+                        0,
+                        [BIT_VECTOR, BIT_VECTOR],
+                        BIT_VECTOR,
+                        eq_input_indices(0, 2, 2),
+                        get_indices_of_first_indexed_input
+                    ), 
+        "bvsub":    indexed_fun(
+                        "bvsub", 
+                        0,
+                        [BIT_VECTOR, BIT_VECTOR],
+                        BIT_VECTOR,
+                        eq_input_indices(0, 2, 2),
+                        get_indices_of_first_indexed_input
+                    ), 
+        "bvsdiv":    indexed_fun(
+                        "bvsdiv", 
+                        0,
+                        [BIT_VECTOR, BIT_VECTOR],
+                        BIT_VECTOR,
+                        eq_input_indices(0, 2, 2),
+                        get_indices_of_first_indexed_input
+                    ), 
+        "bvsrem":    indexed_fun(
+                        "bvsrem", 
+                        0,
+                        [BIT_VECTOR, BIT_VECTOR],
+                        BIT_VECTOR,
+                        eq_input_indices(0, 2, 2),
+                        get_indices_of_first_indexed_input
+                    ), 
+        "bvsmod":    indexed_fun(
+                        "bvsmod", 
+                        0,
+                        [BIT_VECTOR, BIT_VECTOR],
+                        BIT_VECTOR,
+                        eq_input_indices(0, 2, 2),
+                        get_indices_of_first_indexed_input
+                    ), 
+        "bvule":    indexed_fun(
+                        "bvule", 
+                        0,
+                        [BIT_VECTOR, BIT_VECTOR],
+                        BOOL,
+                    ), 
+        "bvugt":    indexed_fun(
+                        "bvugt", 
+                        0,
+                        [BIT_VECTOR, BIT_VECTOR],
+                        BOOL,
+                    ), 
+        "bvuge":    indexed_fun(
+                        "bvuge", 
+                        0,
+                        [BIT_VECTOR, BIT_VECTOR],
+                        BOOL,
+                    ), 
+        "bvslt":    indexed_fun(
+                        "bvslt", 
+                        0,
+                        [BIT_VECTOR, BIT_VECTOR],
+                        BOOL,
+                    ), 
+        "bvsle":    indexed_fun(
+                        "bvsle", 
+                        0,
+                        [BIT_VECTOR, BIT_VECTOR],
+                        BOOL,
+                    ), 
+        "bvsgt":    indexed_fun(
+                        "bvsgt", 
+                        0,
+                        [BIT_VECTOR, BIT_VECTOR],
+                        BOOL,
+                    ), 
+        "bvsge":    indexed_fun(
+                        "bvsge", 
+                        0,
+                        [BIT_VECTOR, BIT_VECTOR],
+                        BOOL,
+                    ), 
+        "bvashr":    indexed_fun(
+                        "bvashr", 
+                        0,
+                        [BIT_VECTOR, BIT_VECTOR],
+                        BIT_VECTOR,
+                        eq_input_indices(0, 2, 2),
+                        get_indices_of_first_indexed_input
+                    ), 
+        "repeat":    indexed_fun(
+                        "repeat", 
+                        1,
+                        [BIT_VECTOR],
+                        BIT_VECTOR,
+                        None, 
+                        multiply_bits, 
+                    ), 
+        "zero_extend":indexed_fun(
+                        "zero_extend", 
+                        1,
+                        [BIT_VECTOR],
+                        BIT_VECTOR,
+                        None, 
+                        plus_bits, 
+                    ), 
+        "sign_extend":indexed_fun(
+                        "sign_extend", 
+                        1,
+                        [BIT_VECTOR],
+                        BIT_VECTOR,
+                        None, 
+                        plus_bits, 
+                    ), 
+        "rotate_left":indexed_fun(
+                        "rotate_left", 
+                        1,
+                        [BIT_VECTOR],
+                        BIT_VECTOR,
+                        None, 
+                        get_indices_of_first_indexed_input, 
+                    ), 
+        "rotate_right":indexed_fun(
+                        "rotate_right", 
+                        1,
+                        [BIT_VECTOR],
+                        BIT_VECTOR,
+                        None, 
+                        get_indices_of_first_indexed_input, 
+                    ), 
     }
-
     funs = merge_multi_dict([funs, core_funs])
-
-    # repl_dicts = [{A: sort} for sort in sorts]
-    # funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
-
     return sorts, funs
 
-def floatingPoints_theory():
-    core_sorts, core_funs = core_theory()
-    # :sorts
+
+def FloatingPoint_theory():
+    core_sorts, core_funs = Core_theory()
     sorts = {
         ROUNDING_MODE_NAME: ROUNDING_MODE,
         REAL_NAME: REAL,
@@ -270,8 +429,6 @@ def floatingPoints_theory():
     }
     sorts = merge_disjoint_dict([sorts, core_sorts])
     funs = {
-        # :funs
-        #   Constants for rounging modes
         "roundNearestTiesToEven": 
             Fun(Identifier("roundNearestTiesToEven"), [], ROUNDING_MODE),
         "RNE": 
@@ -292,8 +449,6 @@ def floatingPoints_theory():
             Fun(Identifier("roundTowardZero"), [], ROUNDING_MODE),
         "RTZ": 
             Fun(Identifier("RTZ"), [], ROUNDING_MODE),
-        # :funs_description
-        #   Bitvector literals
         str(SpecConstType.BINARY): 
                     indexed_fun(
                         SpecConstType.BINARY,
@@ -312,7 +467,6 @@ def floatingPoints_theory():
                         None,
                         get_number_of_binary_digits(16)
                     ),
-        #   FP literals as bit string triples
         "fp":       indexed_fun(
                         "fp",
                         0,
@@ -321,7 +475,6 @@ def floatingPoints_theory():
                         bitvec_bound_of_fp,
                         get_eb_sb_from_bitvec
                     ),
-        #   Plus and minus infinity
         "+oo":      indexed_fun(
                         "+oo",
                         2,
@@ -338,7 +491,6 @@ def floatingPoints_theory():
                         numeral_greater_than_x(1, 2),
                         get_indices_from_op
                     ),
-        #   Plus and minus zero
         "+zero":    indexed_fun(
                         "+zero",
                         2,
@@ -355,7 +507,6 @@ def floatingPoints_theory():
                         numeral_greater_than_x(1, 2),
                         get_indices_from_op
                     ),
-        #   Non-numbers
         "NaN":      indexed_fun(
                         "NaN",
                         2,
@@ -364,7 +515,6 @@ def floatingPoints_theory():
                         numeral_greater_than_x(1, 2),
                         get_indices_from_op
                     ),
-        #   Operators
         "fp.abs":   indexed_fun(
                         "fp.abs",
                         0,
@@ -465,37 +615,32 @@ def floatingPoints_theory():
         "fp.leq":   indexed_fun(
                         "fp.leq",
                         0,
-                        [FLOATING_POINT, FLOATING_POINT],
+                        {FLOATING_POINT},
                         BOOL,
-                        eq_input_indices(0, 2, 2),
                     ),
         "fp.lt":    indexed_fun(
                         "fp.lt",
                         0,
-                        [FLOATING_POINT, FLOATING_POINT],
+                        {FLOATING_POINT},
                         BOOL,
-                        eq_input_indices(0, 2, 2),
                     ),
         "fp.geq":   indexed_fun(
                         "fp.geq",
                         0,
-                        [FLOATING_POINT, FLOATING_POINT],
+                        {FLOATING_POINT},
                         BOOL,
-                        eq_input_indices(0, 2, 2),
                     ),
         "fp.gt":    indexed_fun(
                         "fp.gt",
                         0,
-                        [FLOATING_POINT, FLOATING_POINT],
+                        {FLOATING_POINT},
                         BOOL,
-                        eq_input_indices(0, 2, 2),
                     ),
         "fp.eq":    indexed_fun(
                         "fp.eq",
                         0, 
-                        [FLOATING_POINT, FLOATING_POINT],
+                        {FLOATING_POINT},
                         BOOL,
-                        eq_input_indices
                     ),
         "fp.isNormal":
                     indexed_fun(
@@ -545,7 +690,6 @@ def floatingPoints_theory():
                         [FLOATING_POINT],
                         BOOL
                     ),
-        #   Conversions from other sorts
         "to_fp":[
                     indexed_fun(
                         "to_fp",
@@ -589,7 +733,6 @@ def floatingPoints_theory():
                         None,
                         get_indices_from_op
                     ),
-        #   Conversions to other sorts
         "fp.to_ubv": 
                     indexed_fun(
                         "fp.to_ubv",
@@ -616,17 +759,12 @@ def floatingPoints_theory():
                         REAL
                     ),
     }
-
     funs = merge_multi_dict([funs, core_funs])
-
-    # repl_dicts = [{A: sort} for sort in sorts]
-    # funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
-
     return sorts, funs
 
-def strings_theory():
-    core_sorts, core_funs = core_theory()
-    # :sorts
+
+def Strings_theory():
+    core_sorts, core_funs = Core_theory()
     sorts = {
         STRING_NAME: STRING,
         REG_LAN_NAME: REG_LAN,
@@ -634,8 +772,6 @@ def strings_theory():
     }
     sorts = merge_disjoint_dict([sorts, core_sorts])
     funs = {
-    # :funs_description
-    #   strings consisting of exactly one character
         "char":     indexed_fun(
                         "char",
                         1,
@@ -643,18 +779,13 @@ def strings_theory():
                         STRING,
                         hex_is_char,
                     ),
-    #   string iterals "<STRING>"
         str(SpecConstType.STRING): Fun(SpecConstant(SpecConstType.STRING, None), [], STRING),
-    # :funs
-    # Core functions
-    #   String functions
         "str.++":
-            Fun(Identifier("str.++"), [STRING, STRING], STRING),
+            Fun(Identifier("str.++"), {STRING}, STRING),
         "str.len":
             Fun(Identifier("str.len"), [STRING], INT),
         "str.<":
-            Fun(Identifier("str.<"), [STRING, STRING], BOOL),
-    #   Regular expression functions
+            Fun(Identifier("str.<"), {STRING}, BOOL),
         "str.to_re":
             Fun(Identifier("str.to_re"), [STRING], REG_LAN),
         "str.in_re":
@@ -666,16 +797,15 @@ def strings_theory():
         "re.allchar":
             Fun(Identifier("re.allchar"), [], REG_LAN),
         "re.++":
-            Fun(Identifier("re.++"), [REG_LAN, REG_LAN], REG_LAN),
+            Fun(Identifier("re.++"), {REG_LAN}, REG_LAN),
         "re.union":
-            Fun(Identifier("re.union"), [REG_LAN, REG_LAN], REG_LAN),
+            Fun(Identifier("re.union"), {REG_LAN}, REG_LAN),
         "re.inter":
-            Fun(Identifier("re.inter"), [REG_LAN, REG_LAN], REG_LAN),
+            Fun(Identifier("re.inter"), {REG_LAN}, REG_LAN),
         "re.*":
             Fun(Identifier("re.*"), [REG_LAN], REG_LAN),
-    #   Additional functions
         "str.<=":
-            Fun(Identifier("str.<="), [STRING, STRING], BOOL),
+            Fun(Identifier("str.<="), {STRING}, BOOL),
         "str.at":
             Fun(Identifier("str.at"), [STRING, INT], STRING),
         "str.substr":
@@ -699,14 +829,13 @@ def strings_theory():
         "re.comp":
             Fun(Identifier("re.comp"), [REG_LAN], REG_LAN),
         "re.diff":
-            Fun(Identifier("re.diff"), [REG_LAN, REG_LAN], REG_LAN),
+            Fun(Identifier("re.diff"), {REG_LAN}, REG_LAN),
         "re.+":
             Fun(Identifier("re.+"), [REG_LAN], REG_LAN),
         "re.opt":
             Fun(Identifier("re.opt"), [REG_LAN], REG_LAN),
         "re.range":
             Fun(Identifier("re.range"), [STRING, STRING], REG_LAN),
-        # :funs_description
         "re.^":     indexed_fun(
                         "re.^",
                         1,
@@ -732,26 +861,16 @@ def strings_theory():
         "str.from_int":
             Fun(Identifier("str.from_int"), [INT], STRING),
     }
-
     funs = merge_multi_dict([funs, core_funs])
-
-    # repl_dicts = [{A: sort} for sort in sorts]
-    # funs = merge_multi_dict([funs, get_all_instances(funs, repl_dicts)])
-
     return sorts, funs
 
 
-
-def arraysEX_theory():
-    core_sorts, core_funs = core_theory()
-    # sorts
+def ArraysEX_theory():
+    core_sorts, core_funs = Core_theory()
     sorts = {
         ARRAY_NAME: ARRAY,
     }
     sorts = merge_disjoint_dict([sorts, core_sorts])
-    # parameters
-    X = "X"
-    Y = "Y"
     funs = {
         "select":   Fun(
                         Identifier("select"),
@@ -767,6 +886,5 @@ def arraysEX_theory():
                     ),
     }
     funs = merge_multi_dict([funs, core_funs])
-
-
     return sorts, funs
+

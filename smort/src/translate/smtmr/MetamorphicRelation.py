@@ -7,24 +7,47 @@ class Status(StrEnum):
     UNKNOWN = 'unknown'
 
 
-class SMTMRKeyword(StrEnum):
-    # in notation
-    GEN     = ':gen'
-    VAR     = ':var'
-    CONS    = ':cons'
-    # in method
-    SNIPPET = ':snippet'
-    SEED    = ':seed'
-    # in template
-    FREE    = ':free'
-    # BOUND   = ':bound'
+class NotationKeyword(StrEnum):
+    GEN         = ':gen'
+    FUN         = ':fun'
+    VAR         = ':var'
+    CONS        = ':cons'
+
+
+class TemplateKeyword(StrEnum):
+    GLOBAL_FREE = ':global-free'
+    INWARDS     = ':inwards'
+
+
+class MethodKeyword(StrEnum):
+    SNIPPET     = ':snippet'
+    SEED        = ':seed'
 
 
 
 class NotationInfo:
-    def __init__(self, formula_in=None, attributes=None):
+    def __init__(self, formula_in=None, attributes=None, input_notations=[]):
         self.formula_in = formula_in
         self.attributes = attributes
+        self.input_notations = input_notations 
+
+        self.is_cons = False
+        self.is_var = False
+        self.is_fun = False
+        self.gen_assert = False
+        for attr in self.attributes:
+            match attr:
+                case NotationKeyword.CONS:
+                    self.is_cons = True
+                case NotationKeyword.VAR:
+                    self.is_vars = True
+                case NotationKeyword.FUN:
+                    if self.input_notations == []:
+                        self.is_vars = True
+                    else:
+                        self.is_fun = True
+                case NotationKeyword.GEN:
+                    self.gen_assert = True
     
     def __str__(self):
         if self.formula_in:
@@ -42,10 +65,13 @@ class SubstTemplate:
         self.sorted_vars = sorted_vars
         self.repl_pairs = repl_pairs 
 
-        self.free = False
+        self.global_free = False
+        self.inwards = False
         for attr in self.attributes:
-            if attr.keyword == SMTMRKeyword.FREE:
-                self.free = True
+            if attr.keyword == TemplateKeyword.GLOBAL_FREE:
+                self.global_free = True
+            if attr.keyword == TemplateKeyword.INWARDS:
+                self.inwards = True
     
     def __str__(self):
         return f"(subst-template {list2str(self.attributes)}\
@@ -65,13 +91,11 @@ class Method:
         self.is_snpt = False
 
         for attr in self.attributes:
-            if attr.keyword == SMTMRKeyword.SEED:
+            if attr.keyword == MethodKeyword.SEED:
                 self.is_seed = True
-                break
-            if attr.keyword == SMTMRKeyword.SNIPPET:
+            if attr.keyword == MethodKeyword.SNIPPET:
                 self.is_snpt = True
-                break
-    
+ 
     def __str__(self):
         return f"(method {self.name} {self.formula} {list2str(self.attribute)})"
     

@@ -1,59 +1,14 @@
-from smort.src.translate.tools.utils import *
-from smort.src.translate.tools.Term import *
-from smort.src.translate.tools.Sort import *
+from smort.src.tools.utils import list2str
+from smort.src.translate.smtlibv2.CNFTerm import CNFTerm
 
 
 class Script:
     def __init__(self, commands):
         self.commands = commands
-        self.assert_cmds = []
-
-    def _prefix_vars_in_assert(self, prefix, t):
-        t.bound_vars = {prefix + key: value for key, value in t.bound_vars.items()}
-        t.local_free_vars = {prefix + key: value for key, value in t.local_free_vars.items()}
-        match t.term_type:
-            case TermType.CONST:
-                return
-            case TermType.VAR:
-                t.name = Identifier(prefix + t.name.symbol, t.name.indices)
-                return
-            case TermType.EXPR:
-                for subterm in t.subterms:
-                    self._prefix_vars_in_assert(prefix, subterm)
-            case TermType.LET:
-                for i, vb in enumerate(t.var_bindings):
-                    var, term = vb
-                    # set
-                    t.var_bindings[i][0] = prefix + var
-                    self._prefix_vars_in_assert(prefix, term)
-                self._prefix_vars_in_assert(prefix, t.subterms[0])
-                return
-            case TermType.QUANT:
-                for i, sv in enumerate(t.sorted_vars):
-                    var, _ = sv
-                    # set
-                    t.sorted_vars[i][0] = prefix + var
-                self._prefix_vars_in_assert(prefix, t.subterms[0])
-                return
-            case TermType.MATCH:
-                self._prefix_vars_in_assert(prefix, t.subterms[0])
-                for i, mc in enumerate(t.match_cases):
-                    pat, term = mc
-                    if len(pat) > 1:
-                        for j in range(1, len(pat)):
-                            # set
-                            t.match_cases[i][0][j] = prefix + pat[j]
-                    else:
-                        if pat[0] in term.bound_vars:
-                            # set
-                            # not nullary constructor
-                            t.match_cases[i][0][0] = prefix + pat[0]
-                    self._prefix_vars_in_assert(prefix, term)
-                return
-            case TermType.ANNOT:
-                self._prefix_vars_in_assert(prefix, t.subterms[0])
+        self.assert_merged = None 
  
     def prefix_vars(self, prefix: str):
+        self.global_vars = {prefix + var: sort for var, sort in self.global_vars}
         for cmd in self.commands:
             if isinstance(cmd, DeclareConst):
                 cmd.symbol = prefix + cmd.symbol
@@ -71,34 +26,39 @@ class Script:
                     if fun_decl.sorted_vars == []:
                         fun_decl.symbol = prefix + fun_decl.symbol
             if isinstance(cmd, Assert):
-                self._prefix_vars_in_assert(prefix, cmd.term) 
+                # cmd.term: CNFTerm
+                for c in cmd.term:
+                    for l in c:
+                        # l: Term
+                        l.prefix_vars(prefix)
 
     def merge_asserts(self):
         """
         Merge all assert blocks (possibly separated by exit, reset,
         reset-assertions statement) into a single assert by conjunction.
         """
-        terms = []
+        clauses = []
         local_free_vars = {}
         for cmd in self.commands:
             if isinstance(cmd, Assert):
-                term = cmd.term
-                local_free_vars.update(term.local_free_vars)
-                terms.append(term)
+                for c in cmd.term.clauses:
+                    for l in c:
+                        local_free_vars.update(l.local_free_vars)
+                    clauses.append(c)
             if isinstance(cmd, SMTLIBCommand):
                 if cmd.cmd_str == "(exit)":
                     break
                 if cmd.cmd_str == "(reset)":
-                    terms = []
+                    clauses = []
                 if cmd.cmd_str == "(reset-assertions)":
-                    terms = []
-        conjunction = Assert(Expr(name=Identifier("and"), subterms=terms, local_free_vars=local_free_vars))
+                    clauses = []
+        conjunction = Assert(CNFTerm(clauses))
         new_cmds, first_found = [], False
         for cmd in self.commands:
             if isinstance(cmd, Assert):
                 if not first_found:
                     new_cmds.append(conjunction)
-                    self.assert_cmds.append(conjunction)
+                    self.assert_merged = conjunction
                     first_found = True
                 continue
             if isinstance(cmd, SMTLIBCommand):
@@ -107,7 +67,7 @@ class Script:
                 if cmd.cmd_str == "(reset-assertions)":
                     continue
                 if cmd.cmd_str == "(reset)":
-                    new_cmds, self.assert_cmds, first_found = [], [], False
+                    new_cmds, self.assert_merged, first_found = [], None, False
                     continue
             new_cmds.append(cmd)
         self.commands = new_cmds
@@ -120,10 +80,10 @@ class Script:
 
 
 class ConstructorDec:
-    def __init__(self, name, sdecs):
+    def __init__(self, name: str, sdecs):
         self.name = name 
         self.sdecs = sdecs
-    
+ 
     def __str__(self):
         return f"({self.name} {list2str(self.sdecs)})"
     
@@ -142,6 +102,29 @@ class DataTypeDec:
 ({list2str(self.cdecs)}))" 
         else:
             return f"({list2str(self.cdecs)})"
+    
+    def __repr__(self):
+        return self.__str__()
+
+
+class Pattern:
+    def __init__(self, constructor_name=None, var_list=[]):
+        self.constructor_name = constructor_name
+        self.var_list = var_list 
+    
+    def __str__(self):
+        pattern_str = ""
+        symbol_count = 0
+        if self.constructor_name:
+            pattern_str += self.constructor_name
+            symbol_count += 1
+        if self.var_list:
+            pattern_str += list2str(self.var_list)
+            symbol_count += len(self.var_list)
+        if symbol_count > 1:
+            return f"({pattern_str})"
+        else:
+            return pattern_str
     
     def __repr__(self):
         return self.__str__()
@@ -221,19 +204,6 @@ class DeclareSort:
         return self.__str__()
 
 
-class DefineConst:
-    def __init__(self, symbol, sort, term):
-        self.symbol = symbol
-        self.sort = sort
-        self.term = term
-
-    def __str__(self):
-        return f"(define-const {self.symbol} {self.sort} {self.term})"
-
-    def __repr__(self):
-        return self.__str__()
-
-
 class DefineFun:
     def __init__(self, symbol, sorted_vars, sort, term):
         self.symbol = symbol
@@ -300,17 +270,6 @@ class DefineSort:
     
     def __repr__(self):
         return self.__str__()
-
-
-# class CheckSat:
-#     def __init__(self):
-#         pass
-
-#     def __str__(self):
-#         return "(check-sat)"
-
-#     def __repr__(self):
-#         return self.__str__()
 
 
 # class CheckSatAssuming:
@@ -395,3 +354,4 @@ class SMTLIBCommand:
     
     def __repr__(self):
         return self.__str__()
+

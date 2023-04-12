@@ -265,3 +265,48 @@ class Attribute:
 
     def __repr__(self):
         return self.__str__()
+
+
+def indexed_sort(symbol: str, indices_len, constraint=None):
+    """
+    Indexed sort.
+    indices == dict("len": indices_len) is a marker for indexed sort template. 
+
+    indices_len: an positive integer.
+    constraint: function that indices of sort should satisfy.
+    """
+    return Sort(Identifier(symbol, {"len": indices_len}), [], constraint)
+
+
+def sort_with_arity(symbol: str, arity: int):
+    """
+    (maybe) Parametric sort.
+
+    arity: an non-negative integer, length of sort.parsorts.
+    """
+    if arity == 0:
+        return Sort(Identifier(symbol))
+    def _parametric_sort(par_list: list):
+        """
+        Called in construction of the parametric sort to fill parameter placeholder (string)
+        """
+        if len(par_list) != arity:
+            raise ValueError(f"length of 'par_list' should be {arity}")
+        return Sort(Identifier(symbol), par_list)
+    return _parametric_sort
+
+
+# def indexed_sort_with_arity(symbol: str, indices_len, arity, constraint=None):
+#     if indices_len <= 0:
+#         raise TheoryException("'indices_len' should be an positive number")
+#     if arity < 0:
+#         raise TheoryException("'arity' should be non-negative integer")
+#     id_ = Identifier(symbol, {"len": indices_len})
+#     if arity == 0:
+#         return Sort(id_, [], constraint)
+#     def _indexed_parametric_sort(pars: list):
+#         if len(pars) != arity:
+#             raise TheoryException(f"length of 'pars' should be {arity}")
+#         return Sort(id_, pars, constraint)
+#     return _indexed_parametric_sort
+
