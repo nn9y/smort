@@ -6,28 +6,30 @@ from smort.src.translate.theory.SMTLIBv2Sorts import *
 # accroding to http://smtlib.cs.uiowa.edu/papers/smt-lib-reference-v2.6-r2017-07-18.pdf:
 #   input sorts in funs with :right-assoc, :left-assoc, :chainable and :pairwise attributes are
 #   stored in a set, which means sort of each valid input must be one of them
+
 BOOLEAN_NOT = Identifier("not")
 BOOLEAN_IMPLIES = Identifier("=>")
 BOOLEAN_AND = Identifier("and")
 BOOLEAN_OR = Identifier("or")
+BOOLEAN_XOR = Identifier("xor")
 BOOLEAN_EQUAL = Identifier("=")
+BOOLEAN_DISTINCT = Identifier("distinct")
 BOOLEAN_IF_THEN_ELSE = Identifier("ite")
-
 
 def Core_theory():
     sorts = {
         BOOL_NAME: BOOL
     }
     funs = {
-        str(SpecConstType.B_VALUE): [Fun(SpecConstant(SpecConstType.B_VALUE, None), [], BOOL)],
-        "not": [Fun(BOOLEAN_NOT, [BOOL], BOOL)],
-        "=>": [Fun(BOOLEAN_IMPLIES, {BOOL}, BOOL)],
-        "and": [Fun(BOOLEAN_AND, {BOOL}, BOOL)],
-        "or": [Fun(BOOLEAN_OR, {BOOL}, BOOL)],
-        "xor": [Fun(Identifier("xor"), {BOOL}, BOOL)],
-        "=": [Fun(BOOLEAN_EQUAL, {A}, BOOL, [A])],
-        "distinct": [Fun(Identifier("distinct"), {A}, BOOL, [A])],
-        "ite": [Fun(BOOLEAN_IF_THEN_ELSE, [BOOL, A, A], A, [A])],
+        str(SpecConstType.B_VALUE): Fun(SpecConstant(SpecConstType.B_VALUE, None), [], BOOL),
+        "not": Fun(BOOLEAN_NOT, [BOOL], BOOL),
+        "=>": Fun(BOOLEAN_IMPLIES, {BOOL}, BOOL),
+        "and": Fun(BOOLEAN_AND, {BOOL}, BOOL),
+        "or": Fun(BOOLEAN_OR, {BOOL}, BOOL),
+        "xor": Fun(BOOLEAN_XOR, {BOOL}, BOOL),
+        "=": Fun(BOOLEAN_EQUAL, {A}, BOOL, [A]),
+        "distinct": Fun(BOOLEAN_DISTINCT, {A}, BOOL, [A]),
+        "ite": Fun(BOOLEAN_IF_THEN_ELSE, [BOOL, A, A], A, [A]),
     }
     return [sorts, funs]
 

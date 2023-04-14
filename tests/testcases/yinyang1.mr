@@ -7,6 +7,6 @@
 (notation z :var)
 (notation c :cons)
 
-(subst-template :global-free :inwards ((x Int) (y Int) (z Int)) ((x (div z y)) (y (div z x)) (z (* x y))) )
+(subst-template :global-free :inwards ((x Int) (y Int) (z Int)) ((x (div z y)) (y (div z x)) (z (= z (* x y)))) )
 
 (fuse (and s1 s2))

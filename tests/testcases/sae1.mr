@@ -3,21 +3,44 @@
 
 (notation x s)
 (notation y s)
-(notation a :cons)
+(notation a :var :gen)
 
 (subst-template 
-    ((x Int) (y Int) (a Int))
-    ( ((< x y) (<= x y)) ((< x y) (distinct x y)) ((<= x y) (< x (+ y a))) )
+    ((x Int) (y Int))
+    ( ((< x y) (<= x y)) )
 )
 (subst-template 
-    ((x Real) (y Real) (a Real))
-    ( ((< x y) (<= x y)) ((< x y) (distinct x y)) ((<= x y) (< x (+ y a))) ) 
+    ((x Int) (y Int))
+    ( ((< x y) (distinct x y)) )
 )
 (subst-template
-    ((x String) (y String) (a String))
-    ( ((str.< x y) (str.<= x y)) ((str.<= x y) (str.<= x (str.++ y a))) ) 
+    ((x Int) (y Int))
+    ( ((<= x y) (< x (+ y a))) (a (> a 0)) )
+)
+(subst-template 
+    ((x Real) (y Real))
+    ( ((< x y) (<= x y)) )
+)
+(subst-template 
+    ((x Real) (y Real))
+    ( ((< x y) (distinct x y)) )
 )
 
-(method "LPI" c :seed)
+(subst-template
+    ((x String) (y String))
+    ( ((str.< x y) (str.<= x y)) ) 
+)
+
+(subst-template
+    ((x String) (y String))
+    ( ((str.< x y) (distinct x y)) ) 
+)
+
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((bvult x y) (bvule x y)) ) 
+)
+
+(method "live_predicate_injection_over" c :seed)
 
 (fuse c)

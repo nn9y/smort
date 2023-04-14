@@ -44,7 +44,7 @@ def add_args(arg_parser, current_dir):
     )
     arg_parser.add_argument(
         "-m",
-        "--method-path",
+        "--methods-path",
         metavar="path_to_folder",
         help="extended methods package"
     )

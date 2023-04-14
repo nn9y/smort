@@ -26,7 +26,7 @@ class Tester:
         self.args = args
         self.timeout_count_limit = self.args.iterations
         self.mr = translate_mr_file(self.args.MR_PATH, 10, False)
-        if len(self.mr.methods) > 0 and (not self.methods_path):
+        if len(self.mr.methods) > 0 and (not self.args.methods_path):
             print("method declared in mr file, but no path to methods provided in command args")
             exit(ERR_USAGE)
         self.oracle = self.mr.get_oracle()
@@ -89,7 +89,7 @@ class Tester:
                     continue
 
             self.generator = Generator(scripts, self.mr, self.args)
-            if len(self.generator.valid_index_list) == 0:
+            if (len(self.generator.valid_index_list) == 0) and (len(self.mr.methods) == 0):
                 log_iterations_attempt(0)
             else:
                 log_iterations_attempt(self.args.iterations)

@@ -182,9 +182,11 @@ class ScriptVisitor(SMTLIBv2Visitor):
                 cmds.extend(cmd)
             else:
                 cmds.append(cmd)
-        return Script(cmds)
+        return Script(cmds, self.global_vars)
 
     def handleCommand(self, ctx: SMTLIBv2Parser.CommandContext):
+        if ctx.cmd_setLogic():
+            return self.visitCmd_setLogic(ctx.cmd_setLogic())
         if ctx.cmd_assert():
             return self.visitCmd_assert(ctx.cmd_assert())
         # if ctx.cmd_checkSat():
@@ -259,6 +261,10 @@ class ScriptVisitor(SMTLIBv2Visitor):
     def getString(self, ctx):
         start, stop = ctx.start.start, ctx.stop.stop
         return ctx.start.getInputStream().getText(start, stop)
+    
+    def visitCmd_setLogic(self, ctx:SMTLIBv2Parser.Cmd_setLogicContext):
+        logic = self.visitSymbol(ctx.symbol())
+        return SetLogic(logic) 
     
     def visitSort_dec(self, ctx:SMTLIBv2Parser.Sort_decContext):
         return [self.visitSymbol(ctx.symbol()), int(ctx.numeral().getText())]

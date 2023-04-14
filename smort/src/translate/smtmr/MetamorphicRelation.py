@@ -1,6 +1,7 @@
 from smort.src.tools.utils import list2str, StrEnum
 
 
+
 class Status(StrEnum):
     SAT     = 'sat'
     UNSAT   = 'unsat'
@@ -84,7 +85,7 @@ class SubstTemplate:
 
 class Method:
     def __init__(self, name, formula, attributes=[]):
-        self.name = name
+        self.name = name[1:-1]
         self.formula = formula
         self.attributes = attributes
 
@@ -98,7 +99,7 @@ class Method:
                 self.is_snpt = True
  
     def __str__(self):
-        return f"(method {self.name} {self.formula} {list2str(self.attributes)})"
+        return f"(method \"{self.name}\" {self.formula} {list2str(self.attributes)})"
     
     def __repr__(self):
         return self.__str__()

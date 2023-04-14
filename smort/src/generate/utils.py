@@ -66,7 +66,7 @@ def merge(scripts, fused, decls, asserts, snpts):
     merged_cmds.append(SMTLIBCommand("(check-sat)"))
     merged_cmds.append(SMTLIBCommand("(exit)"))
 
-    return Script(merged_cmds)
+    return Script(merged_cmds, {})
 
 
 def random_tuple_list(lsts, dups, multiple_substs=False):
@@ -171,10 +171,10 @@ def find_valid_templates(formulas, templates):
     return valid_index_list 
   
 
-def call_function_from_module(path, function_name, *args):
+def call_function_from_module(path, function_name, formulas):
     module = importlib.import_module(path)
     function = getattr(module, function_name)
-    return function(*args)
+    return function(formulas)
 
 
 def generate_additions(template, notations, notation2term, decls, asserts):
@@ -197,11 +197,7 @@ def generate_additions(template, notations, notation2term, decls, asserts):
                         break
                 asserts.append(
                     Assert(
-                        term=Expr(
-                            name=BOOLEAN_EQUAL,
-                            subterms=[mapped_term, repl],
-                            sort=BOOL,
-                        )
+                        term=repl
                     )
                 )
 
@@ -209,10 +205,6 @@ def generate_additions(template, notations, notation2term, decls, asserts):
 def replace(template, term_tup, notation2term):
     # replace terms in seed formulas
     for i, term in enumerate(term_tup):
-        t, repl = template.repl_pairs[i]
+        _, repl = template.repl_pairs[i]
         term.substitute(repl, notation2term)
-
-    # for i in range(len(formulas)):
-    #     _, repl = template.repl_pairs[i]
-    #     term_tup[i].substitute(repl, notation2term)
 

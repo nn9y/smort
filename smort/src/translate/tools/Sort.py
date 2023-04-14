@@ -90,6 +90,7 @@ class Sort:
         self.id_ = id_ 
         self.parsorts = parsorts    # list of Sort or str
         self.constraint = constraint
+        self.any_indices = False 
 
     def get_indexed_instance(self, indices):
         id_instance = self.id_.get_indexed_instance(indices, self.constraint)

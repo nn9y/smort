@@ -34,6 +34,8 @@ def match_fun_in_signatures(name, input_list, signatures: dict):
 
     if str(symbol) in signatures:
         fun_list = signatures[str(symbol)]
+        if not isinstance(fun_list, list):
+            fun_list = [fun_list]
         for fun in fun_list:
             if isinstance(fun.name, name_type):
                 fun_output = None

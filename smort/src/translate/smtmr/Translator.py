@@ -1,6 +1,5 @@
 from smort.src.tools.utils import list2str
 from smort.src.translate.tools.Term import (
-    TermType,
     TermScopeType,
     Const,
     Var,
@@ -180,6 +179,13 @@ class Translator(SMTMRVisitor):
             return synonym_sort
         # valid sort
         sort = Sort(id_, parsorts)
+        sort_id = sort.id_
+        # special check
+        if isinstance(sort_id.indices, list) and (len(sort_id.indices) > 1) and (sort.id_.indices[0] == '@'):
+            length = sort.id_.indices[1]
+            sort.id_.indices = ['@' for _ in range(length)]
+            sort.any_indices = True
+            return sort
         if self._is_valid_sort(symbol, sort):
             return sort
         raise SMTMRException("not a valid sort, or a synonym of a valid sort")
@@ -380,10 +386,16 @@ symbol returned by extended method with ':seed' attribute")
         return []
     
     def _check_valid_template(self, symbols, subst_term_pairs):
-        for term, repl in subst_term_pairs:
-            if (term.sort and repl.sort) and (term.sort != repl.sort):
-                raise SMTMRException("sort of terms before and after \
+        for i, pair in enumerate(subst_term_pairs):
+            term, repl = pair
+            if i < len(self.seed_status_list):
+                if (term.sort and repl.sort) and (term.sort != repl.sort):
+                    raise SMTMRException(f"sort of terms before and after \
 substitution should be the same")
+            else:
+                if repl.sort != BOOL:
+                    raise SMTMRException(f"sort of generated assert terms \
+should be Bool")
         if len(subst_term_pairs) < len(self.seed_status_list):
             raise SMTMRException("number of subsitutions in templates \
 is less than number of seeds")
@@ -397,16 +409,7 @@ is less than number of seeds")
                     if idx > i:
                         raise SMTMRException(f"'{inp}' declare should be \
 in front of '{symbol}' declare")
-            if info.gen_assert:
-                valid = False
-                for term, _ in subst_term_pairs:
-                    if (term.term_type == TermType.VAR) and (str(term.name) == symbol):
-                        valid = True
-                        break
-                if not valid:
-                    raise SMTMRException("notation with ':gen' attribute \
-should has one corresponding subsitution in template")
-    
+ 
     def _check_valid_seed(self, symbol: str):
         if not self._is_seed(symbol):
             raise  SMTMRException(f"'{symbol}' is not a seed")

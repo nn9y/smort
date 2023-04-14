@@ -67,13 +67,13 @@ class Generator:
         if self.mr.methods:
             for method in self.mr.methods:
                 try:
-                    f = call_function_from_module(self.args.methods_path, method.name, self, formulas) 
+                    f = call_function_from_module(self.args.methods_path, method.name, formulas) 
                     if method.is_snpt:
                         snpts.append(f)
                     else:
                         processed_formulas[method.formula] = f 
                 except Exception as e:
-                    print(f"calling method '{method.name}' in '{self.methods_path}' raised an exception: {str(e)}")
+                    print(f"calling method '{method.name}' in '{self.args.methods_path}' raised an exception: {str(e)}")
                     exit(ERR_INTERNAL)
         return processed_formulas 
  
@@ -82,7 +82,8 @@ class Generator:
         repl_dict = {}
         for i, formula in enumerate(formulas):
             repl_dict[self.mr.seed_on_index[i]] = CNFTerm2Term(formula.assert_merged.term)
-        repl_dict = dict(repl_dict, **processed_formulas)
+        for key, formula in processed_formulas.items():
+            repl_dict[key] = CNFTerm2Term(formula.assert_merged.term)
         fused.replace_notation_by_term(repl_dict)
         return fused 
  
@@ -145,8 +146,8 @@ class Generator:
             end_iteration = True
         # next template
         # nonsense when '-mt' is enabled
-        self.template_index += 1
-        self.template_index %= len(self.valid_index_list)
-
+        if len(self.valid_index_list) > 0:
+            self.template_index += 1
+            self.template_index %= len(self.valid_index_list)
 
         return morph, end_iteration

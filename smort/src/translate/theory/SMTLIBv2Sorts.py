@@ -1,21 +1,7 @@
 from smort.src.translate.tools.Sort import sort_with_arity, indexed_sort, Sort, Identifier 
 from smort.src.translate.theory.utils import numeral_greater_than_x
+from smort.src.translate.theory.SMTLIBv2SortNames import *
 
-
-# sort names
-BOOL_NAME = "Bool"
-INT_NAME = "Int"
-REAL_NAME = "Real"
-ROUNDING_MODE_NAME = "RoundingMode"
-BIT_VECTOR_NAME = "BitVec"
-FLOATING_POINT_NAME = "FloatingPoint"
-FLOAT16_NAME = "Float16"
-FLOAT32_NAME = "Float32"
-FLOAT64_NAME = "Float64"
-FLOAT128_NAME = "Float128"
-STRING_NAME = "String"
-REG_LAN_NAME = "RegLan"
-ARRAY_NAME = "Array"
 
 # sorts
 BOOL = Sort(Identifier(BOOL_NAME))

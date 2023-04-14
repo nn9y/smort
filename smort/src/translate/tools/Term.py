@@ -232,8 +232,11 @@ class Term:
             return self.subterms[0].equals(other, global_free) 
         if global_free and not self.global_free:
             return False
-        # sort should be the same 
-        if self.sort != other.sort:
+        # sort should be the same (or same indexed type) 
+        if other.sort.any_indices:
+            if not self.sort.same_indexed_type(other.sort):
+                return False
+        elif self.sort != other.sort:
             return False
         # term can be considered as a 'variable' in other
         # when other is an variable, or a constant and self is the same constant,

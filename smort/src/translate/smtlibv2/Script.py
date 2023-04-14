@@ -3,11 +3,40 @@ from smort.src.translate.smtlibv2.CNFTerm import CNFTerm
 
 
 class Script:
-    def __init__(self, commands):
+    def __init__(self, commands, global_vars):
         self.commands = commands
         self.assert_merged = None 
- 
+        self.global_vars = global_vars 
+        self.logic = 'ALL'
+        for cmd in self.commands:
+            if isinstance(cmd, SetLogic):
+                self.logic = cmd.logic
+                # don't break, may override
+        self.global_sorts = set()
+        for _, sort in self.global_vars.items():
+            self.global_sorts.add(sort)
+    
+    def find_global_vars(self):
+        self.global_vars = {}
+        for cmd in self.commands:
+            if isinstance(cmd, DeclareConst):
+                self.global_vars[cmd.symbol] = cmd.sort
+            if isinstance(cmd, DeclareFun):
+                if cmd.input_sort_list == []:
+                    self.global_vars[cmd.symbol] = cmd.output_sort
+            if isinstance(cmd, DefineFun):
+                if cmd.sorted_vars == []:
+                    self.global_vars[cmd.symbol] = cmd.sort
+            if isinstance(cmd, DefineFunRec):
+                if cmd.sorted_vars == []:
+                    self.global_vars[cmd.symbol] = cmd.sort
+            if isinstance(cmd, DefineFunsRec):
+                for fun_decl in cmd.fun_decls: 
+                    if fun_decl.sorted_vars == []:
+                        self.global_vars[cmd.symbol] = cmd.sort
+
     def prefix_vars(self, prefix: str):
+        self.global_vars = {prefix + var: sort for var, sort in self.global_vars.items()}
         for cmd in self.commands:
             if isinstance(cmd, DeclareConst):
                 cmd.symbol = prefix + cmd.symbol
@@ -246,6 +275,28 @@ class DefineSort:
     
     def __repr__(self):
         return self.__str__()
+
+
+class SetLogic:
+    def __init__(self, logic: str):
+        self.logic = logic
+    
+    def __str__(self):
+        return f"(set-logic {self.logic})"
+    
+    def __repr__(self):
+        return self.__str__()
+
+
+# class CheckSat:
+#     def __init__(self):
+#         pass
+
+#     def __str__(self):
+#         return f"(check-sat)"
+
+#     def __repr__(self):
+#         return self.__str__()
 
 
 # class CheckSatAssuming:
