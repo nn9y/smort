@@ -183,6 +183,10 @@ def generate_additions(template, notations, notation2term, decls, asserts):
         if var in notation2term:
             info = notations[var]
             mapped_term = notation2term[var]
+            if len(sort.id_.indices) > 0:
+                sym = sort.id_.indices[0]
+                # get actual sort
+                sort = notation2term[sym].sort
             if info.is_var:
                 symbol = str(mapped_term.name)
                 decls.append(DeclareConst(symbol, sort))
@@ -190,16 +194,18 @@ def generate_additions(template, notations, notation2term, decls, asserts):
                 input_sort_list = [s.sort for s in mapped_term.subterms]
                 decls.append(DeclareFun(str(mapped_term.name), input_sort_list, sort))
             if info.gen_assert:
+                repl = None
                 for t, r in template.repl_pairs:
                     if (t.term_type == TermType.VAR) and (str(t.name) == var):
                         repl = copy.deepcopy(r)
                         repl.replace_notation_by_term(notation2term)
                         break
-                asserts.append(
-                    Assert(
-                        term=repl
+                if repl:
+                    asserts.append(
+                        Assert(
+                            term=repl
+                        )
                     )
-                )
 
 
 def replace(template, term_tup, notation2term):

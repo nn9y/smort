@@ -1,4 +1,4 @@
-from smort.src.tools.utils import list2str
+from smort.src.tools.utils import list2str, prefix_symbol
 from smort.src.translate.smtlibv2.CNFTerm import CNFTerm
 
 
@@ -36,23 +36,23 @@ class Script:
                         self.global_vars[cmd.symbol] = cmd.sort
 
     def prefix_vars(self, prefix: str):
-        self.global_vars = {prefix + var: sort for var, sort in self.global_vars.items()}
+        self.global_vars = {prefix_symbol(prefix, var): sort for var, sort in self.global_vars.items()}
         for cmd in self.commands:
             if isinstance(cmd, DeclareConst):
-                cmd.symbol = prefix + cmd.symbol
+                cmd.symbol = prefix_symbol(prefix, cmd.symbol)
             if isinstance(cmd, DeclareFun):
                 if cmd.input_sort_list == []:
-                    cmd.symbol = prefix + cmd.symbol
+                    cmd.symbol = prefix_symbol(prefix, cmd.symbol)
             if isinstance(cmd, DefineFun):
                 if cmd.sorted_vars == []:
-                    cmd.symbol = prefix + cmd.symbol
+                    cmd.symbol = prefix_symbol(prefix, cmd.symbol)
             if isinstance(cmd, DefineFunRec):
                 if cmd.sorted_vars == []:
-                    cmd.symbol = prefix + cmd.symbol
+                    cmd.symbol = prefix_symbol(prefix, cmd.symbol)
             if isinstance(cmd, DefineFunsRec):
                 for fun_decl in cmd.fun_decls: 
                     if fun_decl.sorted_vars == []:
-                        fun_decl.symbol = prefix + fun_decl.symbol
+                        cmd.symbol = prefix_symbol(prefix, fun_decl.symbol)
             if isinstance(cmd, Assert):
                 # cmd.term: CNFTerm
                 for c in cmd.term.clauses:

@@ -91,6 +91,16 @@ class Generator:
         """
         generate next morph
         """
+        if len(self.valid_index_list) == 0:
+            formulas = [copy.deepcopy(formula) for formula in self.formulas]
+            if len(formulas) > 1:
+                for i, formula in enumerate(formulas):
+                    formula.prefix_vars(f"seed{i}_")
+            snpts = []
+            processed_formulas = self.call_extended_methods(formulas, snpts)
+            fused = self.fuse(formulas, processed_formulas)
+            morph = merge(formulas, fused, [], [], snpts)
+            return morph, True 
         if (
             (self.args.incremental and self.start_increment) # incremental, and the start of an incremental process
             or (not self.args.incremental)
@@ -101,8 +111,9 @@ class Generator:
             else:
                 index_list = [self.valid_index_list[self.template_index]]
             formulas = [copy.deepcopy(formula) for formula in self.formulas]
-            for i, formula in enumerate(formulas):
-                formula.prefix_vars(f"seed{i}_")
+            if len(formulas) > 1:
+                for i, formula in enumerate(formulas):
+                    formula.prefix_vars(f"seed{i}_")
             self.substs_list = random_term_tuples(
                 formulas,
                 self.mr.subst_templates,

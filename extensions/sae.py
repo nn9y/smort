@@ -36,7 +36,7 @@ def live_predicate_injection(formulas, op):
     formula = formulas[0]
     available_sorts = list(support_sorts & formula.global_sorts)
     if len(available_sorts) == 0:
-        return formula[0]
+        return formulas[0]
     processed_formula = copy.deepcopy(formula)
     cnf_term = processed_formula.assert_merged.term
     for i, c in enumerate(cnf_term.clauses):
@@ -75,9 +75,9 @@ def generate_formula_sinppet(formula, sort):
 def generate_atom(formula, sort):
     if sort == INT:
         choices = INT_COMPARE_OPERATORS
-    if sort == REAL:
+    elif sort == REAL:
         choices = REAL_COMPARE_OPERATORS
-    if sort == STRING:
+    elif sort == STRING:
         choices = STRING_COMPARE_OPERATORS
     else:
         choices = []
@@ -94,9 +94,9 @@ def generate_atom(formula, sort):
 def generate_term(formula, sort):
     if sort == INT:
         choices = INT_ARITH_OPERATORS
-    if sort == REAL:
+    elif sort == REAL:
         choices = REAL_ARITH_OPERATORS
-    if sort == STRING:
+    elif sort == STRING:
         choices = STRING_ARITH_OPERATORS
     else:
         choices = []
@@ -130,7 +130,7 @@ def logic_is_linear(logic: str):
 def is_linear_operator(op, sort):
     if sort == INT:
         return op in LINEAR_INT_ARITH_OPERATORS
-    if sort == REAL:
+    elif sort == REAL:
         return op in LINEAR_REAL_ARITH_OPERATORS
     else:
         return True

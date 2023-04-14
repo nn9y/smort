@@ -43,6 +43,13 @@ def list2str(lst, separator=' '):
         return result
 
 
+def prefix_symbol(prefix, symbol):
+    if symbol[0] == '|':
+        return '|' + prefix + symbol[1:]
+    else:
+        return prefix + symbol
+
+
 def cartesian_product(*args):
     return list(itertools.product(*args))
 
@@ -71,4 +78,4 @@ def in_list(stdout, stderr, lst):
     for err in lst:
         if err in stdstream:
             return True 
-    return False 
+    return False

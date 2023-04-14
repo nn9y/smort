@@ -1,9 +1,8 @@
 import copy
 from enum import Enum
 import random
-import inspect
 
-from smort.src.tools.utils import list2str
+from smort.src.tools.utils import list2str, prefix_symbol
 from smort.src.translate.tools.utils import *
 from smort.src.translate.theory.available_sorts import *
 from smort.src.translate.theory.SMTLIBv2Sorts import *
@@ -152,49 +151,38 @@ class Term:
         """
         add prefix to variable names in self recursively
         """
-        self.bound_vars = {prefix + key: value for key, value in self.bound_vars.items()}
-        self.local_free_vars = {prefix + key: value for key, value in self.local_free_vars.items()}
+        self.bound_vars = {prefix_symbol(prefix, key): value for key, value in self.bound_vars.items()}
+        self.local_free_vars = {prefix_symbol(prefix, key): value for key, value in self.local_free_vars.items()}
         match self.term_type:
-            case TermType.CONST:
-                return
             case TermType.VAR:
-                self.name = Identifier(prefix + self.name.symbol, self.name.indices)
-                return
-            case TermType.EXPR:
-                for subterm in self.subterms:
-                    subterm.prefix_vars(prefix)
+                self.name = Identifier(prefix_symbol(prefix, self.name.symbol), self.name.indices)
             case TermType.LET:
                 for i, vb in enumerate(self.var_bindings):
                     var, term = vb
                     # set
-                    self.var_bindings[i][0] = prefix + var
+                    self.var_bindings[i][0] = prefix_symbol(prefix, var) 
                     term.prefix_vars(prefix)
-                self.subterms[0].prefix_vars(prefix)
-                return
             case TermType.QUANT:
                 for i, sv in enumerate(self.sorted_vars):
                     var, _ = sv
                     # set
-                    self.sorted_vars[i][0] = prefix + var
-                self.subterms[0].prefix_vars(prefix)
-                return
+                    self.sorted_vars[i][0] = prefix_symbol(prefix, var) 
             case TermType.MATCH:
-                self.subterms[0].prefix_vars(prefix)
                 for i, mc in enumerate(self.match_cases):
                     pat, term = mc
                     if len(pat) > 1:
                         for j in range(1, len(pat)):
                             # set
-                            self.match_cases[i][0][j] = prefix + pat[j]
+                            self.match_cases[i][0][j] = prefix_symbol(prefix, pat[j])
                     else:
                         if pat[0] in term.bound_vars:
                             # set
                             # not nullary constructor
-                            self.match_cases[i][0][0] = prefix + pat[0]
+                            self.match_cases[i][0][0] = prefix_symbol(prefix, pat[0])
                     term.prefix_vars(prefix)
                 return
-            case TermType.ANNOT:
-                self.subterms[0].prefix_vars(prefix)
+        for subterm in self.subterms:
+            subterm.prefix_vars(prefix)
     
     def find_terms(self, t, occs, global_free=False, inwards=False):
         """

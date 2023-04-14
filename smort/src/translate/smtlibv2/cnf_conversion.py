@@ -1,5 +1,6 @@
 import copy
 
+from smort.src.tools.utils import prefix_symbol
 from smort.src.translate.tools.Sort import Identifier 
 from smort.src.translate.tools.Term import TermType, Var, Expr, LetBinding, QUANT_FORALL, QUANT_EXISTS
 from smort.src.translate.theory.SMTLIBv2Sorts import BOOL
@@ -215,7 +216,7 @@ def prefix_variables_in_scope(t, quant):
             var, sort = sv
             if (var_symbol == var) and (t.sort == sort):
                 # rename this var
-                t.name = Identifier(f"{quant.name}_{var_symbol}", t.name.indices)
+                t.name = Identifier(prefix_symbol(f"{quant.name}_", var_symbol), t.name.indices)
     elif t.term_type == TermType.QUANT:
         for i, svi in enumerate(quant.sorted_vars):
             vari, sorti = svi
@@ -226,7 +227,7 @@ def prefix_variables_in_scope(t, quant):
                     # rename corresponding item in t's sorted vars,
                     #   local free vars and bound vars,
                     # so that it can override the variable later
-                    prefixed_varj = f"{quant.name}_{varj}"
+                    prefixed_varj = prefix_symbol(f"{quant.name}_", varj)
                     t.sorted_vars[j][0] = prefixed_varj 
                     if varj in t.local_free_vars:
                         del t.local_free_vars[varj]
@@ -241,7 +242,7 @@ def prefix_variables_in_scope(t, quant):
 def prefix_quant_vars(quant):
     for i, sv in enumerate(quant.sorted_vars):
         var, _ = sv
-        quant.sorted_vars[i][0] = f"{quant.name}_{var}" 
+        quant.sorted_vars[i][0] = prefix_symbol(f"{quant.name}_", var)
 
 
 def move_quantifiers_outwards(fot):
@@ -306,7 +307,7 @@ def eliminate_exists(fot, forall_sorted_vars):
                 )
                 local_free_vars[var] = sort
             for var, sort in fot.sorted_vars:
-                fun_name = Identifier(var)
+                fun_name = var
                 new_declfuns.append(DeclareFun(fun_name, input_sort_list, sort))
                 term = Expr(
                     name=fun_name,

@@ -123,14 +123,16 @@ class MetamorphicRelation:
         return self.morph[1]
  
     def __str__(self):
-        seed_decls = [(symbol, self.seed_status_list[index]) for symbol, index in self.index_of_seed.items()]
-        mr_str = list2str(seed_decls, separator='\n')
+        mr_str = ""
+        for symbol, index in self.index_of_seed.items():
+            mr_str += f'(seed {symbol} {self.seed_status_list[index]})\n'
 
-        mr_str += f"\n({self.morph[0]} {self.morph[1]})"
+        mr_str += f"\n(morph {self.morph[0]} {self.morph[1]})"
 
         if self.notations:
-            notation_decls = [(symbol, info) for symbol, info in self.notations.items()]
-            mr_str += "\n" + list2str(notation_decls, separator='\n')
+            mr_str += "\n"
+            for symbol, info in self.notations.items():
+                mr_str += f'(notation {symbol} {info})\n'
 
         if self.subst_templates:
             mr_str += "\n" + list2str(self.subst_templates, separator='\n')

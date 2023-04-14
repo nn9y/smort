@@ -177,15 +177,29 @@ class Translator(SMTMRVisitor):
         synonym_sort = get_sort_in_synonym(symbol, parsorts, all_synonyms)
         if synonym_sort:
             return synonym_sort
+        # special check
+        if symbol in self.notations:
+            # return a string
+            return symbol
         # valid sort
         sort = Sort(id_, parsorts)
         sort_id = sort.id_
         # special check
-        if isinstance(sort_id.indices, list) and (len(sort_id.indices) > 1) and (sort.id_.indices[0] == '@'):
-            length = sort.id_.indices[1]
-            sort.id_.indices = ['@' for _ in range(length)]
-            sort.any_indices = True
-            return sort
+        if isinstance(sort_id.indices, list) and (len(sort_id.indices) > 1):
+            if sort.id_.indices[0] == '@':
+                # match any indices in formula
+                length = sort.id_.indices[1]
+                sort.id_.indices = ['@' for _ in range(length)]
+                sort.any_indices = True
+                return sort
+            if sort.id_.indices[0] == '&':
+                # get the sort of notation sym
+                length = sort.id_.indices[1]
+                sym = sort.id_.indices[2]
+                sort.id_.indices = [sym for _ in range(length)]   
+                sort.any_indices = True
+                return sort
+            # same type as notation
         if self._is_valid_sort(symbol, sort):
             return sort
         raise SMTMRException("not a valid sort, or a synonym of a valid sort")
