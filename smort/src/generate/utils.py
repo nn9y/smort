@@ -9,7 +9,6 @@ from smort.src.translate.tools.Term import (
     Const,
     Var,
     Expr,
-    substitute
 )
 from smort.src.translate.theory.SMTLIBv2Sorts import BOOL
 from smort.src.translate.theory.SMTLIBv2Theories import BOOLEAN_EQUAL
@@ -63,9 +62,10 @@ def merge(scripts, fused, decls, asserts, snpts):
     for snpt in snpts:
         merged_cmds.append(Assert(snpt)) 
 
-    # check-sat
+    # check-sat and exit
     merged_cmds.append(SMTLIBCommand("(check-sat)"))
- 
+    merged_cmds.append(SMTLIBCommand("(exit)"))
+
     return Script(merged_cmds)
 
 
@@ -116,8 +116,6 @@ def random_term_tuples(formulas, templates, multiple_substs, index_list, notatio
             term, _ = template.repl_pairs[i]
             # assume assertions have been merged into single one (CNFTerm) in each formula
             formula.assert_merged.term.find_terms(term, term_occs, template.global_free, template.inwards)
-            # xxx here occs list are already "deepcopied"
-            # xxx term_occs = formula.assert_merged.term.pointers_map[k]
             term_occs_list.append(term_occs)
         rnd_tuples = random_tuple_list(term_occs_list, dups, multiple_substs)
         notation2terms = []
@@ -149,7 +147,7 @@ def random_term_tuples(formulas, templates, multiple_substs, index_list, notatio
                             name=mapped_id,
                             subterms=subterms,
                             sort=sort
-                        ) 
+                        )
             notation2terms.append(notation2term)
         lst.append((k, rnd_tuples, notation2terms))
     return lst
@@ -162,16 +160,8 @@ def find_valid_templates(formulas, templates):
         for i, formula in enumerate(formulas):
             term, _ = template.repl_pairs[i]
             term_occs = []
-            # xxx assert_term = formula.assert_merged.term
-            # xxx if k in assert_term.pointers_map:
-            # xxx    term_occs = assert_term.pointers_map[k]
-            # xxx else:
-            # xxx    formula.assert_merged.term.find_terms(term, term_occs, template.global_free, template.inwards)
-            # xxx    save occs list
-            # xxx    formula.assert_merged.term.pointers_map[k] = term_occs
             # assume assertions have been merged into single one (CNFTerm) in each formula
             formula.assert_merged.term.find_terms(term, term_occs, template.global_free, template.inwards)
-            # xxx formula.assert_merged.term.pointers_map[k] = term_occs
             # invalid template
             if len(term_occs) == 0:
                 matched = False
@@ -216,11 +206,13 @@ def generate_additions(template, notations, notation2term, decls, asserts):
                 )
 
 
-def replace(template, term_tup, notation2term, formulas):
+def replace(template, term_tup, notation2term):
     # replace terms in seed formulas
-    # for i, formula in enumerate(formulas):
-    for i in range(len(formulas)):
-        _, repl = template.repl_pairs[i]
-        # formula.assert_merged.term.substitute([term_tup[i]], repl, notation2term)
-        substitute([term_tup[i]], repl, notation2term)
+    for i, term in enumerate(term_tup):
+        t, repl = template.repl_pairs[i]
+        term.substitute(repl, notation2term)
+
+    # for i in range(len(formulas)):
+    #     _, repl = template.repl_pairs[i]
+    #     term_tup[i].substitute(repl, notation2term)
 

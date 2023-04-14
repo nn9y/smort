@@ -1,4 +1,3 @@
-import copy
 from inspect import isfunction
 
 from smort.src.translate.tools.Term import *
@@ -50,7 +49,7 @@ class Fun:
             if not self.name.same_indexed_type(name):
                 return False
             else:
-                name_indices = name.id_indices
+                name_indices = name.indices
         if isinstance(self.inputs, set):
             for inp in inputs:
                 valid = False
@@ -97,6 +96,13 @@ class Fun:
 
     def get_parametric_output(self, par_dict):
         return _get_repl_sort(self.output, par_dict)
+    
+    def get_parametric_instance(self, par_dict):
+        return Fun(
+            name=self.name,
+            inputs=self.get_parametric_inputs(par_dict),
+            output=self.get_parametric_output(par_dict),
+        )
  
     def __eq__(self, other):
         """
@@ -166,11 +172,7 @@ def _get_repl_sort(sort, repl_dict):
     if isinstance(sort, str) and (sort in repl_dict):
         return repl_dict[sort]
     elif isinstance(sort, Sort):
-        if len(sort.parsorts) > 0:
-            repl_sort = sort.get_parametric_instance(repl_dict)
-            return repl_sort
-        else:
-            return copy.deepcopy(sort)
+        return sort.get_indexed_instance(repl_dict)
     else:
         return None
 

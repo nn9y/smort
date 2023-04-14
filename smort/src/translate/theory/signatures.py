@@ -56,7 +56,7 @@ def match_fun_in_signatures(name, input_list, signatures: dict):
                     return fun_output 
     
     # special check for (_ bvX n)
-    if name_type == Identifier and len(name.id_.indices) == 1:
+    if name_type == Identifier and len(name.indices) == 1:
         if name.id_.symbol[0:2] == 'bv':
             # return (_ BitVec n)
             return BIT_VECTOR.get_indexed_instance([name.id_.indices])

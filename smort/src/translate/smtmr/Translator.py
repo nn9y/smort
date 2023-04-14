@@ -272,6 +272,7 @@ class Translator(SMTMRVisitor):
         if ctx.symbol(1):
             formula_in = self.visitSymbol(ctx.symbol(1)) 
             self._check_valid_seed(formula_in)
+        input_notations = []
         if ctx.attribute():
             attributes = []
             for attr_ctx in ctx.attribute():
@@ -284,7 +285,7 @@ class Translator(SMTMRVisitor):
     def visitSubstTemplate_dec(self, ctx: SMTMRParser.SubstTemplate_decContext):
         attributes = []
         for attr_ctx in ctx.attribute():
-            attribute = self.visitAttribute(attr_ctx), TemplateKeyword
+            attribute = self.visitAttribute(attr_ctx, TemplateKeyword)
             if attribute:
                 attributes.append(attribute)
         local_vars = {}
@@ -337,7 +338,7 @@ class Translator(SMTMRVisitor):
 symbol returned by extended method with ':seed' attribute")
     
     def _check_boolean_fun(self, symbol: str, input_list):
-        fun = match_fun_in_signatures(Identifier(symbol), input_list, None, core_funs)
+        fun = match_fun_in_signatures(Identifier(symbol), input_list, core_funs)
         if fun:
             return
         raise SMTMRException(f"'({symbol} {list2str(input_list)})' is not a valid boolean signature")
@@ -396,7 +397,7 @@ is less than number of seeds")
                     if idx > i:
                         raise SMTMRException(f"'{inp}' declare should be \
 in front of '{symbol}' declare")
-            if info.get_assert:
+            if info.gen_assert:
                 valid = False
                 for term, _ in subst_term_pairs:
                     if (term.term_type == TermType.VAR) and (str(term.name) == symbol):

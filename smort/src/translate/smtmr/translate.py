@@ -1,5 +1,3 @@
-import sys
-
 from antlr4.CommonTokenStream import CommonTokenStream
 
 from smort.src.translate.tools.utils import translate_file, ErrorListener
@@ -26,10 +24,3 @@ def translate_mr_file(fn, timeout_limit, silent=True):
     new_fn = preprocess(fn)  # replace all import statements 
     return translate_file(generate_mr, new_fn, timeout_limit, silent) 
 
-
-def main(argv):
-    smtmr = translate_mr_file(argv[1], 10, False)
-    print(smtmr)
-
-if __name__ == "__main__":
-    main(sys.argv)

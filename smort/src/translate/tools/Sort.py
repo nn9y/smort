@@ -80,6 +80,9 @@ class Identifier:
 
     def __repr__(self):
         return self.__str__()
+    
+    def __hash__(self):
+        return hash((self.symbol, tuple(self.indices)))
 
 
 class Sort:
@@ -99,7 +102,7 @@ class Sort:
         parsorts_instance = []
         for par in self.parsorts:
             if isinstance(par, Sort):
-                # ⚠️ assuming parsort cannot be nested parametric sort template
+                # assume parsort cannot be nested parametric sort template
                 parsorts_instance.append(par)
             elif isinstance(par, str) and (par in parsort_dict):
                 parsorts_instance.append(parsort_dict[par])
@@ -169,6 +172,9 @@ class Sort:
 
     def __repr__(self):
         return self.__str__()
+    
+    def __hash__(self):
+        return hash((self.id_, tuple(self.parsorts)))
 
 
 class SExperssion:

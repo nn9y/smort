@@ -4,7 +4,6 @@ import logging
 import random
 import pathlib
 import copy
-import threading
 
 from smort.src.tools.utils import random_string
 from smort.src.sys.exitcodes import ERR_USAGE
@@ -26,7 +25,7 @@ class Tester:
     def __init__(self, args):
         self.args = args
         self.timeout_count_limit = self.args.iterations
-        self.mr = translate_mr_file(self.args.MR_PATH, 100, False)
+        self.mr = translate_mr_file(self.args.MR_PATH, 10, False)
         if len(self.mr.methods) > 0 and (not self.methods_path):
             print("method declared in mr file, but no path to methods provided in command args")
             exit(ERR_USAGE)
@@ -50,7 +49,7 @@ class Tester:
                 self.statistic.invalid_seeds += 1
                 logging.debug(f"Skip invalid seed: exceeds max file size: {self.args.file_size}")
                 return None
-            script = translate_script_file(seed, 100, silent=False)
+            script = translate_script_file(seed, 10, silent=False)
             script.merge_asserts()
             self.scripts[seed] = script
         self.currentseeds.append(pathlib.Path(seed).stem)
@@ -113,7 +112,7 @@ class Tester:
                             log_skip_seeds_group(self.args.iterations, i+1, gens)
                             break
                         self.statistic.morphs += 1
-                        if not self.args.keep_morphs:
+                        if not self.args.keep_morphs and testfile:
                             os.remove(testfile)
                     total_iterations += 1
                     if not generate_further:
@@ -134,8 +133,8 @@ class Tester:
         :returns:   continue generating morphs using current seeds, testfile (generated script file)
         """
         test_list = create_test_list(script, solver_cmds, self.args.testfolder, self.currentseeds, self.name)
-        for testitem in test_list:
-            solver_cmd, testfile = testitem
+        testfile = None
+        for solver_cmd, testfile in test_list:
             # execute testing
             solver = Solver(solver_cmd)
             self.statistic.solver_calls += 1

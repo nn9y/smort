@@ -8,7 +8,6 @@ class Script:
         self.assert_merged = None 
  
     def prefix_vars(self, prefix: str):
-        self.global_vars = {prefix + var: sort for var, sort in self.global_vars}
         for cmd in self.commands:
             if isinstance(cmd, DeclareConst):
                 cmd.symbol = prefix + cmd.symbol
@@ -27,8 +26,8 @@ class Script:
                         fun_decl.symbol = prefix + fun_decl.symbol
             if isinstance(cmd, Assert):
                 # cmd.term: CNFTerm
-                for c in cmd.term:
-                    for l in c:
+                for c in cmd.term.clauses:
+                    for l in c.literals:
                         # l: Term
                         l.prefix_vars(prefix)
 
@@ -42,7 +41,7 @@ class Script:
         for cmd in self.commands:
             if isinstance(cmd, Assert):
                 for c in cmd.term.clauses:
-                    for l in c:
+                    for l in c.literals:
                         local_free_vars.update(l.local_free_vars)
                     clauses.append(c)
             if isinstance(cmd, SMTLIBCommand):
@@ -102,29 +101,6 @@ class DataTypeDec:
 ({list2str(self.cdecs)}))" 
         else:
             return f"({list2str(self.cdecs)})"
-    
-    def __repr__(self):
-        return self.__str__()
-
-
-class Pattern:
-    def __init__(self, constructor_name=None, var_list=[]):
-        self.constructor_name = constructor_name
-        self.var_list = var_list 
-    
-    def __str__(self):
-        pattern_str = ""
-        symbol_count = 0
-        if self.constructor_name:
-            pattern_str += self.constructor_name
-            symbol_count += 1
-        if self.var_list:
-            pattern_str += list2str(self.var_list)
-            symbol_count += len(self.var_list)
-        if symbol_count > 1:
-            return f"({pattern_str})"
-        else:
-            return pattern_str
     
     def __repr__(self):
         return self.__str__()

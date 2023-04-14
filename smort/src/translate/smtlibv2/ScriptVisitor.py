@@ -32,7 +32,7 @@ class ScriptVisitor(SMTLIBv2Visitor):
 
     def visitStart(self, ctx: SMTLIBv2Parser.StartContext):
         return self.visitScript(ctx.script())
-    
+ 
     def visitSymbol(self, ctx: SMTLIBv2Parser.SymbolContext):
         return ctx.getChild(0).getText()
 
@@ -296,7 +296,7 @@ class ScriptVisitor(SMTLIBv2Visitor):
             else:
                 self.signatures[symbol] = Fun(Identifier(symbol), input_sort_list, output_sort) 
 
-        return [new_declfuns, Assert(cnf_term)]
+        return new_declfuns + [Assert(cnf_term)]
     
     def visitCmd_declareConst(self, ctx:SMTLIBv2Parser.Cmd_declareConstContext):
         var = self.visitSymbol(ctx.symbol())
@@ -434,13 +434,11 @@ class ScriptVisitor(SMTLIBv2Visitor):
             if ctx.ParOpen(): 
                 subterms = []
                 input_list = []
-                local_free_vars = {}
                 for term_ctx in ctx.term():
                     subterm = self.visitTerm(term_ctx, local_vars)
                     # x occurs free in some e_i
                     subterms.append(subterm)
                     input_list.append(subterm.sort)
-                    local_free_vars.update(subterm.local_free_vars)
                     # bound vars will be updated by binders
                 if not sort:
                     sort, _ = self._well_sorted_term(id_, input_list, local_vars)
@@ -448,7 +446,6 @@ class ScriptVisitor(SMTLIBv2Visitor):
                             name=id_,
                             subterms=subterms,
                             sort=sort,
-                            local_free_vars=local_free_vars,
                             qual_id=qual_id,
                         )
             else:

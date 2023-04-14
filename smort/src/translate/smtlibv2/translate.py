@@ -1,5 +1,3 @@
-import sys
-
 from antlr4.CommonTokenStream import CommonTokenStream
 
 from smort.src.translate.tools.utils import translate_file, ErrorListener
@@ -24,10 +22,3 @@ def generate_script(stream):
 def translate_script_file(fn, timeout_limit, silent=True):
     return translate_file(generate_script, fn, timeout_limit, silent) 
 
-
-def main(argv):
-    script = translate_script_file(argv[1], 10000000, False)
-    print(script)
-
-if __name__ == "__main__":
-    main(sys.argv)

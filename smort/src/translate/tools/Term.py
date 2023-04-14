@@ -1,6 +1,7 @@
 import copy
 from enum import Enum
 import random
+import inspect
 
 from smort.src.tools.utils import list2str
 from smort.src.translate.tools.utils import *
@@ -41,11 +42,11 @@ def Var(name, sort=None, qual_id=False, global_free=False):
         global_free=global_free,
     )
 
-def Expr(name, subterms, sort=None, local_free_vars=None, qual_id=False):
-    if not local_free_vars:
-        local_free_vars = {} 
+def Expr(name, subterms, sort=None, qual_id=False):
     global_free = True
+    local_free_vars = {}
     for s in subterms:
+        local_free_vars.update(s.local_free_vars)
         if not s.global_free:
             global_free = False
     return Term(
@@ -280,7 +281,7 @@ class Term:
                 # special check for forall, replace inner term
                 self.subterms[0].update_notation2term(other, notation2term)
             else:
-                notation2term[str(other.name)] = self
+                notation2term[str(other.name)] = copy.deepcopy(self)
             return
         # other is an experssion
         for i, t in enumerate(self.subterms):
@@ -288,9 +289,7 @@ class Term:
  
     def replace_notation_by_term(self, repl_dict):
         """
-        Replace notations in an template (self) by corresponding actual terms.
-
-        This template could be repl template or fuse formula.
+        Replace notations in an template fuse formula (self) by corresponding actual terms.
         """
         if self.term_type in {TermType.CONST, TermType.VAR}:
             # notation (variables) in template
@@ -300,6 +299,16 @@ class Term:
         else:
             for s in self.subterms:
                 s.replace_notation_by_term(repl_dict)
+ 
+    def substitute(self, repl, notation2term):
+        """
+        Substitute all terms in self by repl template with notation2term dict.
+        """
+        if (self.term_type == TermType.QUANT) and (self.quantifier == QUANT_FORALL):
+            self.subterms[0].substitute(repl, notation2term)
+        else:
+            self.__dict__ = copy.deepcopy(repl.__dict__)
+            self.replace_notation_by_term(notation2term)
 
     def __eq__(self, other):
         if not isinstance(other, Term):
@@ -326,7 +335,7 @@ class Term:
         # local free vars is decided by other members
         if self.annotations != other.annotations:
             return False
-        # parent can be different
+        # global free can be different
         return True
 
     def __str__(self):
@@ -393,11 +402,30 @@ class Term:
     #     return term_copied 
 
 
-def substitute(occs, repl, notation2term):
-    """
-    Substitute all terms in occs by repl template with notation2term dict.
-    """
-    for occ in occs:
-        occ = copy.deepcopy(repl)
-        occ.replace_notation_by_term(notation2term)
+
+
+
+class Pattern:
+    def __init__(self, constructor_name=None, var_list=[]):
+        self.constructor_name = constructor_name
+        self.var_list = var_list 
+    
+    def __str__(self):
+        pattern_str = ""
+        symbol_count = 0
+        if self.constructor_name:
+            pattern_str += self.constructor_name
+            symbol_count += 1
+        if self.var_list:
+            if self.constructor_name:
+                pattern_str += " "
+            pattern_str += list2str(self.var_list)
+            symbol_count += len(self.var_list)
+        if symbol_count > 1:
+            return f"({pattern_str})"
+        else:
+            return pattern_str
+    
+    def __repr__(self):
+        return self.__str__()
 

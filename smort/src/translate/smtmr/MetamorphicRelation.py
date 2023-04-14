@@ -35,19 +35,20 @@ class NotationInfo:
         self.is_var = False
         self.is_fun = False
         self.gen_assert = False
-        for attr in self.attributes:
-            match attr:
-                case NotationKeyword.CONS:
-                    self.is_cons = True
-                case NotationKeyword.VAR:
-                    self.is_vars = True
-                case NotationKeyword.FUN:
-                    if self.input_notations == []:
-                        self.is_vars = True
-                    else:
-                        self.is_fun = True
-                case NotationKeyword.GEN:
-                    self.gen_assert = True
+        if attributes:
+            for attr in self.attributes:
+                match attr.keyword:
+                    case NotationKeyword.CONS:
+                        self.is_cons = True
+                    case NotationKeyword.VAR:
+                        self.is_var = True
+                    case NotationKeyword.FUN:
+                        if self.input_notations == []:
+                            self.is_var = True
+                        else:
+                            self.is_fun = True
+                    case NotationKeyword.GEN:
+                        self.gen_assert = True
     
     def __str__(self):
         if self.formula_in:
@@ -74,7 +75,7 @@ class SubstTemplate:
                 self.inwards = True
     
     def __str__(self):
-        return f"(subst-template {list2str(self.attributes)}\
+        return f"(subst-template {list2str(self.attributes)} \
 ({list2str(self.sorted_vars)}) ({list2str(self.repl_pairs)}))"
 
     def __repr__(self):
@@ -97,7 +98,7 @@ class Method:
                 self.is_snpt = True
  
     def __str__(self):
-        return f"(method {self.name} {self.formula} {list2str(self.attribute)})"
+        return f"(method {self.name} {self.formula} {list2str(self.attributes)})"
     
     def __repr__(self):
         return self.__str__()

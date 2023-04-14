@@ -21,7 +21,7 @@ def random_constant_value(sort):
     elif sort == INT:
         i = random.randint(-1000, 1000)
         if i < 0:
-            return Expr(name='-',
+            return Expr(name=Identifier('-'),
                         subterms=[Const(
                                     name=SpecConstant(
                                         SpecConstType.NUMERAL,
@@ -42,7 +42,7 @@ def random_constant_value(sort):
     elif sort == REAL:
         r = round(random.uniform(-1000, 1000), 5)
         if r < 0:
-            return Expr(name='-',
+            return Expr(name=Identifier('-'),
                         subterms=[Const(
                                     name=SpecConstant(
                                         SpecConstType.DECIMAL,

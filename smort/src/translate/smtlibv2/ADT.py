@@ -1,3 +1,5 @@
+import copy
+
 from smort.src.translate.tools.Sort import Identifier, Sort
 from smort.src.translate.theory.Fun import Fun
 from smort.src.translate.theory.available_sorts import BOOL 
@@ -9,6 +11,27 @@ class ADT(Sort):
         super().__init__(id_, parsorts, None)
         self.constructors = {} 
         self.selectors_of_constructor = {} 
+    
+
+    def get_parametric_instance(self, parsort_dict):
+        parsorts_instance = []
+        for par in self.parsorts:
+            if isinstance(par, Sort):
+                # assume parsort cannot be nested parametric sort template
+                parsorts_instance.append(par)
+            elif isinstance(par, str) and (par in parsort_dict):
+                parsorts_instance.append(parsort_dict[par])
+            else:
+                return None
+        adt = ADT(copy.deepcopy(self.id_), parsorts_instance)
+        # get parametric instances of functions
+        for name, constructor in self.constructors.items():
+            adt.constructors[name] = constructor.get_parametric_instance(parsort_dict)
+            selector_instances = []
+            for selector in self.selectors_of_constructor[name]:
+                selector_instances.append(selector.get_parametric_instance(parsort_dict))
+            adt.selectors_of_constructor[name] = selector_instances
+        return adt
 
 
 def declare_datatype(name: str, arity: int):

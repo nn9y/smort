@@ -25,6 +25,7 @@ def Term2CNFTerm(t):
     new_declfuns = first_order2CNF(t)
 
     if (t.term_type == TermType.EXPR) and (t.name == BOOLEAN_AND):
+        clauses = []
         for s in t.subterms:
             if (s.term_type == TermType.EXPR) and (s.name == BOOLEAN_OR):
                 literals = [l for l in s.subterms]
@@ -33,13 +34,15 @@ def Term2CNFTerm(t):
             c = Clause(literals)
             clauses.append(c)
     else:
-        clauses = [t]
-
+        clauses = [Clause([t])]
+    
     return new_declfuns, CNFTerm(clauses)
 
 
 def eliminate_match(term):
-    # match term couldn't be nested
+    for s in term.subterms:
+        eliminate_match(s)
+    # match term couldn't be nested in match cases
     if term.term_type == TermType.MATCH:
         # move single variable pattern to last one
         var_pattern = None
@@ -53,7 +56,7 @@ def eliminate_match(term):
         # convert to nested ite experssions
         match_term = term.subterms[0]
         adt = match_term.sort
-        inner_else_term = None
+        inner_term = None
         for p, t in reversed(term.match_cases):
             if p.constructor_name:
                 tester_id = get_tester_id_of_constructor(p.constructor_name)
@@ -61,26 +64,24 @@ def eliminate_match(term):
                     name=tester_id,
                     subterms=[copy.deepcopy(match_term)],
                     sort=t.sort,
-                    local_free_vars=match_term.local_free_vars
                 )
                 if_term.bound_vars = term.bound_vars
-                if len(p.vars) > 0:
+                if len(p.var_list) > 0:
                     # (let ((var match_term)...) t) 
                     var_bindings = []
                     selectors = adt.selectors_of_constructor[p.constructor_name]
-                    for i, var in enumerate(p.vars):
+                    for i, var in enumerate(p.var_list):
                         si = selectors[i]
                         expr = Expr(
                             name=si.name,
                             subterms=[copy.deepcopy(match_term)],
                             sort=si.output,
-                            local_free_vars=match_term.local_free_vars,
                         )
                         expr.bound_vars = term.bound_vars
                         var_bindings.append([var, expr])
                     e = LetBinding(
                         var_bindings=var_bindings,
-                        let_term=[t],
+                        let_term=t,
                         sort=t.sort,
                         local_free_vars=t.local_free_vars
                     )
@@ -89,39 +90,36 @@ def eliminate_match(term):
                     # nullary constructor
                     e = t
             else:
-                var = p.vars[0]
+                var = p.var_list[0]
                 e = LetBinding(
                     var_bindings=[[var, copy.deepcopy(match_term)]],
-                    let_term=[t],
+                    let_term=t,
                     sort=t.sort,
                     local_free_vars=t.local_free_vars
                 )
                 e.bound_vars = match_term.bound_vars
-            if inner_else_term:
+            if inner_term:
                 # assume no single variable pattern in middle
                 this_term = Expr(
                     name=BOOLEAN_IF_THEN_ELSE,
-                    subterms=[if_term, e, inner_else_term],
+                    subterms=[if_term, e, inner_term],
                     sort=e.sort,
-                    local_free_vars=term.local_free_vars,
                 )
                 this_term.bound_vars = term.bound_vars
-                inner_else_term = this_term
+                inner_term = this_term
             else:
-                inner_else_term = e
-    else:
-        for s in term.subterms:
-            eliminate_match(s)
+                inner_term = e
+        term.__dict__ = copy.deepcopy(inner_term.__dict__)
 
 
 def eliminate_let(term):
+    for s in term.subterms:
+        eliminate_let(s)
     if term.term_type == TermType.LET:
-        for v, t in term.var_binders:
+        for v, t in term.var_bindings:
             eliminate_let(t)
             replace_var_by_term(term.subterms[0], v, t)
-    else:
-        for s in term.subterms:
-            eliminate_let(s)
+        term.__dict__ = copy.deepcopy(term.subterms[0].__dict__)
 
 
 def first_order2CNF(fot):
@@ -162,7 +160,7 @@ def eliminate_implies(fot):
 
 
 def move_NOTs_inwards(fot):
-    if (fot.term_type == TermType.EXPR) and (fot.name == BOOLEAN_NOT):
+    while (fot.term_type == TermType.EXPR) and (fot.name == BOOLEAN_NOT):
         t = fot.subterms[0]
         if t.term_type == TermType.QUANT:
             # not (forall(x...) P(x...)) ==> (exists(x...) (not P(x...)))
@@ -186,13 +184,17 @@ def move_NOTs_inwards(fot):
                 #   t is an Expr
             elif t.name == BOOLEAN_NOT:
                 # not not P ==> P 
-                fot = t.subterms[0]
+                fot.__dict__ = copy.deepcopy(t.subterms[0].__dict__)
+            else:
+                break
+        else:
+            break
     for s in fot.subterms:
         move_NOTs_inwards(s)
 
 
 def not_term(t):
-    not_t = Expr(name=BOOLEAN_NOT, subterms=[t], sort=BOOL, local_free_vars=t.local_free_vars)
+    not_t = Expr(name=BOOLEAN_NOT, subterms=[t], sort=BOOL)
     not_t.bound_vars = t.bound_vars
     return not_t
 
@@ -202,7 +204,7 @@ def standardize_quantifiers(fot):
         for s in fot.subterms:
             prefix_variables_in_scope(s, fot)
             prefix_quant_vars(fot)
-    for s in fot.substerms:
+    for s in fot.subterms:
         standardize_quantifiers(s)
 
 
@@ -224,7 +226,7 @@ def prefix_variables_in_scope(t, quant):
                     # rename corresponding item in t's sorted vars,
                     #   local free vars and bound vars,
                     # so that it can override the variable later
-                    prefixed_varj = quant.name + varj
+                    prefixed_varj = f"{quant.name}_{varj}"
                     t.sorted_vars[j][0] = prefixed_varj 
                     if varj in t.local_free_vars:
                         del t.local_free_vars[varj]
@@ -232,19 +234,14 @@ def prefix_variables_in_scope(t, quant):
                     if varj in t.bound_vars:
                         del t.bound_vars[varj]
                     t.bound_vars[prefixed_varj] = sortj
-    else:
-        for s in t.subterms:
-            prefix_variables_in_scope(s, quant)
+    for s in t.subterms:
+        prefix_variables_in_scope(s, quant)
 
 
 def prefix_quant_vars(quant):
-    for i, sv in quant.sorted_vars:
+    for i, sv in enumerate(quant.sorted_vars):
         var, _ = sv
-        quant.sorted_vars[i][0] = quant.name + var 
-    local_free_vars = {quant.name + var: sort for var, sort in quant.local_free_vars.items()}
-    quant.local_free_vars = local_free_vars
-    bound_vars = {quant.name + var: sort for var, sort in quant.bound_vars.items()}
-    quant.local_free_vars = bound_vars 
+        quant.sorted_vars[i][0] = f"{quant.name}_{var}" 
 
 
 def move_quantifiers_outwards(fot):
@@ -278,9 +275,9 @@ def move_quantifiers_outwards(fot):
                     name=op,
                     subterms=expr_subterms,
                     sort=BOOL,
-                    local_free_vars=expr_local_free_vars
                 )
                 expr.bound_vars = expr_bound_vars
+                fot.term_type = TermType.QUANT
                 fot.name = q.name
                 fot.quantifier = q.quantifier
                 fot.sorted_vars = q.sorted_vars
@@ -293,7 +290,7 @@ def move_quantifiers_outwards(fot):
 def eliminate_exists(fot, forall_sorted_vars):
     new_declfuns = []
     if fot.term_type == TermType.QUANT:
-        if fot.quantifier == QUANT_EXISTS: 
+        while fot.quantifier == QUANT_EXISTS: 
             input_sort_list = []
             input_var_list = []
             local_free_vars = {}
@@ -315,21 +312,20 @@ def eliminate_exists(fot, forall_sorted_vars):
                     name=fun_name,
                     subterms=input_var_list,
                     sort=sort,
-                    local_free_vars=local_free_vars,
                 )
                 replace_var_by_term(fot.subterms[0], var, term)
-            fot = fot.subterms[0] 
-        else:
+            fot.__dict__ = copy.deepcopy(fot.subterms[0].__dict__)
+        if fot.quantifier == QUANT_FORALL: 
             forall_sorted_vars += fot.sorted_vars
     for s in fot.subterms:
-        new_declfuns.extend(eliminate_exists(s, forall_sorted_vars))
+        new_declfuns.extend(eliminate_exists(s, copy.deepcopy(forall_sorted_vars)))
     return new_declfuns
 
 
 def replace_var_by_term(t, var, term):
     if (t.term_type == TermType.VAR) and (str(t.name) == var):
         bound_vars = t.bound_vars
-        t = copy.deepcopy(term)
+        t.__dict__ = copy.deepcopy(term.__dict__)
         t.bound_vars = bound_vars
     for s in t.subterms:
         if s.term_type == TermType.QUANT:
@@ -347,73 +343,109 @@ def replace_var_by_term(t, var, term):
 def distribute_ORs_inwards_ANDs(fot):
     for s in fot.subterms:
         distribute_ORs_inwards_ANDs(s)
-    if (fot.term_type == TermType.EXPR) and (fot.name == BOOLEAN_OR):
-        # expand all ORs first
-        # (P or K or M) or ... ===> P or K or M or ...
+    if fot.term_type == TermType.EXPR:
+        if fot.name == BOOLEAN_AND:
+            terms = expand_operator(fot, BOOLEAN_AND) 
+            fot.subterms = terms
+        elif fot.name == BOOLEAN_OR:
+            # expand all ORs first
+            # (P or K or M) or ... ===> P or K or M or ...
+            terms = expand_operator(fot, BOOLEAN_OR)
+            # P or (C1 and C2 and ...) or K... ==>
+            # (P or expand(C1)) and (P or (expand(C2)) and ...) or K... ==>
+            # ...
+            find_and = False
+            i = 0
+            while i < len(terms):
+                s = terms[i]
+                if (s.term_type == TermType.EXPR) and (s.name == BOOLEAN_AND):
+                    find_and = True
+                    # try distribute with neighbor
+                    valid = True
+                    while(valid):
+                        if i-1 >= 0:
+                            k = i-1
+                        elif i+1 < len(terms):
+                            k = i+1
+                        else:
+                            valid = False
+                            break
+                        p = terms[k]
+                        p_subterms = [p]
+                        if (p.term_type == TermType.EXPR) and (p.name == BOOLEAN_AND):
+                            p_subterms = p.subterms
+                        or_terms = []
+                        for t in s.subterms:
+                            for q in p_subterms:
+                                or_term = Expr(
+                                    name=BOOLEAN_OR,
+                                    subterms=[q, t],
+                                    sort=BOOL,
+                                )
+                                or_term.bound_vars = fot.bound_vars
+                                or_terms.append(or_term)
+                        and_term = Expr(
+                            name=BOOLEAN_AND,
+                            subterms=or_terms,
+                            sort=BOOL,
+                        )
+                        and_term.bound_vars = fot.bound_vars
+                        terms[i].__dict__ = copy.deepcopy(and_term.__dict__)
+                        terms.pop(k)
+                        if k == i-1:
+                            i -= 1
+                i += 1
+            if find_and:
+                fot.__dict__ = copy.deepcopy(terms[0].__dict__)
+            else:
+                fot.subterms = terms
+
+
+def expand_operator(fot, operator):
+    if fot.name == operator:
         terms = []
         for s in fot.subterms:
-            if (s.term_type == TermType.EXPR) and (s.name == BOOLEAN_OR):
-                terms.extend(s.subterms)
+            terms.extend(expand_operator(s, operator))
+        return terms
+    else:
+        return [fot]
+
+
+def CNFTerm2Term(t):
+    """
+    Convert a CNFTerm t to Term object
+    """
+
+    if len(t.clauses) > 1:
+        clauses = []
+        for c in t.clauses:
+            if len(c.literals) > 1:
+                literals = [l for l in c.literals]
+                clause = Expr(
+                    name=BOOLEAN_OR,
+                    subterms=literals,
+                    sort=BOOL
+                )
+            elif len(c.literals) == 1:
+                clause = c.literals[0]
             else:
-                terms.append(s)
-        # P or (C1 and C2 and ...) or K... ==>
-        # (P or expand(C1)) and (P or (expand(C2)) and ...) or K... ==>
-        # ...
-        find_and = False
-        i = 0
-        while i < len(terms):
-            s = terms[i]
-            if (s.term_type == TermType.EXPR) and (s.name == BOOLEAN_AND):
-                find_and = True
-                # try distribute with neighbor
-                valid = True
-                while(valid):
-                    if i-1 >= 0:
-                        k = i-1
-                    elif i+1 <= len(terms):
-                        k = i+1
-                    else:
-                        valid = False
-                        break
-                    p = terms[k]
-                    p_subterms = [p]
-                    if (p.term_type == TermType.EXPR) and (p.name == BOOLEAN_AND):
-                        p_subterms = p.subterms
-                    or_terms = []
-                    for t in s.subterms:
-                        for q in p_subterms:
-                            or_term = Expr(
-                                name=BOOLEAN_OR,
-                                subterms=[q, t],
-                                sort=BOOL,
-                                local_free_vars={**q.local_free_vars, **t.local_free_vars},
-                            )
-                            or_term.bound_vars = fot.bound_vars
-                            or_terms.append(or_term)
-                    and_term = Expr(
-                        name=BOOLEAN_AND,
-                        subterms=or_terms,
-                        sort=BOOL,
-                        local_free_vars={**p.local_free_vars, **s.local_free_vars}
-                    )
-                    and_term.bound_vars = fot.bound_vars
-                    terms[i] = and_term
-                    terms.pop(k)
-                    if k == i-1:
-                        i -= 1
-            i += 1
-        if find_and:
-            fot = terms[0]
-        else:
-            fot.subterms = terms
-
-
-# def expand_operator(fot, operator):
-#     if str(fot.name) == operator:
-#         or_terms = []
-#         for s in fot.subterms:
-#             or_terms.extend(expand_operator(s))
-#         return or_terms
-#     else:
-#         return [fot]
+                continue
+            clauses.append(clause)
+        return Expr(
+            name=BOOLEAN_AND,
+            subterms=clauses,
+            sort=BOOL
+        )
+    elif len(t.clauses) == 1:
+        c = t.clauses[0]
+        if len(c.literals) > 1:
+            literals = [l for l in c.literals]
+            return Expr(
+                name=BOOLEAN_OR,
+                subterms=literals,
+                sort=BOOL
+            )
+        elif len(c.literals) == 1:
+            return c.literals[0]
+    return None
 

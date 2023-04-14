@@ -15,7 +15,7 @@ class Clause:
         if len(self.literals) > 1:
             return f"(or {list2str(self.literals)})"
         elif len(self.literals) == 1:
-            return self.literals[0]
+            return str(self.literals[0])
         else:
             return ""
     
@@ -35,15 +35,15 @@ class CNFTerm:
         if len(self.clauses) > 1:
             return f"(and {list2str(self.clauses)})"
         elif len(self.clauses) == 1:
-            return self.clauses[0]
+            return str(self.clauses[0])
         else:
             return ""
     
     def __repr__(self):
         return self.__str__()
-    
+ 
     def find_terms(self, t, occs, global_free=False, inwards=False):
-        for clauses in self.clauses:
-            for literal in clauses.literals:
+        for clause in self.clauses:
+            for literal in clause.literals:
                 literal.find_terms(t, occs, global_free, inwards)
 

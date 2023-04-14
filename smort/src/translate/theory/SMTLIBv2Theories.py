@@ -19,15 +19,15 @@ def Core_theory():
         BOOL_NAME: BOOL
     }
     funs = {
-        str(SpecConstType.B_VALUE): Fun(SpecConstant(SpecConstType.B_VALUE, None), [], BOOL),
-        "not": Fun(BOOLEAN_NOT, [BOOL], BOOL),
-        "=>": Fun(BOOLEAN_IMPLIES, {BOOL}, BOOL),
-        "and": Fun(BOOLEAN_AND, {BOOL}, BOOL),
-        "or": Fun(BOOLEAN_OR, {BOOL}, BOOL),
-        "xor": Fun(Identifier("xor"), {BOOL}, BOOL),
-        "=": Fun(BOOLEAN_EQUAL, {A}, BOOL, [A]),
-        "distinct": Fun(Identifier("distinct"), {A}, BOOL, [A]),
-        "ite": Fun(BOOLEAN_IF_THEN_ELSE, [BOOL, A, A], A, [A]),
+        str(SpecConstType.B_VALUE): [Fun(SpecConstant(SpecConstType.B_VALUE, None), [], BOOL)],
+        "not": [Fun(BOOLEAN_NOT, [BOOL], BOOL)],
+        "=>": [Fun(BOOLEAN_IMPLIES, {BOOL}, BOOL)],
+        "and": [Fun(BOOLEAN_AND, {BOOL}, BOOL)],
+        "or": [Fun(BOOLEAN_OR, {BOOL}, BOOL)],
+        "xor": [Fun(Identifier("xor"), {BOOL}, BOOL)],
+        "=": [Fun(BOOLEAN_EQUAL, {A}, BOOL, [A])],
+        "distinct": [Fun(Identifier("distinct"), {A}, BOOL, [A])],
+        "ite": [Fun(BOOLEAN_IF_THEN_ELSE, [BOOL, A, A], A, [A])],
     }
     return [sorts, funs]
 

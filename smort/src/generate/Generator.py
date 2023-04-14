@@ -10,6 +10,7 @@ from smort.src.generate.utils import (
     generate_additions,
     replace
 )
+from smort.src.translate.smtlibv2.cnf_conversion import CNFTerm2Term
 
 
 class Generator:
@@ -31,8 +32,8 @@ class Generator:
         self.acc_snpts = []
         self.acc_decls = []
         self.acc_asserts = []
-    
-    def metamorphose(self, formulas, decls, asserts):
+
+    def metamorphose(self, decls, asserts):
         if self.args.incremental:
             if len(self.substs_list) == 0:
                 self.end_increment = True
@@ -47,7 +48,7 @@ class Generator:
             i = random.randrange(len(self.substs_list[m][1]))
             term_tup, notation2term = term_tups[i], notation2terms[i] 
             generate_additions(template, self.mr.notations, notation2term, decls, asserts)
-            replace(template, term_tup, notation2term, formulas)
+            replace(template, term_tup, notation2term)
             self.substs_list[m][1].pop(i)
             self.substs_list[m][2].pop(i)
             if len(self.substs_list[m][1]) == 0:
@@ -58,9 +59,8 @@ class Generator:
             for k, term_tups, notation2terms in self.substs_list:
                 template = self.mr.subst_templates[k]
                 for i, term_tup in enumerate(term_tups):
-                    notation2term = notation2terms[i] 
-                    generate_additions(template, self.mr.notations, notation2term, decls, asserts)
-                    replace(template, term_tup, notation2term, formulas)
+                    generate_additions(template, self.mr.notations, notation2terms[i], decls, asserts)
+                    replace(template, term_tup, notation2terms[i])
 
     def call_extended_methods(self, formulas, snpts):
         processed_formulas = {}
@@ -81,7 +81,7 @@ class Generator:
         fused = copy.deepcopy(self.mr.fuse_term)
         repl_dict = {}
         for i, formula in enumerate(formulas):
-            repl_dict[self.mr.seed_on_index[i]] = formula.assert_merged.term
+            repl_dict[self.mr.seed_on_index[i]] = CNFTerm2Term(formula.assert_merged.term)
         repl_dict = dict(repl_dict, **processed_formulas)
         fused.replace_notation_by_term(repl_dict)
         return fused 
@@ -119,7 +119,7 @@ class Generator:
             asserts = self.acc_asserts
             snpts = self.acc_snpts
 
-        self.metamorphose(formulas, decls, asserts)
+        self.metamorphose(decls, asserts)
         processed_formulas = self.call_extended_methods(formulas, snpts)
         # get fused assert term in morph
         fused = self.fuse(formulas, processed_formulas)
@@ -147,5 +147,6 @@ class Generator:
         # nonsense when '-mt' is enabled
         self.template_index += 1
         self.template_index %= len(self.valid_index_list)
+
 
         return morph, end_iteration
