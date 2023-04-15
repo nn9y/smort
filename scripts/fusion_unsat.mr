@@ -1,0 +1,11 @@
+(seed s1 unsat)
+(seed s2 unsat)
+(morph m unsat)
+
+(notation x s1)
+(notation y s2)
+(notation z :var :gen)
+
+(import "10.txt")
+
+(fuse (or s1 s2))

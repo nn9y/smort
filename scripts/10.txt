@@ -1,0 +1,105 @@
+; Generated with: https://github.com/nicdard/fusion-function-generator
+; 10 functions (number of subst-template blocks)
+; 5 operators per function
+
+(subst-template :global-free :inwards
+	(
+		(x String) (y String) (z String) 
+	)
+	(
+		(x (str.substr z 0 (str.indexof z y (str.len x))))
+		(y (str.substr z (str.len x) (str.len y)))
+		(z (= z (str.++ x y)))
+	)
+)
+(subst-template :global-free :inwards
+	(
+		(x String) (y String) (z String) 
+	)
+	(
+		(x (str.substr z 0 (str.len x)))
+		(y (str.substr z (str.indexof z y (str.len x)) (str.len y)))
+		(z (= z (str.++ x y)))
+	)
+)
+(subst-template :global-free :inwards
+	(
+		(x Real) (y Real) (z Real) 
+	)
+	(
+		(x (+ z y))
+		(y (- x z))
+		(z (= z (- x y)))
+	)
+)
+(notation c0 :cons)
+(subst-template :global-free :inwards
+	(
+		(x (_ BitVec 8)) (y (_ BitVec 1)) (z (_ BitVec 8)) (c0 (_ BitVec 7)) 
+	)
+	(
+		(x (bvxor (concat y c0) z))
+		(y ((_ extract 7 7) (bvxor x z)))
+		(z (= z (bvxor x (concat y c0))))
+	)
+)
+(subst-template :global-free :inwards
+	(
+		(x (_ BitVec 1)) (y (_ BitVec 8)) (z (_ BitVec 8)) (c0 (_ BitVec 7)) 
+	)
+	(
+		(x ((_ extract 7 7) (ite (distinct (concat x c0) y) z (concat x c0))))
+		(y (ite (distinct (concat x c0) y) y z))
+		(z (= z (ite (distinct (concat x c0) y) (concat x c0) y)))
+	)
+)
+(subst-template :global-free :inwards
+	(
+		(x Int) (y Int) (z Int) 
+	)
+	(
+		(x (- z y))
+		(y (- z x))
+		(z (= z (+ x y)))
+	)
+)
+(subst-template :global-free :inwards
+	(
+		(x Int) (y Int) (z Int) 
+	)
+	(
+		(x (div z y))
+		(y (div z x))
+		(z (= z (* x y)))
+	)
+)
+(subst-template :global-free :inwards
+	(
+		(x Int) (y Int) (z Int) 
+	)
+	(
+		(x (+ z y))
+		(y (- x z))
+		(z (= z (- x y)))
+	)
+)
+(subst-template :global-free :inwards
+	(
+		(x (_ BitVec 32)) (y (_ BitVec 8)) (z (_ BitVec 40)) 
+	)
+	(
+		(x ((_ extract 39 8) z))
+		(y ((_ extract 7 0) z))
+		(z (= z (concat x y)))
+	)
+)
+(subst-template :global-free :inwards
+	(
+		(x (_ BitVec 1)) (y (_ BitVec 8)) (z (_ BitVec 8)) (c0 (_ BitVec 7)) 
+	)
+	(
+		(x ((_ extract 7 7) (ite (distinct (concat x c0) y) z (concat x c0))))
+		(y (ite (distinct (concat x c0) y) y z))
+		(z (= z (ite (distinct (concat x c0) y) (concat x c0) y)))
+	)
+)

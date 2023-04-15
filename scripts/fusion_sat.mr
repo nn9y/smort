@@ -1,0 +1,11 @@
+(seed s1 sat)
+(seed s2 sat)
+(morph m sat)
+
+(notation x s1)
+(notation y s2)
+(notation z :var)
+
+(import "10.txt")
+
+(fuse (and s1 s2))

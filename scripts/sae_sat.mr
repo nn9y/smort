@@ -1,0 +1,493 @@
+(seed s sat)
+(morph m sat)
+
+(notation x s)
+(notation y s)
+(notation a :var :gen)
+
+; Int
+;   Over-approximation
+;       less than
+(subst-template 
+    ((x Int) (y Int))
+    ( ((< x y) (<= x y)) )
+)
+(subst-template 
+    ((x Int) (y Int))
+    ( ((< x y) (distinct x y)) )
+)
+;       less than or equal to
+(subst-template
+    ((x Int) (y Int) (a Int))
+    ( ((<= x y) (< x (+ y a))) (a (> a 0)) )
+)
+;       greater than
+(subst-template
+    ((x Int) (y Int))
+    ( ((> x y) (>= x y)) )
+)
+(subst-template
+    ((x Int) (y Int))
+    ( ((> x y) (distinct x y)) )
+)
+;       greater than or equal to
+(subst-template
+    ((x Int) (y Int) (a Int))
+    ( ((>= x y) (> (+ x a) y)) (a (> a 0)) )
+)
+;       equal
+(subst-template
+    ((x Int) (y Int))
+    ( ((= x y) (<= x y)) )
+)
+(subst-template
+    ((x Int) (y Int))
+    ( ((= x y) (>= x y)) )
+)
+;       inequal
+(subst-template
+    ((x Int) (y Int) (a Int))
+    ( ((distinct x y) (not (and (= x a) (= y a)))) )
+)
+;   not Under-approximation
+;       less than
+(subst-template 
+    ((x Int) (y Int) (a Int))
+    ( ((not (< x y)) (not (<= (+ x a) y))) (a (> a 0)) )
+)
+;       less than or equal to
+(subst-template
+    ((x Int) (y Int))
+    ( ((not (<= x y)) (not (= x y))) )
+)
+(subst-template
+    ((x Int) (y Int) (a Int))
+    ( ((not (<= x y)) (not (< (+ x a) y))) (a (>= a 0)) )
+)
+;       greater than
+(subst-template
+    ((x Int) (y Int) (a Int))
+    ( ((not (> x y)) (not (>= x (+ y a)))) (a (> a 0)) )
+)
+;       greater than or equal to
+(subst-template
+    ((x Int) (y Int))
+    ( ((not (>= x y)) (not (= x y))) )
+)
+(subst-template
+    ((x Int) (y Int) (a Int))
+    ( ((not (>= x y)) (not (> x (+ y a)))) (a (>= a 0)) )
+)
+;       equal
+(subst-template
+    ((x Int) (y Int) (a Int))
+    ( ((not (= x y)) (not (and (>= x a) (<= x a) (>= y a) (<= y a))) )
+)
+;       inequal
+(subst-template
+    ((x Int) (y Int) (a Int))
+    ( ((not (distinct x y)) (not (> x y))) )
+)
+(subst-template
+    ((x Int) (y Int) (a Int))
+    ( ((not (distinct x y)) (not (< x y))) )
+)
+
+; Real
+;   Over-approximation
+;       less than
+(subst-template 
+    ((x Real) (y Real))
+    ( ((< x y) (<= x y)) )
+)
+(subst-template 
+    ((x Real) (y Real))
+    ( ((< x y) (distinct x y)) )
+)
+;       less than or equal to
+(subst-template
+    ((x Real) (y Real) (a Real))
+    ( ((<= x y) (< x (+ y a))) (a (> a 0)) )
+)
+;       greater than
+(subst-template
+    ((x Real) (y Real))
+    ( ((> x y) (>= x y)) )
+)
+(subst-template
+    ((x Real) (y Real))
+    ( ((> x y) (distinct x y)) )
+)
+;       greater than or equal to
+(subst-template
+    ((x Real) (y Real) (a Real))
+    ( ((>= x y) (> (+ x a) y)) (a (> a 0)) )
+)
+;       equal
+(subst-template
+    ((x Real) (y Real))
+    ( ((= x y) (<= x y)) )
+)
+(subst-template
+    ((x Real) (y Real))
+    ( ((= x y) (>= x y)) )
+)
+;       inequal
+(subst-template
+    ((x Real) (y Real) (a Real))
+    ( ((distinct x y) (not (and (= x a) (= y a)))) )
+)
+;   not Under-approximation
+;       less than
+(subst-template 
+    ((x Real) (y Real) (a Real))
+    ( ((not (< x y)) (not (<= (+ x a) y))) (a (> a 0)) )
+)
+;       less than or equal to
+(subst-template
+    ((x Real) (y Real))
+    ( ((not (<= x y)) (not (= x y))) )
+)
+(subst-template
+    ((x Real) (y Real) (a Real))
+    ( ((not (<= x y)) (not (< (+ x a) y))) (a (>= a 0)) )
+)
+;       greater than
+(subst-template
+    ((x Real) (y Real) (a Real))
+    ( ((not (> x y)) (not (>= x (+ y a)))) (a (> a 0)) )
+)
+;       greater than or equal to
+(subst-template
+    ((x Real) (y Real))
+    ( ((not (>= x y)) (not (= x y))) )
+)
+(subst-template
+    ((x Real) (y Real) (a Real))
+    ( ((not (>= x y)) (not (> x (+ y a)))) (a (>= a 0)) )
+)
+;       equal
+(subst-template
+    ((x Real) (y Real) (a Real))
+    ( ((not (= x y)) (not (and (>= x a) (<= x a) (>= y a) (<= y a))) )
+)
+;       inequal
+(subst-template
+    ((x Real) (y Real) (a Real))
+    ( ((not (distinct x y)) (not (> x y))) )
+)
+(subst-template
+    ((x Real) (y Real) (a Real))
+    ( ((not (distinct x y)) (not (< x y))) )
+)
+
+; BitVec
+;   Over-approximation
+;       unsigned less than
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((bvult x y) (bvule x y)) )
+)
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((bvult x y) (distinct x y)) )
+)
+;       unsigned greater than
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((bvugt x y) (bvuge x y)) )
+)
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((bvugt x y) (distinct x y)) )
+)
+;       signed less than
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((bvslt x y) (bvsle x y)) )
+)
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((bvslt x y) (distinct x y)) )
+)
+;       signed greater than
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((bvsgt x y) (bvsge x y)) )
+)
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((bvsgt x y) (distinct x y)) )
+)
+;       signed equal
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((= x y) (bvsle x y)) )
+)
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((= x y) (bvsge x y)) )
+)
+;       signed inequal
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)) (a (_ BitVec & 1 x)))
+    ( ((distinct x y) (not (and (= x a) (= y a)))) )
+)
+;       unsigned equal
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((= x y) (bvule x y)) )
+)
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((= x y) (bvuge x y)) )
+)
+;   not Under-approximation
+;       unsigned less than or equal to
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((not (bvule x y)) (not (= x y))) )
+)
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((not (bvule x y)) (not (bvult x y))) )
+)
+;       unsigned greater than or equal to
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((not (bvuge x y)) (not (= x y))) )
+)
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((not (bvuge x y)) (not (bvugt x y))) )
+)
+;       signed less than or equal to
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((not (bvsle x y)) (not (= x y))) )
+)
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((not (bvsle x y)) (not (bvslt x y))) )
+)
+;       unsigned greater than or equal to
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((not (bvsge x y)) (not (= x y))) )
+)
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((not (bvsge x y)) (not (bvsgt x y))) )
+)
+;       signed equal
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)) (a (_ BitVec & 1 x)))
+    ( ((not (= x y)) (not (and (bvsle a x) (bvsle x a) (bvsle a y) (bvsle y a)))) )
+)
+;       signed inequal
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((not (distinct x y)) (not (bvsgt x y))) )
+)
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((not (distinct x y)) (not (bvslt x y))) )
+)
+;       unsigned equal
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)) (a (_ BitVec & 1 x)))
+    ( ((not (= x y)) (not (and (bvule a x) (bvule x a) (bvule a y) (bvule y a)))) )
+)
+;       unsigned inequal
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((not (distinct x y)) (not (bvugt x y))) )
+)
+(subst-template
+    ((x (_ BitVec @ 1)) (y (_ BitVec @ 1)))
+    ( ((not (distinct x y)) (not (bvult x y))) )
+)
+
+; Float
+;   Over-approximation
+;       less than
+(subst-template
+    ((x (_ FloatingPoint @ 2)) (y (_ FloatingPoint @ 2)))
+    ( ((fp.lt x y) (fp.leq x y)) )
+)
+(subst-template
+    ((x (_ FloatingPoint @ 2)) (y (_ FloatingPoint @ 2)))
+    ( ((fp.lt x y) (distinct x y)) )
+)
+;       greater than
+(subst-template
+    ((x (_ FloatingPoint @ 2)) (y (_ FloatingPoint @ 2)))
+    ( ((fp.gt x y) (fp.geq x y)) )
+)
+(subst-template
+    ((x (_ FloatingPoint @ 2)) (y (_ FloatingPoint @ 2)))
+    ( ((fp.gt x y) (distinct x y)) )
+)
+;       equal
+(subst-template
+    ((x (_ FloatingPoint @ 2)) (y (_ FloatingPoint @ 2)))
+    ( ((fp.eq x y) (fp.leq x y)) )
+)
+(subst-template
+    ((x (_ FloatingPoint @ 2)) (y (_ FloatingPoint @ 2)))
+    ( ((fp.eq x y) (fp.geq x y)) )
+)
+;       inequal
+(subst-template
+    ((x (_ FloatingPoint @ 2)) (y (_ FloatingPoint @ 2)) (a (_ FloatingPoint & 2 x)))
+    ( ((distinct x y) (not (and (fp.eq x a) (fp.eq y a)))) )
+)
+;   not Under-approximation
+;       less than or equal to
+(subst-template
+    ((x (_ FloatingPoint @ 2)) (y (_ FloatingPoint @ 2)))
+    ( ((not (fp.leq x y)) (not (fp.eq x y))) )
+)
+(subst-template
+    ((x (_ FloatingPoint @ 2)) (y (_ FloatingPoint @ 2)))
+    ( ((not (fp.leq x y)) (not (fp.lt x y))) )
+)
+;       greater than or equal to
+(subst-template
+    ((x (_ FloatingPoint @ 2)) (y (_ FloatingPoint @ 2)))
+    ( ((not (fp.geq x y)) (not (fp.eq x y))) )
+)
+(subst-template
+    ((x (_ FloatingPoint @ 2)) (y (_ FloatingPoint @ 2)))
+    ( ((not (fp.geq x y)) (not (fp.gt x y))) )
+)
+;       equal
+(subst-template
+    ((x (_ FloatingPoint @ 2)) (y (_ FloatingPoint @ 2)) (a (_ FloatingPoint & 2 x)))
+    ( ((not (fp.eq x y)) (not (and (fp.leq a x) (fp.leq x a) (fp.leq a y) (fp.leq y a)))) )
+)
+;       inequal
+(subst-template
+    ((x (_ FloatingPoint @ 2)) (y (_ FloatingPoint @ 2)))
+    ( ((not (distinct x y)) (not (fp.gt x y))) )
+)
+(subst-template
+    ((x (_ FloatingPoint @ 2)) (y (_ FloatingPoint @ 2)))
+    ( ((not (distinct x y)) (not (fp.lt x y))) )
+)
+
+
+; String
+;   Over-approximation
+;       lexicographic ordering: <
+(subst-template
+    ((x String) (y String))
+    ( ((str.< x y) (str.<= x y)) ) 
+)
+(subst-template
+    ((x String) (y String))
+    ( ((str.< x y) (distinct x y)) ) 
+)
+;       lexicographic ordering: <=
+(subst-template
+    ((x String) (y String) (a String))
+    ( ((str.<= x y) (str.< x (str.++ y a))) (a (> (str.len a) 0)) ) 
+)
+;       prefix
+(subst-template
+    ((x String) (y String))
+    ( ((str.prefixof x y) (str.<= x y)) ) 
+)
+(subst-template
+    ((x String) (y String))
+    ( ((str.prefixof x y) (str.contains y x)) ) 
+)
+;       suffix 
+(subst-template
+    ((x String) (y String))
+    ( ((str.suffixof x y) (str.<= x y)) ) 
+)
+(subst-template
+    ((x String) (y String))
+    ( ((str.suffixof x y) (str.contains y x)) ) 
+)
+;       contains 
+(subst-template
+    ((x String) (y String))
+    ( ((str.contains x y) (str.<= y x)) ) 
+)
+;       equal
+(subst-template
+    ((x String) (y String))
+    ( ((= x y) (str.suffixof x y)) ) 
+)
+(subst-template
+    ((x String) (y String))
+    ( ((= x y) (str.prefixof x y)) ) 
+)
+(subst-template
+    ((x String) (y String))
+    ( ((= x y) (str.contains x y)) ) 
+)
+(subst-template
+    ((x String) (y String))
+    ( ((= x y) (str.<= x y)) ) 
+)
+;       inequal
+(subst-template
+    ((x String) (y String) (a String))
+    ( ((distinct x y) (not (and (= x a) (= y a)))) ) 
+)
+;   not Under-approximation
+;       lexicographic ordering
+(subst-template
+    ((x String) (y String) (a String))
+    ( ((not (str.< x y)) (not (str.<= (str.++ x a) y))) (a (> (str.len a) 0)) ) 
+)
+;       lexicographic ordering: <=
+(subst-template
+    ((x String) (y String))
+    ( ((not (str.<= x y)) (not (= x y)))) 
+)
+(subst-template
+    ((x String) (y String))
+    ( ((not (str.<= x y)) (not (str.< x y)))) 
+)
+;       prefix
+(subst-template
+    ((x String) (y String) (a String))
+    ( ((not (str.prefixof x y)) (not (= y (str.++ x a)))) (a (>= (str.len a) 0)) ) 
+)
+;       suffix 
+(subst-template
+    ((x String) (y String) (a String))
+    ( ((not (str.prefixof x y)) (not (= y (str.++ a x)))) (a (>= (str.len a) 0)) ) 
+)
+;       contains 
+(subst-template
+    ((x String) (y String))
+    ( ((not (str.contains x y)) (not (str.suffixof y x))) ) 
+)
+(subst-template
+    ((x String) (y String))
+    ( ((not (str.contains x y)) (not (str.prefixof y x))) ) 
+)
+;       equal
+(subst-template
+    ((x String) (y String) (a String))
+    ( ((not (= x y)) (not (and (str.suffixof x a) (str.prefixof x a) (str.suffixof y a) (str.prefixof y a)))) ) 
+)
+;       inequal
+(subst-template
+    ((x String) (y String) (a String))
+    ( ((not (distinct x y)) (not (str.< x y))) ) 
+)
+(subst-template
+    ((x String) (y String) (a String))
+    ( ((not (distinct x y)) (not (str.< y x))) ) 
+)
+
+
+(method "live_predicate_injection_over" c :seed)
+
+(fuse c)
