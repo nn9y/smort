@@ -324,10 +324,10 @@ def get_indices_from_op(name_indices, input_indices_list):
 def multiply_bits(name_indices, input_indices_list):
     m = name_indices[0]
     n = input_indices_list[0][0]
-    return m * n
+    return [m * n]
 
 
 def plus_bits(name_indices, input_indices_list):
     m = name_indices[0]
     n = input_indices_list[0][0]
-    return m + n
+    return [m + n]

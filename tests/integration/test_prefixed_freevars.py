@@ -11,7 +11,7 @@ def test_prefixed_freevars(f):
     file = '/home/yang/Projects/smort/tests/testcases/testnia/sat/1.smt2'
     script = translate_script_file(file, 10000000)
     script.merge_asserts()
-    script.prefix_vars('seed_')
+    script.prefix_sigs('seed_')
     print_term_free_vars(script.assert_merged.term, f) 
 
 

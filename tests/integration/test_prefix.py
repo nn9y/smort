@@ -5,7 +5,7 @@ from smort.src.translate.smtlibv2.Script import *
 def test_prefix():
     file = '/home/yang/Projects/smort/tests/testcases/testprefix/0.smt2'
     script = translate_script_file(file, 10000000)
-    script.prefix_vars('seed1_')
+    script.prefix_sigs('seed1_')
     print(script)
 
 

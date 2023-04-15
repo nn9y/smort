@@ -7,7 +7,7 @@ from smort.src.translate.theory.available_sorts import BOOL
 # Algebraic Data Type
 
 class ADT(Sort):
-    def __init__(self, id_=None, parsorts=None):
+    def __init__(self, id_=None, parsorts=[]):
         super().__init__(id_, parsorts, None)
         self.constructors = {} 
         self.selectors_of_constructor = {} 

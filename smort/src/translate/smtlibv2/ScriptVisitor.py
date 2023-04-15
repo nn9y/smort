@@ -28,6 +28,7 @@ class ScriptVisitor(SMTLIBv2Visitor):
                                 # str -> Sort
         self.synonyms = {}      # global self-defines synonyms of sorts 
                                 # str -> [Sort, list]
+        self.datatype_functions = {}
         self.quant_count = 0
 
     def visitStart(self, ctx: SMTLIBv2Parser.StartContext):
@@ -117,7 +118,6 @@ class ScriptVisitor(SMTLIBv2Visitor):
             return synonym_sort
         # valid sort
         sort = Sort(id_, parsorts)
-        # TODO _valid
         if self._is_valid_sort(symbol, sort):
             return sort
         # parameter placeholder
@@ -182,7 +182,9 @@ class ScriptVisitor(SMTLIBv2Visitor):
                 cmds.extend(cmd)
             else:
                 cmds.append(cmd)
-        return Script(cmds, self.global_vars)
+        global_sigs = {sig: fun.output for sig, fun in self.signatures.items()}
+        global_sigs.update(self.global_vars)
+        return Script(cmds, self.global_vars, global_sigs, self.datatype_functions)
 
     def handleCommand(self, ctx: SMTLIBv2Parser.CommandContext):
         if ctx.cmd_setLogic():
@@ -321,9 +323,10 @@ class ScriptVisitor(SMTLIBv2Visitor):
         else:
             self.datatypes[str(adt_name)] = adt
         for cdec in cdecs:
-            funs_list = add_functions_of_datatype(cdec, adt, pars)
-            for fun in funs_list:
+            fun_list = add_functions_of_datatype(cdec, adt, pars)
+            for fun in fun_list:
                 self.signatures[str(fun.name)] = fun
+                self.datatype_functions[str(fun.name)] = fun.output
 
         return DeclareDataType(adt_name, DataTypeDec(pars, cdecs)) 
 
@@ -348,9 +351,10 @@ class ScriptVisitor(SMTLIBv2Visitor):
                 self.datatypes[str(adt_name)] = adts[i](pars) 
             datatype_decs.append(DataTypeDec(pars, cdecs))
             for cdec in cdecs:
-                funs_list = add_functions_of_datatype(cdec, adts[i], pars)
-                for fun in funs_list:
+                fun_list = add_functions_of_datatype(cdec, adts[i], pars)
+                for fun in fun_list:
                     self.signatures[str(fun.name)] = fun
+                    self.datatype_functions[str(fun.name)] = fun.output
 
         return DeclareDataTypes(sort_decs, datatype_decs) 
     
@@ -362,7 +366,7 @@ class ScriptVisitor(SMTLIBv2Visitor):
         output_sort = self.visitSort(ctx.sort()[-1])
 
         if len(input_sort_list) == 0:
-            self.global_vars[symbol] = output_sort 
+            self.global_vars[symbol] = output_sort
         else:
             self.signatures[symbol] = Fun(Identifier(symbol), input_sort_list, output_sort) 
 
@@ -377,6 +381,8 @@ class ScriptVisitor(SMTLIBv2Visitor):
             sort = sort(par_list)
 
         self.datatypes[symbol] = sort
+
+        return DeclareSort(symbol, arity)
 
     def visitCmd_defineFun(self, ctx:SMTLIBv2Parser.Cmd_defineFunContext):
         symbol, sorted_vars, sort, term = self.visitFunction_def(ctx.function_def)

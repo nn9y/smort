@@ -146,44 +146,48 @@ class Term:
         self.qual_id = qual_id
         self.global_free = global_free
         # self.pointers_map = pointers_map
-    
-    def prefix_vars(self, prefix):
-        """
-        add prefix to variable names in self recursively
-        """
+ 
+    def prefix_sigs(self, prefix, global_sigs, datatype_functions):
         self.bound_vars = {prefix_symbol(prefix, key): value for key, value in self.bound_vars.items()}
         self.local_free_vars = {prefix_symbol(prefix, key): value for key, value in self.local_free_vars.items()}
-        match self.term_type:
-            case TermType.VAR:
+        if self.term_type == TermType.CONST:
+            return
+        if self.term_type == TermType.VAR:
+            if str(self.name) not in datatype_functions:
                 self.name = Identifier(prefix_symbol(prefix, self.name.symbol), self.name.indices)
-            case TermType.LET:
-                for i, vb in enumerate(self.var_bindings):
-                    var, term = vb
+            return
+        if self.term_type == TermType.EXPR:
+            if (str(self.name) in global_sigs) and (str(self.name) not in datatype_functions):
+                self.name = Identifier(prefix_symbol(prefix, self.name.symbol), self.name.indices)
+            for subterm in self.subterms:
+                subterm.prefix_sigs(prefix, global_sigs, datatype_functions)
+            return
+        if self.term_type == TermType.LET:
+            for i, vb in enumerate(self.var_bindings):
+                var, term = vb
+                # set
+                self.var_bindings[i][0] = prefix_symbol(prefix, var) 
+                term.prefix_sigs(prefix, global_sigs, datatype_functions)
+            self.subterms[0].prefix_sigs(prefix, global_sigs, datatype_functions)
+            return
+        if self.term_type == TermType.QUANT:
+            for i, sv in enumerate(self.sorted_vars):
+                var, _ = sv
+                # set
+                self.sorted_vars[i][0] = prefix_symbol(prefix, var) 
+            self.subterms[0].prefix_sigs(prefix, global_sigs, datatype_functions)
+            return
+        if self.term_type == TermType.MATCH:
+            for i, mc in enumerate(self.match_cases):
+                pat, term = mc
+                # functions of ADTs are not renamed
+                for j, v in enumerate(pat.var_list):
                     # set
-                    self.var_bindings[i][0] = prefix_symbol(prefix, var) 
-                    term.prefix_vars(prefix)
-            case TermType.QUANT:
-                for i, sv in enumerate(self.sorted_vars):
-                    var, _ = sv
-                    # set
-                    self.sorted_vars[i][0] = prefix_symbol(prefix, var) 
-            case TermType.MATCH:
-                for i, mc in enumerate(self.match_cases):
-                    pat, term = mc
-                    if len(pat) > 1:
-                        for j in range(1, len(pat)):
-                            # set
-                            self.match_cases[i][0][j] = prefix_symbol(prefix, pat[j])
-                    else:
-                        if pat[0] in term.bound_vars:
-                            # set
-                            # not nullary constructor
-                            self.match_cases[i][0][0] = prefix_symbol(prefix, pat[0])
-                    term.prefix_vars(prefix)
-                return
-        for subterm in self.subterms:
-            subterm.prefix_vars(prefix)
-    
+                    self.match_cases[i][0].var_list[j] = prefix_symbol(prefix, v)
+                term.prefix_sigs(prefix, global_sigs, datatype_functions)
+            self.subterms[0].prefix_sigs(prefix, global_sigs, datatype_functions)
+            return
+
     def find_terms(self, t, occs, global_free=False, inwards=False):
         """
         find terms match template t in self and add them to the list occs.
@@ -391,8 +395,6 @@ class Term:
     #             term_copied.pointers_map[k].extend(pointers)
     #         term_copied.subterms.append(t_copied)
     #     return term_copied 
-
-
 
 
 

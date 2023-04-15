@@ -10,8 +10,6 @@ from smort.src.translate.tools.Term import (
     Var,
     Expr,
 )
-from smort.src.translate.theory.SMTLIBv2Sorts import BOOL
-from smort.src.translate.theory.SMTLIBv2Theories import BOOLEAN_EQUAL
 from smort.src.translate.theory.constants import random_constant_value 
 from smort.src.translate.smtlibv2.Script import (
     Script,
@@ -36,18 +34,29 @@ def merge(scripts, fused, decls, asserts, snpts):
     # add new decls
     merged_cmds += decls
     # merge decls and defs
+    dup_sorts = set() 
     for script in scripts:
         for cmd in script.commands:
             if isinstance(cmd, DeclareConst):
                 merged_cmds.append(cmd)
             if isinstance(cmd, DeclareDataType):
-                merged_cmds.append(cmd)
+                if cmd.symbol not in dup_sorts:
+                    merged_cmds.append(cmd)
+                    dup_sorts.add(cmd.symbol)
             if isinstance(cmd, DeclareDataTypes):
-                merged_cmds.append(cmd)
+                dup = True 
+                for symbol, _ in cmd.sort_decs:
+                    if symbol not in dup_sorts:
+                        dup = False
+                        dup_sorts.add(symbol)
+                if not dup:
+                    merged_cmds.append(cmd)
             if isinstance(cmd, DeclareFun):
                 merged_cmds.append(cmd)
             if isinstance(cmd, DeclareSort):
-                merged_cmds.append(cmd)
+                if cmd.symbol not in dup_sorts:
+                    merged_cmds.append(cmd)
+                    dup_sorts.add(cmd.symbol)
             if isinstance(cmd, DefineFun):
                 merged_cmds.append(cmd)
             if isinstance(cmd, DefineFunRec):
@@ -66,7 +75,7 @@ def merge(scripts, fused, decls, asserts, snpts):
     merged_cmds.append(SMTLIBCommand("(check-sat)"))
     merged_cmds.append(SMTLIBCommand("(exit)"))
 
-    return Script(merged_cmds, {})
+    return Script(merged_cmds)
 
 
 def random_tuple_list(lsts, dups, multiple_substs=False):
@@ -79,7 +88,7 @@ def random_tuple_list(lsts, dups, multiple_substs=False):
     if len(product) == 0:
         k = 0
     elif multiple_substs:
-        k = random.randint(1, len(product))
+        k = random.randint(1, min(len(product), 30))
     else:
         # single substitution for each template
         k = 1
@@ -186,7 +195,8 @@ def generate_additions(template, notations, notation2term, decls, asserts):
             if len(sort.id_.indices) > 0:
                 sym = sort.id_.indices[0]
                 # get actual sort
-                sort = notation2term[sym].sort
+                if sym in notation2term:
+                    sort = notation2term[sym].sort
             if info.is_var:
                 symbol = str(mapped_term.name)
                 decls.append(DeclareConst(symbol, sort))

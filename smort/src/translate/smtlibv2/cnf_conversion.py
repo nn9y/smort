@@ -8,7 +8,7 @@ from smort.src.translate.theory.SMTLIBv2Theories import (
     BOOLEAN_NOT, BOOLEAN_IMPLIES, BOOLEAN_AND, BOOLEAN_OR, BOOLEAN_IF_THEN_ELSE
 )
 from smort.src.translate.smtlibv2.CNFTerm import Clause, CNFTerm 
-from smort.src.translate.smtlibv2.Script import DeclareFun
+from smort.src.translate.smtlibv2.Commands import DeclareFun
 from smort.src.translate.smtlibv2.ADT import get_tester_id_of_constructor
 
 
@@ -116,7 +116,7 @@ def eliminate_match(term):
 def eliminate_let(term):
     for s in term.subterms:
         eliminate_let(s)
-    if term.term_type == TermType.LET:
+    while term.term_type == TermType.LET:
         for v, t in term.var_bindings:
             eliminate_let(t)
             replace_var_by_term(term.subterms[0], v, t)
@@ -153,7 +153,7 @@ def first_order2CNF(fot):
 def eliminate_implies(fot):
     if (fot.term_type == TermType.EXPR) and (fot.name == BOOLEAN_IMPLIES):
         # P -> Q ==> (not P) or Q
-        p, _ = fot.subterms
+        p = fot.subterms[0]
         fot.subterms[0] = not_term(p)
         fot.name = BOOLEAN_OR
     for s in fot.subterms:
@@ -310,7 +310,7 @@ def eliminate_exists(fot, forall_sorted_vars):
                 fun_name = var
                 new_declfuns.append(DeclareFun(fun_name, input_sort_list, sort))
                 term = Expr(
-                    name=fun_name,
+                    name=Identifier(fun_name),
                     subterms=input_var_list,
                     sort=sort,
                 )
@@ -342,64 +342,92 @@ def replace_var_by_term(t, var, term):
 
 
 def distribute_ORs_inwards_ANDs(fot):
-    for s in fot.subterms:
-        distribute_ORs_inwards_ANDs(s)
     if fot.term_type == TermType.EXPR:
-        if fot.name == BOOLEAN_AND:
-            terms = expand_operator(fot, BOOLEAN_AND) 
-            fot.subterms = terms
-        elif fot.name == BOOLEAN_OR:
-            # expand all ORs first
-            # (P or K or M) or ... ===> P or K or M or ...
-            terms = expand_operator(fot, BOOLEAN_OR)
-            # P or (C1 and C2 and ...) or K... ==>
-            # (P or expand(C1)) and (P or (expand(C2)) and ...) or K... ==>
-            # ...
-            find_and = False
-            i = 0
-            while i < len(terms):
-                s = terms[i]
+        if (fot.name == BOOLEAN_AND) or (fot.name == BOOLEAN_OR):
+            for s in fot.subterms:
+                distribute_ORs_inwards_ANDs(s)
+            return
+        while (fot.name == BOOLEAN_OR) and (len(fot.subterms) > 1):
+            for i, s in enumerate(fot.subterms):
                 if (s.term_type == TermType.EXPR) and (s.name == BOOLEAN_AND):
-                    find_and = True
-                    # try distribute with neighbor
-                    valid = True
-                    while(valid):
-                        if i-1 >= 0:
-                            k = i-1
-                        elif i+1 < len(terms):
-                            k = i+1
-                        else:
-                            valid = False
-                            break
-                        p = terms[k]
-                        p_subterms = [p]
-                        if (p.term_type == TermType.EXPR) and (p.name == BOOLEAN_AND):
-                            p_subterms = p.subterms
-                        or_terms = []
-                        for t in s.subterms:
-                            for q in p_subterms:
-                                or_term = Expr(
+                    if i-1 >= 0:
+                        k = i-1
+                    elif i+1 < len(fot.subterms):
+                        k = i+1
+                    else:
+                        break
+                    neighbor = fot.subterms[k]
+                    ors = []
+                    for t in s.subterms:
+                        for n in neighbor.subterms:
+                            ors.append(
+                                Expr(
                                     name=BOOLEAN_OR,
-                                    subterms=[q, t],
+                                    subterms=[t, n],
                                     sort=BOOL,
                                 )
-                                or_term.bound_vars = fot.bound_vars
-                                or_terms.append(or_term)
-                        and_term = Expr(
-                            name=BOOLEAN_AND,
-                            subterms=or_terms,
-                            sort=BOOL,
-                        )
-                        and_term.bound_vars = fot.bound_vars
-                        terms[i].__dict__ = copy.deepcopy(and_term.__dict__)
-                        terms.pop(k)
-                        if k == i-1:
-                            i -= 1
-                i += 1
-            if find_and:
-                fot.__dict__ = copy.deepcopy(terms[0].__dict__)
-            else:
-                fot.subterms = terms
+                            )
+                    fot.subterms[i] = Expr(
+                        name=BOOLEAN_AND,
+                        subterms=ors,
+                        sort=BOOL
+                    )
+                    fot.subterms.pop(k)
+                    if len(fot.subterms) == 1:
+                        fot.__dict__ = copy.deepcopy(fot.subterms[0].__dict__)
+                    break
+
+    # for s in fot.subterms:
+    #     distribute_ORs_inwards_ANDs(s)
+    # # all subterms are in CNF
+    # if fot.term_type == TermType.EXPR:
+    #     if fot.name == BOOLEAN_AND:
+    #         terms = expand_operator(fot, BOOLEAN_AND) 
+    #         fot.subterms = terms
+    #     elif fot.name == BOOLEAN_OR:
+    #         # expand all ORs first
+    #         # (P or K or M) or ... ===> P or K or M or ...
+    #         terms = expand_operator(fot, BOOLEAN_OR)
+    #         # P or (C1 and C2 and ...) or K... ==>
+    #         # ((P or expand(C1)) and (P or (expand(C2)) and ...)) or K... ==>
+    #         # ...
+    #         fot.subterms = terms
+    #         while len(terms) > 1:
+    #             find_and = False
+    #             for i, term in enumerate(terms):
+    #                 if (term.term_type == TermType.EXPR) and (term.name == BOOLEAN_AND):
+    #                     find_and = True
+    #                     if i-1 >= 0:
+    #                         k = i-1
+    #                     elif i+1 < len(terms):
+    #                         k = i+1
+    #                     else:
+    #                         break
+    #                     neighbor = terms[k]
+    #                     neighbor_expand_and_subterms = expand_operator(neighbor, BOOLEAN_AND)
+    #                     new_or_terms = []
+    #                     for t in term.subterms:
+    #                         for n in neighbor_expand_and_subterms:
+    #                             t_expand_or_subterms = expand_operator(t, BOOLEAN_OR)
+    #                             n_expand_or_subterms = expand_operator(n, BOOLEAN_OR)
+    #                             new_or_term = Expr(
+    #                                 name=BOOLEAN_OR,
+    #                                 subterms=t_expand_or_subterms+n_expand_or_subterms,
+    #                                 sort=BOOL,
+    #                             )
+    #                             new_or_term.bound_vars = fot.bound_vars
+    #                             new_or_terms.append(new_or_term)
+    #                     terms[i] = Expr(
+    #                         name=BOOLEAN_AND,
+    #                         subterms=new_or_terms,
+    #                         sort=BOOL,
+    #                     )
+    #                     terms[i].bound_vars = fot.bound_vars
+    #                     fot.__dict__ = copy.deepcopy(terms[i].__dict__)
+    #                     terms.pop(k)
+    #                     break
+    #             if not find_and:
+    #                 break
 
 
 def expand_operator(fot, operator):

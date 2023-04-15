@@ -47,3 +47,8 @@ class CNFTerm:
             for literal in clause.literals:
                 literal.find_terms(t, occs, global_free, inwards)
 
+    def prefix_sigs(self, prefix, global_sigs, datatype_functions):
+        for c in self.clauses:
+            for l in c.literals:
+                l.prefix_sigs(prefix, global_sigs, datatype_functions)
+
