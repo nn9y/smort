@@ -1,0 +1,7 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Int)
+(declare-fun seed0_T_2 () Bool)
+(declare-fun seed0_var_0xINPUT_242085 () String)
+(assert (and (or (>= seed0_T_1 (str.len seed0_var_0xINPUT_242085)) (< (div seed0_T_1 seed0_T_1) (* seed0_T_1 seed0_T_1))) (or (= seed0_T_2 (= seed0_T_1 0)) (or (str.prefixof (str.++ seed0_var_0xINPUT_242085 "0BoFX4sSO") (str.++ seed0_var_0xINPUT_242085 "1eM")) (str.suffixof (str.++ seed0_var_0xINPUT_242085 "PmCl4pQfJ60ZO2Tk") (str.++ seed0_var_0xINPUT_242085 "B6AD5w4L2FeRyXjm")))) (or seed0_T_2 (str.contains (str.++ seed0_var_0xINPUT_242085 "7m5jP0I46Kfcvz") (str.++ seed0_var_0xINPUT_242085 "DtSI1qKWw9Lar6cAkU")))))
+(check-sat)
+(exit)

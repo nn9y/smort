@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-fun seed0_str () String)
+(assert (and (or (and (and (and (and (and (not (= (ite (> (str.len seed0_str) 1) 1 0) 0)) (not (= (ite (= (str.at seed0_str 0) "+") 1 0) 0))) (not (= (ite (> (str.len seed0_str) 0) 1 0) 0))) (= (ite (= (str.at seed0_str 0) "-") 1 0) 0)) (not (= (ite (> (str.len seed0_str) 0) 1 0) 0))) (= (ite (= (str.at seed0_str 0) " ") 1 0) 0)) (xor (str.contains (str.++ seed0_str "oTRSJQgsuX2VkbvcMG") (str.++ seed0_str "d8JnXxhaLAq5NR")) (str.<= (str.++ seed0_str "53IcH9gk7") (str.++ seed0_str "PsC7O")))) (or (not (= (ite (> (str.len seed0_str) 0) 1 0) 0)) (and (str.< (str.++ seed0_str "NmaG") (str.++ seed0_str "")) (str.contains (str.++ seed0_str "xBgYFfd8ySAWwJCm") (str.++ seed0_str "M5R0KcTUxj8punG"))))))
+(check-sat)
+(exit)

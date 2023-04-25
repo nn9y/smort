@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_key1 () String)
+(declare-fun seed0_key2 () String)
+(assert (and (or (and (and (and (and (not (= (ite (= seed0_key1 "connection") 1 0) 0)) (not (= (ite (= seed0_key2 "te") 1 0) 0))) (= (ite (= seed0_key2 "proxy-authorization") 1 0) 0)) (= (ite (= seed0_key2 "proxy-authenticate") 1 0) 0)) (= (ite (= seed0_key2 "keep-alive") 1 0) 0)) (not (str.contains (str.++ seed0_key2 "O2") (str.++ seed0_key1 "uXJUVRlO51379bpdEt")))) (or (= (ite (= seed0_key2 "connection") 1 0) 0) (and (str.prefixof (str.++ seed0_key1 "XPiWAFnM8ZSYHO") (str.++ seed0_key1 "14CngUOFylJdtfwqB")) (str.contains (str.++ seed0_key2 "sVl5") (str.++ seed0_key2 "nQE5"))))))
+(check-sat)
+(exit)

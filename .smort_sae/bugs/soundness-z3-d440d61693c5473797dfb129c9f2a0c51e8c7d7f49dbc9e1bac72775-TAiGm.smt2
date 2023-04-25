@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-fun seed0_str () String)
+(assert (and (or (and (and (and (and (and (and (and (and (and (and (and (and (and (not (= (ite (> (str.len seed0_str) 5) 1 0) 0)) (not (= (ite (= (str.at seed0_str 4) "+") 1 0) 0))) (not (= (ite (> (str.len seed0_str) 4) 1 0) 0))) (= (ite (= (str.at seed0_str 4) "-") 1 0) 0)) (not (= (ite (> (str.len seed0_str) 4) 1 0) 0))) (= (ite (= (str.at seed0_str 4) " ") 1 0) 0)) (not (= (ite (> (str.len seed0_str) 4) 1 0) 0))) (not (= (ite (= (str.at seed0_str 3) " ") 1 0) 0))) (not (= (ite (> (str.len seed0_str) 3) 1 0) 0))) (not (= (ite (= (str.at seed0_str 2) " ") 1 0) 0))) (not (= (ite (> (str.len seed0_str) 2) 1 0) 0))) (not (= (ite (= (str.at seed0_str 1) " ") 1 0) 0))) (not (= (ite (> (str.len seed0_str) 1) 1 0) 0))) (not (= (ite (= (str.at seed0_str 0) " ") 1 0) 0))) (or (str.prefixof (str.++ seed0_str "SomKU1i5PvlZOG") (str.++ seed0_str "IHhAkKO6Z4t")) (str.< (str.++ seed0_str "OSildHv5rN39zUDwC7F") (str.++ seed0_str "")))) (or (not (= (ite (> (str.len seed0_str) 0) 1 0) 0)) (not (str.contains (str.++ seed0_str "qGgwVLcBMKrp") (str.++ seed0_str "EMwPmd"))))))
+(check-sat)
+(exit)

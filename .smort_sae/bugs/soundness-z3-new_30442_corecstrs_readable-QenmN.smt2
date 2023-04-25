@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Bool)
+(declare-fun seed0_var_0xINPUT_79062 () String)
+(assert (and (or (= seed0_T_1 (not (= "labpixiesdata.appspot.com" seed0_var_0xINPUT_79062))) (str.prefixof (str.++ seed0_var_0xINPUT_79062 "C") (str.++ seed0_var_0xINPUT_79062 "YHrDZqiGuBbvC"))) (or seed0_T_1 (str.contains (str.++ seed0_var_0xINPUT_79062 "EZzBc0") (str.++ seed0_var_0xINPUT_79062 "e52LhQ1BfOF")))))
+(check-sat)
+(exit)

@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_value2 () String)
+(declare-fun seed0_key2 () String)
+(assert (and (or (and (and (and (and (and (and (and (and (and (and (= (ite (= (str.len (str.substr seed0_value2 1 (- (str.len seed0_value2) 1))) 0) 1 0) 0) (not (= (ite (= (str.at seed0_value2 0) "\u{9}") 1 0) 0))) (= (ite (= (str.at seed0_value2 0) " ") 1 0) 0)) (= (ite (= (str.len seed0_value2) 0) 1 0) 0)) (not (= (ite (= (str.indexof seed0_value2 "=" 0) (- 1)) 1 0) 0))) (= (ite (not (= (str.indexof seed0_value2 "=" 0) (- 1))) 1 0) 0)) (= (ite (str.contains seed0_value2 ",") 1 0) 0)) (= (ite (= (str.len seed0_value2) 0) 1 0) 0)) (not (= (ite (= seed0_key2 "cache-control") 1 0) 0))) (not (= (ite (= seed0_key2 "cache-control") 1 0) 0))) (>= 1 0)) (str.suffixof (str.++ seed0_key2 "hW1Qam7cpoCvx") (str.++ seed0_value2 "UY5cfqN3XtIT6z"))) (or (>= (- (str.len seed0_value2) 1) 0) (=> (str.contains (str.++ seed0_value2 "N6hHoL1TFm9YDKqj") (str.++ seed0_key2 "rcgwmVSskLdiZJ9Mn")) (str.contains (str.++ seed0_key2 "pOyxhiWIevU") (str.++ seed0_value2 "249R0vwNBtqE5sjlyk"))))))
+(check-sat)
+(exit)

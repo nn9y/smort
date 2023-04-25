@@ -1,0 +1,4 @@
+command: /home/yang/Projects/smort/solvers/z3-4.11.2/bin/z3
+stderr:
+stdout:
+sat

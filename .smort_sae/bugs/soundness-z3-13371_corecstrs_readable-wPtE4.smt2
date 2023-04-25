@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Bool)
+(declare-fun seed0_var_0xINPUT_114888 () String)
+(assert (and (or (= seed0_T_1 (= "ORAvs8BdKx" seed0_var_0xINPUT_114888)) (xor (str.< (str.++ seed0_var_0xINPUT_114888 "") (str.++ seed0_var_0xINPUT_114888 "sY6m8G2v5M7Uk30SVio")) (str.<= (str.++ seed0_var_0xINPUT_114888 "5qc2J1SlhmZYuAzv70") (str.++ seed0_var_0xINPUT_114888 "WYoGTNCS")))) (or seed0_T_1 (str.prefixof (str.++ seed0_var_0xINPUT_114888 "Y02ADz4d6hiVIBS5Z") (str.++ seed0_var_0xINPUT_114888 "")))))
+(check-sat)
+(exit)

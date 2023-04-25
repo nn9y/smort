@@ -1,0 +1,7 @@
+(set-logic ALL)
+(declare-fun seed0_word1 () String)
+(declare-fun seed0_in1 () String)
+(declare-fun seed0_in0 () String)
+(assert (and (or (= (ite (= seed0_word1 seed0_in1) 1 0) 0) (and (str.suffixof (str.++ seed0_in0 "NMTi9A3dXBa0H1fVguG8") (str.++ seed0_word1 "")) (str.contains (str.++ seed0_in0 "HYrVT5scfOZ1Wem0MU") (str.++ seed0_word1 "wE7s")))) (or (not (= (ite (= seed0_word1 seed0_in0) 1 0) 0)) (and (str.suffixof (str.++ seed0_word1 "DjCgwb7GsLm") (str.++ seed0_in1 "ytieqIhd7")) (str.prefixof (str.++ seed0_in0 "") (str.++ seed0_in0 "KMihGzcjkV"))))))
+(check-sat)
+(exit)

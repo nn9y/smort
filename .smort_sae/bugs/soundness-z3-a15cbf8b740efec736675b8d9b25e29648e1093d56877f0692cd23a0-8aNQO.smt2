@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-fun seed0_url () String)
+(assert (and (or (and (and (and (and (and (and (and (and (= (ite (str.contains (str.substr seed0_url 0 (- (str.indexof seed0_url ":" 0) 0)) "A") 1 0) 0) (= (ite (not (= (str.len (str.substr seed0_url (+ (str.indexof seed0_url ":" 0) 1) (- (str.len seed0_url) (+ (str.indexof seed0_url ":" 0) 1)))) 0)) 1 0) 0)) (= (ite (= (str.substr seed0_url 0 (- (str.indexof seed0_url ":" 0) 0)) "http") 1 0) 0)) (not (= (ite (> (str.indexof seed0_url ":" 0) 0) 1 0) 0))) (>= 0 0)) (>= (- (str.indexof seed0_url ":" 0) 0) 0)) (>= (+ (str.indexof seed0_url ":" 0) 1) 0)) (>= (- (str.len seed0_url) (+ (str.indexof seed0_url ":" 0) 1)) 0)) (>= 0 0)) (or (str.prefixof (str.++ seed0_url "DqevN") (str.++ seed0_url "HQS6wvfM")) (str.< (str.++ seed0_url "a") (str.++ seed0_url "")))) (or (>= (- (str.indexof seed0_url ":" 0) 0) 0) (or (str.prefixof (str.++ seed0_url "XmZExSdYUDyFvWueG") (str.++ seed0_url "SJldpmYyPW2FbDNcGR")) (str.suffixof (str.++ seed0_url "KSzoBCxvlaZO81XfDrp") (str.++ seed0_url "HIzRkwDAdGo7EJv3Z5be"))))))
+(check-sat)
+(exit)

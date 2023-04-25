@@ -1,0 +1,7 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Int)
+(declare-fun seed0_T_2 () Bool)
+(declare-fun seed0_var_0xINPUT_476040 () String)
+(assert (and (or (>= seed0_T_1 (str.len seed0_var_0xINPUT_476040)) (str.suffixof (str.++ seed0_var_0xINPUT_476040 "MFTPWf") (str.++ seed0_var_0xINPUT_476040 "4FmC"))) (or (= seed0_T_2 (= seed0_T_1 0)) (or (< (mod seed0_T_1 seed0_T_1) (mod seed0_T_1 seed0_T_1)) (distinct (* seed0_T_1 seed0_T_1) (div seed0_T_1 seed0_T_1)))) (or seed0_T_2 (=> (>= (mod seed0_T_1 seed0_T_1) (- seed0_T_1 (- 439))) (= (- seed0_T_1 (- 809)) (+ seed0_T_1 540))))))
+(check-sat)
+(exit)

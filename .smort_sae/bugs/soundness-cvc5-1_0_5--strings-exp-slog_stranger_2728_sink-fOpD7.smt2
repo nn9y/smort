@@ -1,0 +1,8 @@
+(set-logic ALL)
+(declare-const a_random97_0 String)
+(declare-fun seed0_sigmaStar_2 () String)
+(declare-fun seed0_epsilon () String)
+(declare-fun seed0_x_3 () String)
+(assert (and (and (= seed0_epsilon "") (and (str.< (str.++ seed0_x_3 seed0_x_3) (str.++ seed0_sigmaStar_2 seed0_x_3)) (str.suffixof (str.++ seed0_epsilon seed0_epsilon) (str.++ seed0_sigmaStar_2 seed0_x_3)))) (and (and (str.suffixof seed0_x_3 a_random97_0) (str.prefixof seed0_x_3 a_random97_0) (str.suffixof (str.replace seed0_epsilon "\u{68}\u{74}\u{74}\u{70}\u{3a}\u{2f}\u{2f}" "\u{68}\u{74}\u{74}\u{70}\u{73}\u{3a}\u{2f}\u{2f}") a_random97_0) (str.prefixof (str.replace seed0_epsilon "\u{68}\u{74}\u{74}\u{70}\u{3a}\u{2f}\u{2f}" "\u{68}\u{74}\u{74}\u{70}\u{73}\u{3a}\u{2f}\u{2f}") a_random97_0)) (not (str.contains (str.++ seed0_epsilon seed0_x_3) (str.++ seed0_epsilon seed0_sigmaStar_2)))) (and (str.in_re seed0_x_3 (re.++ (re.* re.allchar ) (re.++ (str.to_re "\u{2f}\u{65}\u{76}\u{69}\u{6c}") (re.* re.allchar )))) (=> (str.contains (str.++ seed0_sigmaStar_2 seed0_x_3) (str.++ seed0_sigmaStar_2 seed0_epsilon)) (str.contains (str.++ seed0_epsilon seed0_sigmaStar_2) (str.++ seed0_epsilon seed0_x_3))))))
+(check-sat)
+(exit)

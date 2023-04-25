@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Bool)
+(declare-fun seed0_var_0xINPUT_102206 () String)
+(assert (and (or (= seed0_T_1 (= seed0_var_0xINPUT_102206 "bJFPuuPCME")) (not (str.contains (str.++ seed0_var_0xINPUT_102206 "ZfsGEwMKPBQuVLxFA") (str.++ seed0_var_0xINPUT_102206 "vJ7sljpYwK0H")))) (or seed0_T_1 (not (str.contains (str.++ seed0_var_0xINPUT_102206 "kbcdJVnyZF84") (str.++ seed0_var_0xINPUT_102206 "oyKrhJdjW9qm"))))))
+(check-sat)
+(exit)

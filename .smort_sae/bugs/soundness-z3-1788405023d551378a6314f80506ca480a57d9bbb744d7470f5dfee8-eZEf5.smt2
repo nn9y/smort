@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_in0 () String)
+(declare-fun seed0_in1 () String)
+(assert (and (or (and (and (= (ite (> (str.len seed0_in0) 1) 1 0) 0) (= (ite (not (= (str.at seed0_in0 0) (str.at seed0_in1 0))) 1 0) 0)) (not (= (ite (> (str.len seed0_in0) 0) 1 0) 0))) (str.suffixof (str.++ seed0_in1 "9fR4pwyaoANOtE0J3") (str.++ seed0_in1 "hcnC2q80KNe"))) (or (= (ite (< (str.len seed0_in1) (str.len seed0_in0)) 1 0) 0) (not (str.< (str.++ seed0_in0 "CNSDuod8BHLkf") (str.++ seed0_in0 ""))))))
+(check-sat)
+(exit)

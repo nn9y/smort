@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Bool)
+(declare-fun seed0_var_0xINPUT_23713 () String)
+(assert (and (or (= seed0_T_1 (= "-" seed0_var_0xINPUT_23713)) (and (str.contains (str.++ seed0_var_0xINPUT_23713 "GPO8") (str.++ seed0_var_0xINPUT_23713 "zMiFW5rkV1qbwCcYX")) (str.contains (str.++ seed0_var_0xINPUT_23713 "k2BSzLM5vOIWy") (str.++ seed0_var_0xINPUT_23713 "rgOKj0")))) (or seed0_T_1 (str.contains (str.++ seed0_var_0xINPUT_23713 "Layhuk39MN") (str.++ seed0_var_0xINPUT_23713 "")))))
+(check-sat)
+(exit)

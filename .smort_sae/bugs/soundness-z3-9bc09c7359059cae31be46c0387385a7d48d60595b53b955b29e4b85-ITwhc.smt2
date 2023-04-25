@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_key2 () String)
+(declare-fun seed0_value2 () String)
+(assert (and (or (and (and (and (and (and (and (and (and (and (and (and (and (and (not (= (ite (= (str.at seed0_value2 (- (str.len seed0_value2) 1)) "\u{b}") 1 0) 0)) (= (ite (= (str.at seed0_value2 (- (str.len seed0_value2) 1)) "\u{d}") 1 0) 0)) (= (ite (= (str.at seed0_value2 (- (str.len seed0_value2) 1)) "\u{a}") 1 0) 0)) (= (ite (= (str.at seed0_value2 (- (str.len seed0_value2) 1)) "\u{9}") 1 0) 0)) (= (ite (= (str.at seed0_value2 (- (str.len seed0_value2) 1)) " ") 1 0) 0)) (= (ite (= (str.at seed0_value2 0) "\u{c}") 1 0) 0)) (= (ite (= (str.at seed0_value2 0) "\u{b}") 1 0) 0)) (= (ite (= (str.at seed0_value2 0) "\u{d}") 1 0) 0)) (= (ite (= (str.at seed0_value2 0) "\u{a}") 1 0) 0)) (= (ite (= (str.at seed0_value2 0) "\u{9}") 1 0) 0)) (= (ite (= (str.at seed0_value2 0) " ") 1 0) 0)) (= (ite (= (str.len seed0_value2) 0) 1 0) 0)) (= (ite (str.contains seed0_value2 ",") 1 0) 0)) (= (ite (= (str.len seed0_value2) 0) 1 0) 0)) (str.contains (str.++ seed0_key2 "7YLWhPmjC1Sxo6eRbGKJ") (str.++ seed0_value2 "JIlnZH0G748YesdpUocv"))) (or (not (= (ite (= seed0_key2 "connection") 1 0) 0)) (or (str.contains (str.++ seed0_value2 "2DfkPJ6rQn3") (str.++ seed0_value2 "AU")) (str.< (str.++ seed0_value2 "LjBm") (str.++ seed0_value2 "0sjRkfgGATM6v5m3Xr"))))))
+(check-sat)
+(exit)

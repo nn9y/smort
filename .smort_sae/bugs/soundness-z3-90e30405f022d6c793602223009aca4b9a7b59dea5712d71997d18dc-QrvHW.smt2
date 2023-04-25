@@ -1,0 +1,7 @@
+(set-logic ALL)
+(declare-fun seed0_s2 () String)
+(declare-fun seed0_s1 () String)
+(declare-fun seed0_s3 () String)
+(assert (and (or (and (and (and (and (and (and (and (and (and (and (and (and (and (= (ite (= (str.len seed0_s2) 2) 1 0) 0) (not (= (ite (= (str.len seed0_s1) 0) 1 0) 0))) (= (ite (= (str.len seed0_s1) (- 1)) 1 0) 0)) (not (= (ite (= (str.at seed0_s2 1) (str.at seed0_s3 1)) 1 0) 0))) (not (= (ite (> (str.len seed0_s2) 1) 1 0) 0))) (= (ite (> (str.len seed0_s1) 0) 1 0) 0)) (= (ite (= (str.len seed0_s2) 1) 1 0) 0)) (not (= (ite (= (str.len seed0_s1) 0) 1 0) 0))) (= (ite (= (str.len seed0_s1) (- 1)) 1 0) 0)) (not (= (ite (= (str.at seed0_s2 0) (str.at seed0_s3 0)) 1 0) 0))) (not (= (ite (> (str.len seed0_s2) 0) 1 0) 0))) (= (ite (> (str.len seed0_s1) 0) 1 0) 0)) (= (ite (= (str.len seed0_s2) 0) 1 0) 0)) (not (= (ite (= (str.len seed0_s1) 0) 1 0) 0))) (xor (str.suffixof (str.++ seed0_s1 "nCwo6z") (str.++ seed0_s3 "Mw3tmJZk1")) (str.suffixof (str.++ seed0_s3 "6iVwLJ") (str.++ seed0_s2 "JzG2P1")))) (or (= (ite (not (= (+ (str.len seed0_s1) (str.len seed0_s2)) (str.len seed0_s3))) 1 0) 0) (or (str.contains (str.++ seed0_s1 "Tl9ftOwRd5SuyxnWE") (str.++ seed0_s3 "")) (str.prefixof (str.++ seed0_s1 "JinPVf04lRI2aB") (str.++ seed0_s3 "BtyM8O9su2UHoiC"))))))
+(check-sat)
+(exit)

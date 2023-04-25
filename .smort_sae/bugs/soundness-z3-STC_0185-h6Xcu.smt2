@@ -1,0 +1,7 @@
+(set-logic ALL)
+(declare-fun seed0_x () Int)
+(declare-fun seed0_y () Int)
+(declare-fun seed0_z () Int)
+(assert (and (= (+ (* seed0_x seed0_x seed0_x) (* seed0_y seed0_y seed0_y) (* seed0_z seed0_z seed0_z)) 185) (xor (<= (- seed0_y seed0_x) (+ seed0_z seed0_z)) (distinct (* seed0_y seed0_y) (div seed0_y seed0_y)))))
+(check-sat)
+(exit)

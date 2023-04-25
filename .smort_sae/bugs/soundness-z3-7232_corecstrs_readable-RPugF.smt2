@@ -1,0 +1,7 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Bool)
+(declare-fun seed0_T_2 () Bool)
+(declare-fun seed0_var_0xINPUT_173612 () String)
+(assert (and (or (= seed0_T_1 (not (= "ywUN4ZIDAC" seed0_var_0xINPUT_173612))) (not (str.suffixof (str.++ seed0_var_0xINPUT_173612 "7oiJXfMrFlqvtOmWj2") (str.++ seed0_var_0xINPUT_173612 "VRyhxTvL0a9zq8YsB")))) (or seed0_T_1 (str.<= (str.++ seed0_var_0xINPUT_173612 "OSueAR2Bg3aKnbf1CE") (str.++ seed0_var_0xINPUT_173612 "4NrgQG"))) (or (= seed0_T_2 (not (= seed0_var_0xINPUT_173612 "6JX7G3VKFq"))) (=> (str.<= (str.++ seed0_var_0xINPUT_173612 "DsTg") (str.++ seed0_var_0xINPUT_173612 "")) (str.<= (str.++ seed0_var_0xINPUT_173612 "Ql2SV6f") (str.++ seed0_var_0xINPUT_173612 "xNgs")))) (or seed0_T_2 (and (str.prefixof (str.++ seed0_var_0xINPUT_173612 "XPakNGO") (str.++ seed0_var_0xINPUT_173612 "tjBPO0WNrL9TKa58x")) (str.<= (str.++ seed0_var_0xINPUT_173612 "AnZcRbhIW3TCs2ypYoUr") (str.++ seed0_var_0xINPUT_173612 "lPE9cBnOzFj"))))))
+(check-sat)
+(exit)

@@ -1,0 +1,7 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Bool)
+(declare-fun seed0_T_2 () Bool)
+(declare-fun seed0_var_0xINPUT_47521 () String)
+(assert (and (or (= seed0_T_1 (not (= "file:" seed0_var_0xINPUT_47521))) (and (str.prefixof (str.++ seed0_var_0xINPUT_47521 "FshJePZM7") (str.++ seed0_var_0xINPUT_47521 "1za3riKlMOFH9uq2osD6")) (str.contains (str.++ seed0_var_0xINPUT_47521 "Zo") (str.++ seed0_var_0xINPUT_47521 "Lon02jZmAWPY")))) (or (= seed0_T_2 (not seed0_T_1)) (=> (str.prefixof (str.++ seed0_var_0xINPUT_47521 "SD7l6JdRQrG0j") (str.++ seed0_var_0xINPUT_47521 "vnxZUz5hrKP8cXB")) (str.suffixof (str.++ seed0_var_0xINPUT_47521 "GSzP6wOp0sF") (str.++ seed0_var_0xINPUT_47521 "k6VN3z0SIeBwy8jg")))) (or seed0_T_2 (or (str.contains (str.++ seed0_var_0xINPUT_47521 "f5Jn") (str.++ seed0_var_0xINPUT_47521 "jwkTtcvDapimeK2Vz")) (str.contains (str.++ seed0_var_0xINPUT_47521 "sYB4K3JZAuhr") (str.++ seed0_var_0xINPUT_47521 "YTq2rncmovy"))))))
+(check-sat)
+(exit)

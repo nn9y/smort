@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_in1 () String)
+(declare-fun seed0_in0 () String)
+(assert (or (not (= (ite (not (= seed0_in1 seed0_in0)) 1 0) 0)) (or (str.contains (str.++ seed0_in0 "YPDyAadkM") (str.++ seed0_in1 "Fl")) (str.suffixof (str.++ seed0_in0 "W2nQxkl7") (str.++ seed0_in1 "")))))
+(check-sat)
+(exit)

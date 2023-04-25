@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Bool)
+(declare-fun seed0_var_0xINPUT_113105 () String)
+(assert (and (or (= seed0_T_1 (= "-" seed0_var_0xINPUT_113105)) (or (str.< (str.++ seed0_var_0xINPUT_113105 "LBPn5ym40H9deOifItz") (str.++ seed0_var_0xINPUT_113105 "")) (str.<= (str.++ seed0_var_0xINPUT_113105 "pLcUfez8POaBXgTw6rvI") (str.++ seed0_var_0xINPUT_113105 "0jZNQH5JRDdF9qTh")))) (or seed0_T_1 (or (str.<= (str.++ seed0_var_0xINPUT_113105 "KGiq3t1PXTuRCzOhZ2") (str.++ seed0_var_0xINPUT_113105 "8V")) (str.prefixof (str.++ seed0_var_0xINPUT_113105 "uKCAr3SYps1g") (str.++ seed0_var_0xINPUT_113105 "NMXU70nqxirchBjOzK"))))))
+(check-sat)
+(exit)

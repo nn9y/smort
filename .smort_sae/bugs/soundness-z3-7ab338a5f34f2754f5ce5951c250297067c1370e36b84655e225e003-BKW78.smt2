@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-fun seed0_s () String)
+(assert (and (or (and (and (= (ite (not (= (str.at seed0_s 0) (str.at seed0_s 2))) 1 0) 0) (= (ite (= (str.at seed0_s 2) (str.at seed0_s 1)) 1 0) 0)) (= (ite (= (str.at seed0_s 1) (str.at seed0_s 0)) 1 0) 0)) (xor (str.< (str.++ seed0_s "kNQs60uOGaxjwqnLFviH") (str.++ seed0_s "AcO6sr")) (str.prefixof (str.++ seed0_s "Nm0boIXYlLGaPrZfc") (str.++ seed0_s "p7aGElUk")))) (or (= (ite (<= (str.len seed0_s) 1) 1 0) 0) (not (str.<= (str.++ seed0_s "") (str.++ seed0_s "EFaBqjhvN3cADQxy"))))))
+(check-sat)
+(exit)

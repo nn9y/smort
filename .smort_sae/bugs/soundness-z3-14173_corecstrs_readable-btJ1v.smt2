@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Bool)
+(declare-fun seed0_var_0xINPUT_174003 () String)
+(assert (and (or (= seed0_T_1 (= seed0_var_0xINPUT_174003 "https:")) (not (str.contains (str.++ seed0_var_0xINPUT_174003 "Z") (str.++ seed0_var_0xINPUT_174003 "b9f2ZYT7")))) (or seed0_T_1 (not (str.contains (str.++ seed0_var_0xINPUT_174003 "NP2Bk95derE") (str.++ seed0_var_0xINPUT_174003 "965xcoC7MqLftnkNiIG"))))))
+(check-sat)
+(exit)

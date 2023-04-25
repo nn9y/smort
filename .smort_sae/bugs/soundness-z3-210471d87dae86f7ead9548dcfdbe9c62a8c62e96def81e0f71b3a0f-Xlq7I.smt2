@@ -1,0 +1,7 @@
+(set-logic ALL)
+(declare-fun seed0_s1 () String)
+(declare-fun seed0_s2 () String)
+(declare-fun seed0_s3 () String)
+(assert (and (or (= (ite (= (str.len seed0_s1) 0) 1 0) 0) (str.suffixof (str.++ seed0_s1 "CX5EvQhzs") (str.++ seed0_s3 "j4ylFtnO0wM821UWPfvR"))) (or (= (ite (not (= (+ (str.len seed0_s1) (str.len seed0_s2)) (str.len seed0_s3))) 1 0) 0) (not (str.contains (str.++ seed0_s2 "Eyh7CqFsm") (str.++ seed0_s3 "WiyCT"))))))
+(check-sat)
+(exit)

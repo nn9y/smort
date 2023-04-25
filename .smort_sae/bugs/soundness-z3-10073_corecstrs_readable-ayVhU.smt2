@@ -1,0 +1,7 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Bool)
+(declare-fun seed0_T_2 () Bool)
+(declare-fun seed0_var_0xINPUT_107475 () String)
+(assert (and (or (= seed0_T_1 (not (= "file:" seed0_var_0xINPUT_107475))) (str.suffixof (str.++ seed0_var_0xINPUT_107475 "3") (str.++ seed0_var_0xINPUT_107475 "vk"))) (or (= seed0_T_2 (not seed0_T_1)) (not (str.prefixof (str.++ seed0_var_0xINPUT_107475 "xagbvyXnOKmG") (str.++ seed0_var_0xINPUT_107475 "elhSL7yIK3AC")))) (or seed0_T_2 (or (str.prefixof (str.++ seed0_var_0xINPUT_107475 "qwbXB") (str.++ seed0_var_0xINPUT_107475 "VgJ")) (str.contains (str.++ seed0_var_0xINPUT_107475 "kwKTJ8Rhqne1p") (str.++ seed0_var_0xINPUT_107475 "SJT9X0UocMWGLBA1iweu"))))))
+(check-sat)
+(exit)

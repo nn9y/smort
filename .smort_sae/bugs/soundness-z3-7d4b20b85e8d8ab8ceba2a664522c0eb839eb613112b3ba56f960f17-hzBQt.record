@@ -1,0 +1,4 @@
+command: /home/yang/Projects/smort/solvers/z3-4.8.1/bin/z3
+stderr:
+stdout:
+unsat

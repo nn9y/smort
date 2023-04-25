@@ -1,0 +1,7 @@
+(set-logic ALL)
+(declare-fun seed0_c_mp_add_~r2~0_primed () Int)
+(declare-fun seed0_c_mp_add_~partial_sum~0 () Int)
+(declare-fun seed0_c_mp_add_~i~0 () Int)
+(assert (and (or (= 2 (mod seed0_c_mp_add_~i~0 256)) (not (< (* seed0_c_mp_add_~r2~0_primed seed0_c_mp_add_~i~0) (+ seed0_c_mp_add_~partial_sum~0 seed0_c_mp_add_~partial_sum~0)))) (or (>= seed0_c_mp_add_~r2~0_primed seed0_c_mp_add_~partial_sum~0) (xor (distinct (- seed0_c_mp_add_~i~0 seed0_c_mp_add_~r2~0_primed) (mod seed0_c_mp_add_~i~0 seed0_c_mp_add_~r2~0_primed)) (= (mod seed0_c_mp_add_~r2~0_primed seed0_c_mp_add_~partial_sum~0) (div seed0_c_mp_add_~partial_sum~0 seed0_c_mp_add_~partial_sum~0)))) (or (forall ((seed0_Q1_v_mp_add_~i~0_63 Int)) (or (not (= (mod seed0_Q1_v_mp_add_~i~0_63 256) 1)) (not (= seed0_c_mp_add_~i~0 (+ (mod seed0_Q1_v_mp_add_~i~0_63 256) 1))))) (and (<= (+ seed0_c_mp_add_~r2~0_primed seed0_c_mp_add_~i~0) (div seed0_c_mp_add_~i~0 seed0_c_mp_add_~r2~0_primed)) (>= (div seed0_c_mp_add_~r2~0_primed seed0_c_mp_add_~r2~0_primed) (mod seed0_c_mp_add_~i~0 seed0_c_mp_add_~i~0))))))
+(check-sat)
+(exit)

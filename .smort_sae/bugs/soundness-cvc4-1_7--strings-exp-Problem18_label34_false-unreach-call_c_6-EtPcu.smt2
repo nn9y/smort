@@ -1,0 +1,8 @@
+(set-logic ALL)
+(declare-const a_random2_0 Int)
+(declare-fun |seed0_c_old(~a3~0)| () Int)
+(declare-fun seed0_c_~a3~0 () Int)
+(assert (and (or (< seed0_c_~a3~0 (+ |seed0_c_old(~a3~0)| a_random2_0)) (xor (> (- seed0_c_~a3~0 |seed0_c_old(~a3~0)|) (div |seed0_c_old(~a3~0)| |seed0_c_old(~a3~0)|)) (= (- |seed0_c_old(~a3~0)| seed0_c_~a3~0) (- |seed0_c_old(~a3~0)| |seed0_c_old(~a3~0)|)))) (or (forall ((seed0_Q1_v_~a3~0_2178 Int)) (forall ((seed0_Q2_v_~a3~0_2178 Int)) (forall ((seed0_Q3_v_~a3~0_2178 Int)) (and (or (not (= 0 (mod seed0_Q1_v_~a3~0_2178 5))) (not (<= seed0_Q1_v_~a3~0_2178 |seed0_c_old(~a3~0)|)) (not (<= (+ seed0_c_~a3~0 125944) (div (+ seed0_Q1_v_~a3~0_2178 (- 600335)) 5)))) (or (not (<= seed0_Q2_v_~a3~0_2178 |seed0_c_old(~a3~0)|)) (not (<= (+ seed0_c_~a3~0 125943) (div (+ seed0_Q2_v_~a3~0_2178 (- 600335)) 5))) (= 0 (mod seed0_Q2_v_~a3~0_2178 5)) (not (< seed0_Q2_v_~a3~0_2178 600335))) (or (not (<= seed0_Q3_v_~a3~0_2178 |seed0_c_old(~a3~0)|)) (not (<= (+ seed0_c_~a3~0 125944) (div (+ seed0_Q3_v_~a3~0_2178 (- 600335)) 5))) (not (<= 600335 seed0_Q3_v_~a3~0_2178))))))) (and (< (- seed0_c_~a3~0 seed0_c_~a3~0) (div |seed0_c_old(~a3~0)| |seed0_c_old(~a3~0)|)) (<= (* seed0_c_~a3~0 seed0_c_~a3~0) (- seed0_c_~a3~0 |seed0_c_old(~a3~0)|))))))
+(assert (> a_random2_0 0))
+(check-sat)
+(exit)

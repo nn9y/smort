@@ -1,0 +1,7 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Int)
+(declare-fun seed0_T_2 () Bool)
+(declare-fun seed0_var_0xINPUT_503103 () String)
+(assert (and (or (>= seed0_T_1 (str.len seed0_var_0xINPUT_503103)) (distinct (+ seed0_T_1 (- 806)) (+ seed0_T_1 (- 905)))) (or (= seed0_T_2 (= seed0_T_1 0)) (not (str.contains (str.++ seed0_var_0xINPUT_503103 "Ko5V") (str.++ seed0_var_0xINPUT_503103 "Gcsuo028bwDM")))) (or seed0_T_2 (<= (- seed0_T_1 45) (mod seed0_T_1 seed0_T_1)))))
+(check-sat)
+(exit)

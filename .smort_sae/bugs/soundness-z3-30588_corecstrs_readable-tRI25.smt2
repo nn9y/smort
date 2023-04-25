@@ -1,0 +1,7 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Int)
+(declare-fun seed0_T_2 () Bool)
+(declare-fun seed0_var_0xINPUT_303665 () String)
+(assert (and (or (>= seed0_T_1 (str.len seed0_var_0xINPUT_303665)) (not (str.contains (str.++ seed0_var_0xINPUT_303665 "P") (str.++ seed0_var_0xINPUT_303665 "lJZ")))) (or (= seed0_T_2 (= seed0_T_1 0)) (not (distinct (+ seed0_T_1 529) (mod seed0_T_1 seed0_T_1)))) (or seed0_T_2 (not (str.contains (str.++ seed0_var_0xINPUT_303665 "ork") (str.++ seed0_var_0xINPUT_303665 "wmQ"))))))
+(check-sat)
+(exit)

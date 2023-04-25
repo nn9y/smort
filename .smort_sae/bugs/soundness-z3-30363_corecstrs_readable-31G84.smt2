@@ -1,0 +1,8 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Int)
+(declare-fun seed0_T_2 () Bool)
+(declare-fun seed0_T_3 () Bool)
+(declare-fun seed0_var_0xINPUT_173419 () String)
+(assert (and (or (>= seed0_T_1 (str.len seed0_var_0xINPUT_173419)) (and (>= (div seed0_T_1 seed0_T_1) (* seed0_T_1 seed0_T_1)) (> (mod seed0_T_1 seed0_T_1) (* seed0_T_1 seed0_T_1)))) (or (= seed0_T_2 (< 0 seed0_T_1)) (str.contains (str.++ seed0_var_0xINPUT_173419 "1GRw8") (str.++ seed0_var_0xINPUT_173419 "ia5OFI"))) (or (= seed0_T_3 (not seed0_T_2)) (not (< (+ seed0_T_1 (- 262)) (div seed0_T_1 seed0_T_1)))) (or seed0_T_3 (xor (<= (div seed0_T_1 seed0_T_1) (- seed0_T_1 (- 863))) (> (- seed0_T_1 (- 480)) (div seed0_T_1 seed0_T_1))))))
+(check-sat)
+(exit)

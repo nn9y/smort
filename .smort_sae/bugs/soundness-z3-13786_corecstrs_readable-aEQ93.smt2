@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Bool)
+(declare-fun seed0_var_0xINPUT_236835 () String)
+(assert (and (or (= seed0_T_1 (= seed0_var_0xINPUT_236835 "chrome:")) (or (str.contains (str.++ seed0_var_0xINPUT_236835 "3pVienv4fkO8yt9PqwM") (str.++ seed0_var_0xINPUT_236835 "AvkOQ60w9uc7ob13rTn")) (str.prefixof (str.++ seed0_var_0xINPUT_236835 "PWuKGm1OkqtfcAZR") (str.++ seed0_var_0xINPUT_236835 "AX9")))) (or seed0_T_1 (not (str.contains (str.++ seed0_var_0xINPUT_236835 "fG") (str.++ seed0_var_0xINPUT_236835 "uQBsl"))))))
+(check-sat)
+(exit)

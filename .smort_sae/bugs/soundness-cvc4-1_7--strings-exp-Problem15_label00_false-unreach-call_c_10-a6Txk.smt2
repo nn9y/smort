@@ -1,0 +1,8 @@
+(set-logic ALL)
+(declare-const a_random2_0 Int)
+(declare-fun |seed0_c_old(~a29~0)| () Int)
+(declare-fun seed0_c_~a29~0 () Int)
+(assert (and (or (< seed0_c_~a29~0 (+ |seed0_c_old(~a29~0)| a_random2_0)) (xor (> (- seed0_c_~a29~0 |seed0_c_old(~a29~0)|) (+ seed0_c_~a29~0 |seed0_c_old(~a29~0)|)) (= (* |seed0_c_old(~a29~0)| seed0_c_~a29~0) (+ seed0_c_~a29~0 seed0_c_~a29~0)))) (or (forall ((seed0_Q1_v_prenex_81 Int)) (or (not (<= 0 (+ (* 4 (div seed0_Q1_v_prenex_81 5)) 4))) (not (<= 0 seed0_Q1_v_prenex_81)) (not (<= 0 (* 4 (div seed0_Q1_v_prenex_81 5)))) (not (<= seed0_c_~a29~0 (+ (mod (* 4 (div seed0_Q1_v_prenex_81 5)) 299978) 300021))))) (distinct (mod seed0_c_~a29~0 |seed0_c_old(~a29~0)|) (- |seed0_c_old(~a29~0)| |seed0_c_old(~a29~0)|)))))
+(assert (> a_random2_0 0))
+(check-sat)
+(exit)

@@ -1,0 +1,8 @@
+(set-logic ALL)
+(declare-const a_random97_0 String)
+(declare-fun seed0_sigmaStar_0 () String)
+(declare-fun seed0_x_2 () String)
+(declare-fun seed0_literal_1 () String)
+(assert (and (and (= seed0_literal_1 "\u{61}\u{74}\u{74}\u{65}\u{6d}\u{70}\u{74}\u{2e}\u{70}\u{68}\u{70}\u{3f}\u{69}\u{64}\u{3d}") (and (str.contains (str.++ seed0_x_2 seed0_literal_1) (str.++ seed0_sigmaStar_0 seed0_literal_1)) (str.< (str.++ seed0_sigmaStar_0 seed0_sigmaStar_0) (str.++ seed0_literal_1 seed0_literal_1)))) (and (and (str.suffixof seed0_x_2 a_random97_0) (str.prefixof seed0_x_2 a_random97_0) (str.suffixof seed0_literal_1 a_random97_0) (str.prefixof seed0_literal_1 a_random97_0)) (=> (str.< (str.++ seed0_sigmaStar_0 seed0_x_2) (str.++ seed0_literal_1 seed0_literal_1)) (str.< (str.++ seed0_x_2 seed0_literal_1) (str.++ seed0_literal_1 seed0_x_2)))) (and (str.in_re seed0_x_2 (re.++ (re.* re.allchar ) (re.++ (str.to_re "\u{5c}\u{3c}\u{53}\u{43}\u{52}\u{49}\u{50}\u{54}") (re.* re.allchar )))) (=> (str.<= (str.++ seed0_x_2 seed0_literal_1) (str.++ seed0_sigmaStar_0 seed0_literal_1)) (str.contains (str.++ seed0_x_2 seed0_x_2) (str.++ seed0_sigmaStar_0 seed0_literal_1))))))
+(check-sat)
+(exit)

@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-fun seed0_url () String)
+(assert (and (or (and (and (and (and (and (and (and (and (= (ite (str.contains (str.substr seed0_url 0 (- (str.indexof seed0_url ":" 0) 0)) "A") 1 0) 0) (= (ite (not (= (str.len (str.substr seed0_url (+ (str.indexof seed0_url ":" 0) 1) (- (str.len seed0_url) (+ (str.indexof seed0_url ":" 0) 1)))) 0)) 1 0) 0)) (= (ite (= (str.substr seed0_url 0 (- (str.indexof seed0_url ":" 0) 0)) "http") 1 0) 0)) (not (= (ite (> (str.indexof seed0_url ":" 0) 0) 1 0) 0))) (>= 0 0)) (>= (- (str.indexof seed0_url ":" 0) 0) 0)) (>= (+ (str.indexof seed0_url ":" 0) 1) 0)) (>= (- (str.len seed0_url) (+ (str.indexof seed0_url ":" 0) 1)) 0)) (>= 0 0)) (not (str.suffixof (str.++ seed0_url "nCO") (str.++ seed0_url "1amS3iovYAE")))) (or (>= (- (str.indexof seed0_url ":" 0) 0) 0) (or (str.contains (str.++ seed0_url "mSnhXEFyUcC") (str.++ seed0_url "GFBZ26Mi5NLHXEpWhQoq")) (str.suffixof (str.++ seed0_url "tfz7P5xL") (str.++ seed0_url "C5pbGtw29ZcLjgv"))))))
+(check-sat)
+(exit)

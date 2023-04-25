@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Bool)
+(declare-fun seed0_var_0xINPUT_193109 () String)
+(assert (and (or (= seed0_T_1 (= seed0_var_0xINPUT_193109 "Type")) (not (str.<= (str.++ seed0_var_0xINPUT_193109 "") (str.++ seed0_var_0xINPUT_193109 "AjcDLCF9PR64VY")))) (or seed0_T_1 (str.prefixof (str.++ seed0_var_0xINPUT_193109 "r8RZk74lHL1653ws") (str.++ seed0_var_0xINPUT_193109 "3vGBUxQs4gmZ2fuLSJhr")))))
+(check-sat)
+(exit)

@@ -1,0 +1,8 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Int)
+(declare-fun seed0_T_2 () Bool)
+(declare-fun seed0_T_3 () Bool)
+(declare-fun seed0_var_0xINPUT_406067 () String)
+(assert (and (or (>= seed0_T_1 (str.len seed0_var_0xINPUT_406067)) (=> (str.suffixof (str.++ seed0_var_0xINPUT_406067 "lqIf2v4t9zakwm6L") (str.++ seed0_var_0xINPUT_406067 "LUhcoX5ASnIBvWD4EyJY")) (str.contains (str.++ seed0_var_0xINPUT_406067 "WFPzgMTU4XBOGEfY") (str.++ seed0_var_0xINPUT_406067 "u4cwYbWklQKBzG")))) (or (= seed0_T_2 (= seed0_T_1 0)) (xor (<= (div seed0_T_1 seed0_T_1) (mod seed0_T_1 seed0_T_1)) (distinct (mod seed0_T_1 seed0_T_1) (- seed0_T_1 995)))) (or (= seed0_T_3 (not seed0_T_2)) (=> (distinct (mod seed0_T_1 seed0_T_1) (+ seed0_T_1 (- 228))) (< (div seed0_T_1 seed0_T_1) (div seed0_T_1 seed0_T_1)))) (or seed0_T_3 (=> (<= (+ seed0_T_1 (- 401)) (+ seed0_T_1 (- 34))) (= (div seed0_T_1 seed0_T_1) (mod seed0_T_1 seed0_T_1))))))
+(check-sat)
+(exit)

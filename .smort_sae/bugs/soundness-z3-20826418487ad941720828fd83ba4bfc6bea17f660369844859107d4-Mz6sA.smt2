@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_key2 () String)
+(declare-fun seed0_key1 () String)
+(assert (and (or (and (and (and (and (and (and (and (and (and (not (= (ite (= seed0_key2 "proxy-authorization") 1 0) 0)) (= (ite (= seed0_key2 "proxy-authenticate") 1 0) 0)) (= (ite (= seed0_key2 "keep-alive") 1 0) 0)) (= (ite (= seed0_key2 "connection") 1 0) 0)) (not (= (ite (= seed0_key1 "transfer-encoding") 1 0) 0))) (= (ite (= seed0_key1 "trailers") 1 0) 0)) (= (ite (= seed0_key1 "te") 1 0) 0)) (= (ite (= seed0_key1 "proxy-authorization") 1 0) 0)) (= (ite (= seed0_key1 "proxy-authenticate") 1 0) 0)) (= (ite (= seed0_key1 "keep-alive") 1 0) 0)) (or (str.< (str.++ seed0_key1 "EOTf28kWbVznyxwjC") (str.++ seed0_key1 "")) (str.suffixof (str.++ seed0_key2 "vSzflAxOFRWJ4EnUkNMm") (str.++ seed0_key2 "RNntUsGc")))) (or (= (ite (= seed0_key1 "connection") 1 0) 0) (=> (str.<= (str.++ seed0_key1 "x8oSuErBkUcKtOq") (str.++ seed0_key1 "n40ERxCz2katG93bfYiB")) (str.suffixof (str.++ seed0_key2 "7EgdcJPUY5lC") (str.++ seed0_key1 "SiYB3A"))))))
+(check-sat)
+(exit)
