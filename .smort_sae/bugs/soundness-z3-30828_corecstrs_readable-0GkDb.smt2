@@ -1,0 +1,7 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Int)
+(declare-fun seed0_T_2 () Bool)
+(declare-fun seed0_var_0xINPUT_482360 () String)
+(assert (and (or (>= seed0_T_1 (str.len seed0_var_0xINPUT_482360)) (and (> (mod seed0_T_1 seed0_T_1) (div seed0_T_1 seed0_T_1)) (>= (* seed0_T_1 seed0_T_1) (div seed0_T_1 seed0_T_1)))) (or (= seed0_T_2 (= seed0_T_1 0)) (and (< (- seed0_T_1 (- 540)) (- seed0_T_1 (- 815))) (distinct (* seed0_T_1 seed0_T_1) (- seed0_T_1 677)))) (or seed0_T_2 (str.prefixof (str.++ seed0_var_0xINPUT_482360 "MVPsjD4GO1g") (str.++ seed0_var_0xINPUT_482360 "b")))))
+(check-sat)
+(exit)

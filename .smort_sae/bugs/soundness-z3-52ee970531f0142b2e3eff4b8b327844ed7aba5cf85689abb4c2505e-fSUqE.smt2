@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_word () String)
+(declare-fun seed0_abbr () String)
+(assert (and (or (and (and (and (and (and (and (and (and (not (= (ite (<= (str.len seed0_word) 4) 1 0) 0)) (= (ite (not (= (str.at seed0_word 3) (str.at seed0_abbr 3))) 1 0) 0)) (= (ite (<= (str.len seed0_word) 3) 1 0) 0)) (= (ite (not (= (str.at seed0_word 2) (str.at seed0_abbr 2))) 1 0) 0)) (= (ite (<= (str.len seed0_word) 2) 1 0) 0)) (= (ite (not (= (str.at seed0_word 1) (str.at seed0_abbr 1))) 1 0) 0)) (= (ite (<= (str.len seed0_word) 1) 1 0) 0)) (= (ite (not (= (str.at seed0_word 0) (str.at seed0_abbr 0))) 1 0) 0)) (= (ite (<= (str.len seed0_word) 0) 1 0) 0)) (and (str.contains (str.++ seed0_abbr "LRwEU67vpGHfk1aC") (str.++ seed0_abbr "ZpYFL7Xw9ezi3tfvjC8")) (str.<= (str.++ seed0_abbr "EZY5On") (str.++ seed0_abbr "3SxR61Lhf")))) (or (= (ite (<= (str.len seed0_abbr) 0) 1 0) 0) (or (str.contains (str.++ seed0_abbr "rIRH1bw5") (str.++ seed0_abbr "q")) (str.< (str.++ seed0_abbr "n1MLXveURrpcal") (str.++ seed0_abbr ""))))))
+(check-sat)
+(exit)

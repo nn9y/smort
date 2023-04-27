@@ -1,0 +1,4 @@
+command: /home/yang/Projects/smort/solvers/cvc4-1.7 --strings-exp
+stderr:
+stdout:
+unsat

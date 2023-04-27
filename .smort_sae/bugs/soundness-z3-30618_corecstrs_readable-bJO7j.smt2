@@ -1,0 +1,7 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Int)
+(declare-fun seed0_T_2 () Bool)
+(declare-fun seed0_var_0xINPUT_269318 () String)
+(assert (and (or (>= seed0_T_1 (str.len seed0_var_0xINPUT_269318)) (xor (<= (+ seed0_T_1 367) (div seed0_T_1 seed0_T_1)) (> (mod seed0_T_1 seed0_T_1) (mod seed0_T_1 seed0_T_1)))) (or (= seed0_T_2 (= seed0_T_1 0)) (xor (= (* seed0_T_1 seed0_T_1) (* seed0_T_1 seed0_T_1)) (>= (mod seed0_T_1 seed0_T_1) (- seed0_T_1 (- 177))))) (or seed0_T_2 (or (<= (- seed0_T_1 (- 263)) (mod seed0_T_1 seed0_T_1)) (>= (- seed0_T_1 (- 718)) (div seed0_T_1 seed0_T_1))))))
+(check-sat)
+(exit)

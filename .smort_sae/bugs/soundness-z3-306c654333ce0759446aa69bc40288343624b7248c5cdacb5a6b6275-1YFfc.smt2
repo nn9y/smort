@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-fun seed0_uri () String)
+(assert (and (or (= (ite (str.contains seed0_uri "%") 1 0) 0) (xor (str.prefixof (str.++ seed0_uri "JdjFfuB4XrID97W") (str.++ seed0_uri "bI")) (str.contains (str.++ seed0_uri "gwoZDrzhmCt78Yu5") (str.++ seed0_uri "1Gloc78")))) (or (= (ite (= (str.len seed0_uri) 0) 1 0) 0) (not (str.contains (str.++ seed0_uri "PvDIW") (str.++ seed0_uri "B0eHdUOVZz1bpYu3j"))))))
+(check-sat)
+(exit)

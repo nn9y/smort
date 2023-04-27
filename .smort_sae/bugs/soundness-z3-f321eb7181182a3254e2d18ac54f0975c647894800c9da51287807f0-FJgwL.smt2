@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_in0 () String)
+(declare-fun seed0_in1 () String)
+(assert (and (or (and (and (and (and (and (and (and (and (= (ite (> (str.len seed0_in0) 4) 1 0) 0) (= (ite (not (= (str.at seed0_in0 3) (str.at seed0_in1 3))) 1 0) 0)) (not (= (ite (> (str.len seed0_in0) 3) 1 0) 0))) (= (ite (not (= (str.at seed0_in0 2) (str.at seed0_in1 2))) 1 0) 0)) (not (= (ite (> (str.len seed0_in0) 2) 1 0) 0))) (= (ite (not (= (str.at seed0_in0 1) (str.at seed0_in1 1))) 1 0) 0)) (not (= (ite (> (str.len seed0_in0) 1) 1 0) 0))) (= (ite (not (= (str.at seed0_in0 0) (str.at seed0_in1 0))) 1 0) 0)) (not (= (ite (> (str.len seed0_in0) 0) 1 0) 0))) (and (str.contains (str.++ seed0_in1 "1B9be0hY8DATUQmxZw") (str.++ seed0_in1 "maOg1n3r205h")) (str.< (str.++ seed0_in1 "NXy3ldEc6H9zu8M") (str.++ seed0_in0 "JT8")))) (or (= (ite (< (str.len seed0_in1) (str.len seed0_in0)) 1 0) 0) (xor (str.<= (str.++ seed0_in1 "28nGi4c") (str.++ seed0_in1 "")) (str.<= (str.++ seed0_in0 "jg5bZlfhWDK1IF6EB2L") (str.++ seed0_in0 "KusVF5z2ZIRDxlc0iOHo"))))))
+(check-sat)
+(exit)

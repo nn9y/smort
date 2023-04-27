@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Bool)
+(declare-fun seed0_var_0xINPUT_418285 () String)
+(assert (and (or (= seed0_T_1 (= seed0_var_0xINPUT_418285 "Search")) (and (str.< (str.++ seed0_var_0xINPUT_418285 "m5x") (str.++ seed0_var_0xINPUT_418285 "1oOCJfYzwrn9B2It")) (str.< (str.++ seed0_var_0xINPUT_418285 "xgubolKejIEzhMpdyQAL") (str.++ seed0_var_0xINPUT_418285 "19l")))) (or seed0_T_1 (str.< (str.++ seed0_var_0xINPUT_418285 "20AYb1ZQg") (str.++ seed0_var_0xINPUT_418285 "")))))
+(check-sat)
+(exit)

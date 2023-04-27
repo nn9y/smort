@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_s () String)
+(declare-fun seed0_t () String)
+(assert (and (or (and (and (and (and (and (and (and (and (and (and (not (= (ite (= (str.at seed0_s 2) (str.at seed0_t (+ 2 (- (str.len seed0_t) (str.len seed0_s))))) 1 0) 0)) (not (= (ite (> (str.len seed0_s) 2) 1 0) 0))) (not (= (ite (= (str.at seed0_s 1) (str.at seed0_t (+ 1 (- (str.len seed0_t) (str.len seed0_s))))) 1 0) 0))) (not (= (ite (> (str.len seed0_s) 1) 1 0) 0))) (= (ite (= (- (str.len seed0_t) (str.len seed0_s)) 0) 1 0) 0)) (= (ite (= (str.len seed0_s) 1) 1 0) 0)) (= (ite (= (str.at seed0_s 1) (str.at seed0_t 1)) 1 0) 0)) (not (= (ite (> (str.len seed0_s) 1) 1 0) 0))) (not (= (ite (= (str.at seed0_s 0) (str.at seed0_t 0)) 1 0) 0))) (not (= (ite (> (str.len seed0_s) 0) 1 0) 0))) (= (ite (> (- (str.len seed0_t) (str.len seed0_s)) 1) 1 0) 0)) (=> (str.suffixof (str.++ seed0_s "5Ao1s9buMf") (str.++ seed0_t "CDibvJrgFsy")) (str.contains (str.++ seed0_s "MNlCZbvWwjxY04") (str.++ seed0_t "Fb1zPXrhx6dl")))) (or (= (ite (> (str.len seed0_s) (str.len seed0_t)) 1 0) 0) (not (str.contains (str.++ seed0_s "X3Ych") (str.++ seed0_t "LqnsIm9TjHpECG5"))))))
+(check-sat)
+(exit)

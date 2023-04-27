@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-fun seed0_uri () String)
+(assert (and (or (and (and (and (not (= (ite (= (str.len (str.substr seed0_uri (+ (str.indexof seed0_uri "%" 0) 1) (- (str.len seed0_uri) (+ (str.indexof seed0_uri "%" 0) 1)))) 0) 1 0) 0)) (not (= (ite (str.contains seed0_uri "%") 1 0) 0))) (= (ite (= (str.len seed0_uri) 0) 1 0) 0)) (>= (+ (str.indexof seed0_uri "%" 0) 1) 0)) (or (str.<= (str.++ seed0_uri "IO") (str.++ seed0_uri "")) (str.suffixof (str.++ seed0_uri "P5SrXVY7ezKl") (str.++ seed0_uri "wJL8")))) (or (>= (- (str.len seed0_uri) (+ (str.indexof seed0_uri "%" 0) 1)) 0) (str.prefixof (str.++ seed0_uri "xD1i3t") (str.++ seed0_uri "5Ayah")))))
+(check-sat)
+(exit)

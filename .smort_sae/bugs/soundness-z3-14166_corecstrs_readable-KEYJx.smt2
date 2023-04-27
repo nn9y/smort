@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Bool)
+(declare-fun seed0_var_0xINPUT_149836 () String)
+(assert (and (or (= seed0_T_1 (= "https:" seed0_var_0xINPUT_149836)) (not (str.prefixof (str.++ seed0_var_0xINPUT_149836 "dmLoIFViRY3D8") (str.++ seed0_var_0xINPUT_149836 "IXsVdkx")))) (or seed0_T_1 (or (str.contains (str.++ seed0_var_0xINPUT_149836 "R9sY7FSDQ8XAqnzvf") (str.++ seed0_var_0xINPUT_149836 "023xfVA8k")) (str.contains (str.++ seed0_var_0xINPUT_149836 "JdYP") (str.++ seed0_var_0xINPUT_149836 "gHsKcYFtNWDGb5iqf"))))))
+(check-sat)
+(exit)

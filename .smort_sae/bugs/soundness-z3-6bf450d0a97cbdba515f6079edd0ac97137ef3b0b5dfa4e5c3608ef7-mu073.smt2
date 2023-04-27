@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_b () String)
+(declare-fun seed0_a () String)
+(assert (and (or (and (and (and (and (= (ite (>= (+ (str.len seed0_b) (- 2)) 0) 1 0) 0) (not (= (ite (>= (+ (str.len seed0_a) (- 2)) 0) 1 0) 0))) (not (= (ite (>= (+ (str.len seed0_a) (- 2)) 0) 1 0) 0))) (not (= (ite (>= (+ (str.len seed0_b) (- 1)) 0) 1 0) 0))) (not (= (ite (>= (+ (str.len seed0_a) (- 1)) 0) 1 0) 0))) (=> (str.prefixof (str.++ seed0_a "MiHu1AIvsozjF8hVqTyY") (str.++ seed0_a "vdiS5JYWzpXf4NELu2")) (str.contains (str.++ seed0_b "A") (str.++ seed0_b "Cul")))) (or (not (= (ite (>= (+ (str.len seed0_a) (- 1)) 0) 1 0) 0)) (=> (str.contains (str.++ seed0_a "W") (str.++ seed0_a "N08mWEyb1QcxwZKGV")) (str.prefixof (str.++ seed0_b "TH") (str.++ seed0_b "pm2X86"))))))
+(check-sat)
+(exit)

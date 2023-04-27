@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_value () String)
+(declare-fun seed0_key () String)
+(assert (and (or (and (and (and (and (and (and (and (and (and (not (= (ite (= (str.at (str.substr seed0_value 1 (- (str.len seed0_value) 1)) 0) " ") 1 0) 0)) (= (ite (= (str.len (str.substr seed0_value 1 (- (str.len seed0_value) 1))) 0) 1 0) 0)) (not (= (ite (= (str.at seed0_value 0) "\u{9}") 1 0) 0))) (= (ite (= (str.at seed0_value 0) " ") 1 0) 0)) (= (ite (= (str.len seed0_value) 0) 1 0) 0)) (not (= (ite (= seed0_key "www-authenticate") 1 0) 0))) (not (= (ite (= seed0_key "www-authenticate") 1 0) 0))) (>= 1 0)) (>= (- (str.len seed0_value) 1) 0)) (>= 1 0)) (xor (str.contains (str.++ seed0_key "ByCFA6U0DHpS5IRwX") (str.++ seed0_value "346k0VSxaQFUC1OAZed")) (str.< (str.++ seed0_value "nlJ") (str.++ seed0_value "")))) (or (>= (- (str.len seed0_value) 1) 0) (str.prefixof (str.++ seed0_key "D15dSmg") (str.++ seed0_key "jV0hLTJuEgmqAFpdceR")))))
+(check-sat)
+(exit)

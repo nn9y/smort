@@ -1,0 +1,7 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Bool)
+(declare-fun seed0_T_2 () Bool)
+(declare-fun seed0_var_0xINPUT_31495 () String)
+(assert (and (or (= seed0_T_1 (not (= "</div><img" seed0_var_0xINPUT_31495))) (or (str.prefixof (str.++ seed0_var_0xINPUT_31495 "VarI7i1") (str.++ seed0_var_0xINPUT_31495 "yO")) (str.prefixof (str.++ seed0_var_0xINPUT_31495 "Wg4N2K6TLpDyYjEGb") (str.++ seed0_var_0xINPUT_31495 "U3xYvqERojp5FJcIZlNL")))) (or (= seed0_T_2 (not seed0_T_1)) (=> (str.contains (str.++ seed0_var_0xINPUT_31495 "l3E") (str.++ seed0_var_0xINPUT_31495 "D9JdAY2z5c0")) (str.contains (str.++ seed0_var_0xINPUT_31495 "BK8Yj7ONUEJ5v3qpay4") (str.++ seed0_var_0xINPUT_31495 "glD")))) (or seed0_T_2 (not (str.contains (str.++ seed0_var_0xINPUT_31495 "KiwgD") (str.++ seed0_var_0xINPUT_31495 "SP5trTnV4gm3laGxI2cf"))))))
+(check-sat)
+(exit)

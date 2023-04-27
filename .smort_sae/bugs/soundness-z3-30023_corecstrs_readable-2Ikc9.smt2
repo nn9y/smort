@@ -1,0 +1,8 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Int)
+(declare-fun seed0_T_2 () Bool)
+(declare-fun seed0_T_3 () Bool)
+(declare-fun seed0_var_0xINPUT_250999 () String)
+(assert (and (or (>= seed0_T_1 (str.len seed0_var_0xINPUT_250999)) (or (<= (+ seed0_T_1 (- 840)) (- seed0_T_1 10)) (> (- seed0_T_1 (- 503)) (* seed0_T_1 seed0_T_1)))) (or (= seed0_T_2 (= seed0_T_1 0)) (or (>= (div seed0_T_1 seed0_T_1) (+ seed0_T_1 (- 806))) (<= (+ seed0_T_1 (- 953)) (* seed0_T_1 seed0_T_1)))) (or (= seed0_T_3 (not seed0_T_2)) (or (str.contains (str.++ seed0_var_0xINPUT_250999 "URMaFGI8TPq") (str.++ seed0_var_0xINPUT_250999 "lXpHwbtT5QKEMI36Y9mx")) (str.contains (str.++ seed0_var_0xINPUT_250999 "YN2JEQDMUl") (str.++ seed0_var_0xINPUT_250999 "9VMnJS5")))) (or seed0_T_3 (xor (str.contains (str.++ seed0_var_0xINPUT_250999 "oihnsM5wVxClfN") (str.++ seed0_var_0xINPUT_250999 "nU476")) (str.prefixof (str.++ seed0_var_0xINPUT_250999 "UHZ4sw35") (str.++ seed0_var_0xINPUT_250999 "0pysj5bCTN"))))))
+(check-sat)
+(exit)

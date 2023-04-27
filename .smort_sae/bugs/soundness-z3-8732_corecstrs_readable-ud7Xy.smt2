@@ -1,0 +1,7 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Bool)
+(declare-fun seed0_T_2 () Bool)
+(declare-fun seed0_var_0xINPUT_116877 () String)
+(assert (and (or (= seed0_T_1 (= "HbTCePicSe" seed0_var_0xINPUT_116877)) (=> (str.contains (str.++ seed0_var_0xINPUT_116877 "x") (str.++ seed0_var_0xINPUT_116877 "YM685fov3KgUX0Zc")) (str.suffixof (str.++ seed0_var_0xINPUT_116877 "cRP3t0Mh7s") (str.++ seed0_var_0xINPUT_116877 "Y8q16W03h49jgnJIBfKR")))) (or (= seed0_T_2 (not seed0_T_1)) (not (str.prefixof (str.++ seed0_var_0xINPUT_116877 "kBX") (str.++ seed0_var_0xINPUT_116877 "ztH046ojVq2CTe")))) (or seed0_T_2 (or (str.contains (str.++ seed0_var_0xINPUT_116877 "MauzXGJqmFoBVp5ZnIAO") (str.++ seed0_var_0xINPUT_116877 "fbw5USAg92zjIGuTVBsN")) (str.suffixof (str.++ seed0_var_0xINPUT_116877 "hHF0") (str.++ seed0_var_0xINPUT_116877 "U2"))))))
+(check-sat)
+(exit)

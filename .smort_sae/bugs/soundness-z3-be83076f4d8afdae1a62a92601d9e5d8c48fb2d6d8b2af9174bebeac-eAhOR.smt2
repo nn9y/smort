@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-fun seed0_s () String)
+(assert (and (or (and (and (and (and (and (and (and (and (and (not (= (ite (= (str.at seed0_s 1) (str.at seed0_s (- (str.len seed0_s) 1))) 1 0) 0)) (not (= (ite (>= (- (str.len seed0_s) 1) 1) 1 0) 0))) (not (= (ite (>= (- (str.len seed0_s) 1) 0) 1 0) 0))) (not (= (ite (> (str.len seed0_s) 1) 1 0) 0))) (= (ite (<= (- (str.len seed0_s) 1) 0) 1 0) 0)) (= (ite (< (- (str.len seed0_s) 1) 0) 1 0) 0)) (= (ite (<= (str.len seed0_s) 0) 1 0) 0)) (= (ite (= (str.at seed0_s 0) (str.at seed0_s (- (str.len seed0_s) 1))) 1 0) 0)) (not (= (ite (>= (- (str.len seed0_s) 1) 0) 1 0) 0))) (not (= (ite (>= (- (str.len seed0_s) 1) 0) 1 0) 0))) (xor (str.< (str.++ seed0_s "d1w5TnmXFGPh") (str.++ seed0_s "UyMp2")) (str.<= (str.++ seed0_s "") (str.++ seed0_s "ATr")))) (or (not (= (ite (> (str.len seed0_s) 0) 1 0) 0)) (str.suffixof (str.++ seed0_s "DAxXycWqgRFJ") (str.++ seed0_s "VQx")))))
+(check-sat)
+(exit)

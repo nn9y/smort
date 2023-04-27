@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_value () String)
+(declare-fun seed0_key () String)
+(assert (and (or (and (and (and (and (and (and (and (and (and (and (and (and (not (= (ite (= (str.at (str.substr seed0_value 1 (- (str.len seed0_value) 1)) 0) "\u{9}") 1 0) 0)) (= (ite (= (str.at (str.substr seed0_value 1 (- (str.len seed0_value) 1)) 0) " ") 1 0) 0)) (= (ite (= (str.len (str.substr seed0_value 1 (- (str.len seed0_value) 1))) 0) 1 0) 0)) (not (= (ite (= (str.at seed0_value 0) "\u{9}") 1 0) 0))) (= (ite (= (str.at seed0_value 0) " ") 1 0) 0)) (= (ite (= (str.len seed0_value) 0) 1 0) 0)) (not (= (ite (= seed0_key "www-authenticate") 1 0) 0))) (not (= (ite (= seed0_key "www-authenticate") 1 0) 0))) (>= 1 0)) (>= (- (str.len seed0_value) 1) 0)) (>= 1 0)) (>= (- (str.len seed0_value) 1) 0)) (>= 1 0)) (xor (str.< (str.++ seed0_value "u") (str.++ seed0_value "")) (str.contains (str.++ seed0_value "KWtRs9hrJcol3PxU") (str.++ seed0_value "b")))) (or (>= (- (str.len seed0_value) 1) 0) (xor (str.contains (str.++ seed0_value "ZTKWI2gf") (str.++ seed0_value "I")) (str.prefixof (str.++ seed0_key "") (str.++ seed0_key "r"))))))
+(check-sat)
+(exit)

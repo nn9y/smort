@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_pattern () String)
+(declare-fun seed0_str () String)
+(assert (and (or (and (and (and (and (= (ite (not (= (str.len seed0_pattern) 2)) 1 0) 0) (not (= (ite (= (str.len (str.substr seed0_str (+ (str.indexof seed0_str " " 0) 1) (- (str.len seed0_str) (+ (str.indexof seed0_str " " 0) 1)))) 0) 1 0) 0))) (not (= (ite (str.contains seed0_str " ") 1 0) 0))) (= (ite (= (str.len seed0_str) 0) 1 0) 0)) (>= (+ (str.indexof seed0_str " " 0) 1) 0)) (not (str.contains (str.++ seed0_pattern "k6cFbZCenIt50HGKN8s4") (str.++ seed0_str "H9C8LmbS")))) (or (>= (- (str.len seed0_str) (+ (str.indexof seed0_str " " 0) 1)) 0) (not (str.suffixof (str.++ seed0_pattern "VkgaCi") (str.++ seed0_pattern "AkEgD"))))))
+(check-sat)
+(exit)

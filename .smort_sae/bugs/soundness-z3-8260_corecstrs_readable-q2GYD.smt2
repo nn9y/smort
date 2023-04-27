@@ -1,0 +1,7 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Bool)
+(declare-fun seed0_T_2 () Bool)
+(declare-fun seed0_var_0xINPUT_80720 () String)
+(assert (and (or (= seed0_T_1 (not (= "labpixiesdata.appspot.com" seed0_var_0xINPUT_80720))) (or (str.prefixof (str.++ seed0_var_0xINPUT_80720 "MiHaO6YoFnm") (str.++ seed0_var_0xINPUT_80720 "nTRYI2rem4Ja0pWEcFwS")) (str.contains (str.++ seed0_var_0xINPUT_80720 "d") (str.++ seed0_var_0xINPUT_80720 "V86m9DyO5wFAz1BE2")))) (or (= seed0_T_2 (not seed0_T_1)) (xor (str.contains (str.++ seed0_var_0xINPUT_80720 "yLOFJPdbRomDHKpeCw") (str.++ seed0_var_0xINPUT_80720 "BWM0cD2d1zULNJyYCQm")) (str.suffixof (str.++ seed0_var_0xINPUT_80720 "a7") (str.++ seed0_var_0xINPUT_80720 "85XJqkAHGTVmfaF")))) (or seed0_T_2 (xor (str.< (str.++ seed0_var_0xINPUT_80720 "") (str.++ seed0_var_0xINPUT_80720 "lLj1sJTg7ZBhry")) (str.suffixof (str.++ seed0_var_0xINPUT_80720 "") (str.++ seed0_var_0xINPUT_80720 "LpBwSFvrPD8y3ed7h"))))))
+(check-sat)
+(exit)

@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-fun seed0_path () String)
+(assert (and (or (and (and (and (= (ite (= (str.len (str.substr seed0_path (+ (str.indexof seed0_path "/" 0) 1) (- (str.len seed0_path) (+ (str.indexof seed0_path "/" 0) 1)))) 0) 1 0) 0) (not (= (ite (str.contains seed0_path "/") 1 0) 0))) (= (ite (= (str.len seed0_path) 0) 1 0) 0)) (>= (+ (str.indexof seed0_path "/" 0) 1) 0)) (xor (str.prefixof (str.++ seed0_path "zfFSs39c4UPXOZbMEeHW") (str.++ seed0_path "NRw")) (str.<= (str.++ seed0_path "6yZiuwYCaKW1ke") (str.++ seed0_path "")))) (or (>= (- (str.len seed0_path) (+ (str.indexof seed0_path "/" 0) 1)) 0) (not (str.prefixof (str.++ seed0_path "ifzKStLRgya") (str.++ seed0_path "8PX4tnys9q"))))))
+(check-sat)
+(exit)

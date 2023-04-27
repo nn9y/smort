@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Bool)
+(declare-fun seed0_var_0xINPUT_100788 () String)
+(assert (and (or (= seed0_T_1 (= "-" seed0_var_0xINPUT_100788)) (=> (str.suffixof (str.++ seed0_var_0xINPUT_100788 "wK4shgAleix2SpN") (str.++ seed0_var_0xINPUT_100788 "z8rSnlWJF")) (str.suffixof (str.++ seed0_var_0xINPUT_100788 "WS9oGL2jw4") (str.++ seed0_var_0xINPUT_100788 "3HuF7MnptJxer6v8OBD1")))) (or seed0_T_1 (str.contains (str.++ seed0_var_0xINPUT_100788 "SYlkGJdcDrm3zb61THt") (str.++ seed0_var_0xINPUT_100788 "ig5mhU")))))
+(check-sat)
+(exit)

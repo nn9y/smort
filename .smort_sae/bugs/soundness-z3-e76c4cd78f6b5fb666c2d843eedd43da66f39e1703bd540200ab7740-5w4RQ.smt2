@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-fun seed0_url () String)
+(assert (or (= (ite (not (= (str.len seed0_url) 0)) 1 0) 0) (not (str.contains (str.++ seed0_url "8zRWuAvmItpyMo1P9i") (str.++ seed0_url "aR0whxUvWZzpg93rbY")))))
+(check-sat)
+(exit)

@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_guess () String)
+(declare-fun seed0_secret () String)
+(assert (and (or (and (and (and (= (ite (= (str.at seed0_guess 3) (str.at seed0_secret 3)) 1 0) 0) (not (= (ite (= (str.at seed0_guess 2) (str.at seed0_secret 2)) 1 0) 0))) (not (= (ite (= (str.at seed0_guess 1) (str.at seed0_secret 1)) 1 0) 0))) (not (= (ite (= (str.at seed0_guess 0) (str.at seed0_secret 0)) 1 0) 0))) (=> (str.<= (str.++ seed0_secret "TfnS") (str.++ seed0_guess "2tuHlgmQk3Pq")) (str.< (str.++ seed0_secret "") (str.++ seed0_secret "19vQCKsGWhJ0")))) (or (= (ite (<= (str.len seed0_secret) 0) 1 0) 0) (and (str.suffixof (str.++ seed0_secret "Jvk") (str.++ seed0_guess "WJ")) (str.suffixof (str.++ seed0_secret "") (str.++ seed0_guess "ZBRQWLVFyK13u"))))))
+(check-sat)
+(exit)

@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-fun seed0_T_1 () Bool)
+(declare-fun seed0_var_0xINPUT_157938 () String)
+(assert (and (or (= seed0_T_1 (not (= "file:" seed0_var_0xINPUT_157938))) (not (str.< (str.++ seed0_var_0xINPUT_157938 "9") (str.++ seed0_var_0xINPUT_157938 "th")))) (or seed0_T_1 (xor (str.< (str.++ seed0_var_0xINPUT_157938 "Qr9XIyAv") (str.++ seed0_var_0xINPUT_157938 "nqvI46UydO")) (str.< (str.++ seed0_var_0xINPUT_157938 "Qd49Fe6qLME8B") (str.++ seed0_var_0xINPUT_157938 "Q"))))))
+(check-sat)
+(exit)
